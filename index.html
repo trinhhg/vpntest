@@ -79,11 +79,11 @@
     </nav>
     <div class="h-[110px] md:h-[70px]"></div>
 
-    <div id="portalNav" class="hidden md:hidden fixed bottom-3 left-1/2 transform -translate-x-1/2 z-[60] bg-white/95 backdrop-blur-md shadow-[0_5px_20px_rgba(0,0,0,0.15)] rounded-full p-1.5 flex gap-1.5 whitespace-nowrap overflow-x-auto pkg-filters border border-slate-200">
-        <button onclick="switchPortalTab('p-home')" class="btn-nav-p-home portal-nav-btn active flex items-center justify-center text-slate-500 font-bold w-10 h-10 rounded-full text-lg transition-colors"><i class="fas fa-tv"></i></button>
-        <button onclick="switchPortalTab('p-store')" class="btn-nav-p-store portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-10 h-10 rounded-full text-lg transition-colors"><i class="fas fa-shopping-cart"></i></button>
-        <button onclick="switchPortalTab('p-ref')" class="btn-nav-p-ref portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-10 h-10 rounded-full text-lg transition-colors"><i class="fas fa-user-plus"></i></button>
-        <button onclick="switchPortalTab('p-guide')" class="btn-nav-p-guide portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-10 h-10 rounded-full text-lg transition-colors"><i class="fas fa-book"></i></button>
+    <div id="portalNav" class="hidden md:hidden fixed bottom-2 left-1/2 transform -translate-x-1/2 z-[60] bg-white/95 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.1)] rounded-full p-1.5 flex gap-2 whitespace-nowrap overflow-x-auto pkg-filters border border-slate-200">
+        <button onclick="switchPortalTab('p-home')" class="btn-nav-p-home portal-nav-btn active flex items-center justify-center text-slate-500 font-bold w-9 h-9 rounded-full text-base transition-colors"><i class="fas fa-tv"></i></button>
+        <button onclick="switchPortalTab('p-store')" class="btn-nav-p-store portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-9 h-9 rounded-full text-base transition-colors"><i class="fas fa-shopping-cart"></i></button>
+        <button onclick="switchPortalTab('p-ref')" class="btn-nav-p-ref portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-9 h-9 rounded-full text-base transition-colors"><i class="fas fa-user-plus"></i></button>
+        <button onclick="switchPortalTab('p-guide')" class="btn-nav-p-guide portal-nav-btn flex items-center justify-center text-slate-500 font-bold w-9 h-9 rounded-full text-base transition-colors"><i class="fas fa-book"></i></button>
     </div>
 
     <main class="flex-grow z-10 relative px-2 md:px-4 py-4 md:py-6 max-w-7xl mx-auto w-full overflow-x-hidden">
@@ -137,7 +137,7 @@
                                 </tr>
                             </thead>
                             <tbody id="historyTablePortal" class="divide-y divide-slate-100 bg-white">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -345,7 +345,7 @@
     </footer>
 
     <script>
-        const API_URL = "https://vpntrinhhg.pages.dev"; 
+        const API_URL = ""; // Để trống để tự động lấy local thông qua _worker.js Proxy
         const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         const SESSION_KEY = 'vpn_portal_session_24h';
         const DB_KEY = 'vpn_orders_db';
@@ -786,7 +786,6 @@
                 cmsCache = await apiGet("/api/cms");
                 showGuide('android');
 
-                // XỬ LÝ REFERRAL Ở CỔNG KHÁCH
                 let refsDb = await apiGet("/api/refs");
                 if(!Array.isArray(refsDb)) refsDb = [];
                 let myRef = refsDb.find(r => r.email === o.email);
@@ -812,7 +811,6 @@
                     document.getElementById('myRefLink').value = 'Hệ thống đang cập nhật...';
                 }
 
-                // XỬ LÝ ĐỒNG BỘ LỊCH SỬ
                 historiesDb = await apiGet("/api/history");
                 if(!Array.isArray(historiesDb)) historiesDb = [];
                 let myHistory = historiesDb.filter(h => h.email === o.email);
@@ -873,7 +871,6 @@
             document.querySelectorAll('.dev-btn').forEach(b => { b.classList.remove('active', 'border-indigo-500'); });
             document.getElementById('btn-dev-' + dev).classList.add('active', 'border-indigo-500');
             document.getElementById('guideContent').classList.remove('hidden');
-            // Cập nhật: Render HTML trực tiếp từ CMS, xóa lệnh tự động chèn <br> để tránh lỗi cách quá dài
             document.getElementById('guideText').innerHTML = cmsCache[dev] || i18n[lang].guide_empty;
         }
 
