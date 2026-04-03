@@ -43,7 +43,6 @@
            <button onclick="switchTab('tab-devices')" id="btn-tab-devices" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-laptop mr-2"></i>Thiết bị</button>
        </div>
 
-       <!-- TAB ĐƠN HÀNG -->
        <div id="tab-orders">
            <button onclick="openEditModal(null)" class="mb-4 bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-indigo-200 transition"><i class="fas fa-plus mr-2"></i>Tạo Đơn Thủ Công</button>
            <div class="glass-card overflow-x-auto">
@@ -56,7 +55,6 @@
            </div>
        </div>
 
-       <!-- TAB LỊCH SỬ -->
        <div id="tab-history" class="hidden glass-card p-5 md:p-8">
            <div class="flex justify-between items-center mb-4">
                <h2 class="text-xl font-bold">Lịch sử Mua hàng (Thêm Thủ Công)</h2>
@@ -79,7 +77,6 @@
            </div>
        </div>
 
-       <!-- TAB HẾT HẠN -->
        <div id="tab-exp" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-4">Quản lý Đơn hàng sắp hết hạn</h2>
            <p class="text-xs text-slate-500 mb-6">Hệ thống sẽ bôi đỏ các đơn hàng còn <= 3 ngày sử dụng để nhắc nhở gửi Email.</p>
@@ -99,7 +96,6 @@
            </div>
        </div>
 
-       <!-- TAB QUẢN LÝ LINK -->
        <div id="tab-links" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-2">Quản lý Link Sub Ẩn (Masked Link)</h2>
            <p class="text-xs text-slate-500 mb-6">Chỉ cần dán Link gốc (Liangxin). Hệ thống sẽ bẻ lái (Redirect 302) để đảm bảo độ ổn định tuyệt đối.</p>
@@ -133,7 +129,6 @@
            </div>
        </div>
 
-       <!-- TAB QUẢN LÝ REFERRAL -->
        <div id="tab-refs" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-4">Quản lý chương trình Mời Bạn (Referral)</h2>
            <p class="text-xs text-slate-500 mb-6">Hệ thống tính tự động 8% tiền hoa hồng cho mã. Bạn có thể chỉnh sửa thủ công nếu cần.</p>
@@ -153,7 +148,6 @@
            </div>
        </div>
 
-       <!-- TAB CMS & DEVICES -->
        <div id="tab-cms" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-4">Soạn thảo Hướng dẫn (CMS Editor)</h2>
            <div class="flex flex-wrap gap-2 mb-4">
@@ -187,7 +181,6 @@
        </div>
    </div>
 
-   <!-- MODAL ĐƠN HÀNG -->
    <div id="modalEdit" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
        <div class="glass-card p-5 md:p-8 w-full max-w-2xl max-h-[95vh] overflow-y-auto">
            <h3 class="text-xl md:text-2xl font-bold mb-4" id="modalTitle">Chỉnh sửa Đơn Hàng</h3>
@@ -246,7 +239,6 @@
        </div>
    </div>
 
-   <!-- MODAL THÊM LỊCH SỬ THỦ CÔNG -->
    <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
        <div class="glass-card p-6 w-full max-w-lg">
            <h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3>
@@ -279,7 +271,6 @@
        </div>
    </div>
 
-   <!-- MODAL SỬA LINK ẨN -->
    <div id="modalEditLink" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
        <div class="glass-card p-6 w-full max-w-lg">
            <h3 class="text-xl font-bold mb-4">Chỉnh sửa Link Sub</h3>
@@ -299,7 +290,6 @@
        </div>
    </div>
 
-   <!-- MODAL SỬA REFERRAL -->
    <div id="modalEditRef" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
        <div class="glass-card p-6 w-full max-w-sm">
            <h3 class="text-xl font-bold mb-4">Sửa Thống Kê Giới Thiệu</h3>
@@ -320,7 +310,8 @@
    </div>
 
    <script>
-       const API_URL = "https://vpntrinhhg.pages.dev"; 
+       // QUAN TRỌNG: Để trống API_URL để script gọi relative path qua _worker.js Proxy
+       const API_URL = ""; 
        const MY_PAGES_DOMAIN = "https://vpntrinhhg.pages.dev"; 
        const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         
