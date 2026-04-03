@@ -7,7 +7,7 @@ export default {
       const workerUrl = new URL(request.url);
       
       // QUAN TRỌNG: Đổi dòng này thành domain của con Worker TEST bạn vừa tạo
-      workerUrl.hostname = "https://vpn-worker-test.doicucden.workers.dev/"; 
+      workerUrl.hostname = "vpn-worker-test.doicucden.workers.dev/"; 
       
       // Chuyển tiếp toàn bộ gói tin sang Worker xử lý
       const newRequest = new Request(workerUrl.toString(), request);
