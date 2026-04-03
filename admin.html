@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>VPN Trinh Hg - Admin Panel</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+   <style>
+       @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+       body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+       .glass-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); border-radius: 1.5rem; }
+       .dev-btn.active { border-color: #4f46e5; background-color: #e0e7ff; color: #4338ca; }
+   </style>
+</head>
+<body class="min-h-screen pb-20 overflow-x-hidden">
+   <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+   <div id="loginScreen" class="fixed inset-0 bg-slate-50 z-50 flex items-center justify-center p-4">
+       <div class="glass-card p-8 md:p-10 w-full max-w-sm text-center">
+           <h2 class="text-2xl font-extrabold mb-8 text-slate-800">Admin Panel</h2>
+           <input type="password" id="adminPass" class="w-full bg-slate-100 rounded-xl p-4 text-center mb-4 outline-none font-bold tracking-widest" placeholder="Mật khẩu...">
+           <button onclick="checkAdminPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition"><i class="fas fa-sign-in-alt mr-2"></i>ĐĂNG NHẬP</button>
+       </div>
+   </div>
+
+   <div id="adminPanel" class="hidden max-w-7xl mx-auto p-4 md:p-8">
+       <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
+           <h1 class="text-xl md:text-2xl font-extrabold text-indigo-600">VPN Trinh Hg Admin</h1>
+           <div class="flex gap-2 w-full md:w-auto">
+               <button onclick="fetchAllData(true)" class="flex-1 md:flex-none bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-4 py-2.5 rounded-xl font-bold text-sm transition"><i class="fas fa-sync-alt mr-2"></i>Làm mới</button>
+               <button onclick="logoutAdmin()" class="flex-1 md:flex-none bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl font-bold text-sm transition"><i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất</button>
+           </div>
+       </div>
+
+       <div class="flex flex-wrap gap-2 mb-6">
+           <button onclick="switchTab('tab-orders')" id="btn-tab-orders" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-indigo-600 text-white shadow-md"><i class="fas fa-box mr-2"></i>Đơn hàng</button>
+           <button onclick="switchTab('tab-exp')" id="btn-tab-exp" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-clock mr-2"></i>Hết hạn</button>
+           <button onclick="switchTab('tab-history')" id="btn-tab-history" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-history mr-2"></i>Lịch sử</button>
+           <button onclick="switchTab('tab-links')" id="btn-tab-links" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-link mr-2"></i>Link Sub</button>
+           <button onclick="switchTab('tab-refs')" id="btn-tab-refs" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-users mr-2"></i>Mời Bạn</button>
+           <button onclick="switchTab('tab-cms')" id="btn-tab-cms" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-book mr-2"></i>Hướng dẫn</button>
+           <button onclick="switchTab('tab-devices')" id="btn-tab-devices" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-laptop mr-2"></i>Thiết bị</button>
+       </div>
+
+       <!-- TAB ĐƠN HÀNG -->
+       <div id="tab-orders">
+           <button onclick="openEditModal(null)" class="mb-4 bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-indigo-200 transition"><i class="fas fa-plus mr-2"></i>Tạo Đơn Thủ Công</button>
+           <div class="glass-card overflow-x-auto">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[900px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr><th class="p-4 md:p-5">Mã Đơn</th><th class="p-4 md:p-5">Thông tin Khách</th><th class="p-4 md:p-5">Gói VPN</th><th class="p-4 md:p-5">Trạng Thái</th><th class="p-4 md:p-5 text-right">Hành động</th></tr>
+                   </thead>
+                   <tbody id="orderTable" class="divide-y divide-slate-100"></tbody>
+               </table>
+           </div>
+       </div>
+
+       <!-- TAB LỊCH SỬ -->
+       <div id="tab-history" class="hidden glass-card p-5 md:p-8">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-xl font-bold">Lịch sử Mua hàng (Thêm Thủ Công)</h2>
+               <button onclick="openHistoryModal()" class="bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-indigo-200 transition"><i class="fas fa-plus mr-2"></i>Thêm Lịch Sử</button>
+           </div>
+           <p class="text-xs text-slate-500 mb-6">Thêm lịch sử vào đây để khách hàng thấy được bảng lịch sử trong tab Trang Chủ ở Cổng Khách Hàng. Sẽ tự cộng 8% hoa hồng cho mã Code Ref nếu có nhập.</p>
+           <div class="overflow-x-auto border border-slate-200 rounded-xl">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr>
+                           <th class="p-4">Email Khách</th>
+                           <th class="p-4">Gói & Dung Lượng</th>
+                           <th class="p-4">Mã Ref Tác Động</th>
+                           <th class="p-4">Ngày Hết Hạn</th>
+                           <th class="p-4 text-right">Xóa</th>
+                       </tr>
+                   </thead>
+                   <tbody id="historyTable" class="divide-y divide-slate-100 bg-white"></tbody>
+               </table>
+           </div>
+       </div>
+
+       <!-- TAB HẾT HẠN -->
+       <div id="tab-exp" class="hidden glass-card p-5 md:p-8">
+           <h2 class="text-xl font-bold mb-4">Quản lý Đơn hàng sắp hết hạn</h2>
+           <p class="text-xs text-slate-500 mb-6">Hệ thống sẽ bôi đỏ các đơn hàng còn <= 3 ngày sử dụng để nhắc nhở gửi Email.</p>
+           <div class="overflow-x-auto border border-slate-200 rounded-xl">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr>
+                           <th class="p-4">Mã Đơn</th>
+                           <th class="p-4">Email Khách</th>
+                           <th class="p-4">Ngày Hết Hạn</th>
+                           <th class="p-4">Còn lại</th>
+                           <th class="p-4 text-right">Nhắc nhở</th>
+                       </tr>
+                   </thead>
+                   <tbody id="expTable" class="divide-y divide-slate-100 bg-white"></tbody>
+               </table>
+           </div>
+       </div>
+
+       <!-- TAB QUẢN LÝ LINK -->
+       <div id="tab-links" class="hidden glass-card p-5 md:p-8">
+           <h2 class="text-xl font-bold mb-2">Quản lý Link Sub Ẩn (Masked Link)</h2>
+           <p class="text-xs text-slate-500 mb-6">Chỉ cần dán Link gốc (Liangxin). Hệ thống sẽ bẻ lái (Redirect 302) để đảm bảo độ ổn định tuyệt đối.</p>
+           
+           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6">
+               <div class="grid md:grid-cols-2 gap-4 mb-4">
+                   <div>
+                       <label class="block font-bold text-xs text-slate-700 mb-1">Link Gốc (Liangxin / Djjc)</label>
+                       <input type="text" id="linkOrigInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm" placeholder="https://liangxin.xyz/api/v1/liangxin?OwO=...">
+                   </div>
+                   <div>
+                       <label class="block font-bold text-xs text-slate-700 mb-1">Email Khách Hàng (Tùy chọn)</label>
+                       <input type="text" id="linkEmailInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="Ví dụ: khachhang@gmail.com">
+                   </div>
+               </div>
+               <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> TẠO & LƯU LINK ẨN</button>
+           </div>
+
+           <div class="overflow-x-auto border border-slate-200 rounded-xl">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[700px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr>
+                           <th class="p-4 w-1/4">Email Khách</th>
+                           <th class="p-4 w-1/3">Link Gốc</th>
+                           <th class="p-4 w-1/3">Link Đã Ẩn (Gửi Khách)</th>
+                           <th class="p-4 text-right">Hành động</th>
+                       </tr>
+                   </thead>
+                   <tbody id="linksTable" class="divide-y divide-slate-100 bg-white"></tbody>
+               </table>
+           </div>
+       </div>
+
+       <!-- TAB QUẢN LÝ REFERRAL -->
+       <div id="tab-refs" class="hidden glass-card p-5 md:p-8">
+           <h2 class="text-xl font-bold mb-4">Quản lý chương trình Mời Bạn (Referral)</h2>
+           <p class="text-xs text-slate-500 mb-6">Hệ thống tính tự động 8% tiền hoa hồng cho mã. Bạn có thể chỉnh sửa thủ công nếu cần.</p>
+           <div class="overflow-x-auto border border-slate-200 rounded-xl">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr>
+                           <th class="p-4">Email Khách</th>
+                           <th class="p-4">Mã Giới Thiệu Của Khách</th>
+                           <th class="p-4">Số lượng hoàn thành</th>
+                           <th class="p-4">Hoa Hồng (VNĐ)</th>
+                           <th class="p-4 text-right">Hành động</th>
+                       </tr>
+                   </thead>
+                   <tbody id="refsTable" class="divide-y divide-slate-100 bg-white"></tbody>
+               </table>
+           </div>
+       </div>
+
+       <!-- TAB CMS & DEVICES -->
+       <div id="tab-cms" class="hidden glass-card p-5 md:p-8">
+           <h2 class="text-xl font-bold mb-4">Soạn thảo Hướng dẫn (CMS Editor)</h2>
+           <div class="flex flex-wrap gap-2 mb-4">
+               <button onclick="changeCmsDevice('android')" id="cms-btn-android" class="dev-btn active border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-android text-green-500 mr-2"></i> Android</button>
+               <button onclick="changeCmsDevice('windows')" id="cms-btn-windows" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-windows text-blue-500 mr-2"></i> Windows</button>
+               <button onclick="changeCmsDevice('macos')" id="cms-btn-macos" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-apple text-slate-800 mr-2"></i> MacOS</button>
+               <button onclick="changeCmsDevice('ios')" id="cms-btn-ios" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-app-store-ios text-blue-400 mr-2"></i> iOS</button>
+           </div>
+           <div class="bg-slate-50 p-3 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
+               <button onclick="insertMacro('header')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-purple-600 hover:bg-purple-50 transition"><i class="fas fa-layer-group mr-1"></i> Header Tổng</button>
+               <button onclick="insertMacro('title')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-heading mr-1"></i> Mục Nhỏ</button>
+               <button onclick="insertMacro('step')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-list-ol mr-1"></i> Bước Cài</button>
+               <button onclick="insertMacro('note')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-orange-600 hover:bg-orange-50 transition"><i class="fas fa-exclamation-triangle mr-1"></i> Lưu ý</button>
+               <button onclick="insertMacro('btn')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition"><i class="fas fa-download mr-1"></i> Nút Tải Động</button>
+               <button onclick="insertMacro('img')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-pink-600 hover:bg-pink-50 transition"><i class="fas fa-image mr-1"></i> Ảnh</button>
+           </div>
+           <textarea id="cmsGuide" rows="16" class="w-full p-4 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-sm leading-relaxed resize-y overflow-x-hidden" placeholder="Soạn nội dung HTML..."></textarea>
+           <button onclick="saveCmsToCloud()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-md w-full md:w-auto transition"><i class="fas fa-save mr-2"></i> LƯU LÊN MÁY CHỦ</button>
+       </div>
+
+       <div id="tab-devices" class="hidden glass-card p-5 md:p-8">
+           <h2 class="text-xl font-bold mb-4">Các thiết bị được phép vào Admin</h2>
+           <div class="overflow-x-auto">
+               <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
+                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr><th class="p-4">ID Thiết bị</th><th class="p-4">Trình duyệt / Thiết bị</th><th class="p-4">Ngày cấp</th><th class="p-4 text-right">Xóa</th></tr>
+                   </thead>
+                   <tbody id="devicesTable" class="divide-y divide-slate-100"></tbody>
+               </table>
+           </div>
+       </div>
+   </div>
+
+   <!-- MODAL ĐƠN HÀNG -->
+   <div id="modalEdit" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="glass-card p-5 md:p-8 w-full max-w-2xl max-h-[95vh] overflow-y-auto">
+           <h3 class="text-xl md:text-2xl font-bold mb-4" id="modalTitle">Chỉnh sửa Đơn Hàng</h3>
+           
+           <div class="grid md:grid-cols-2 gap-3 mb-3">
+               <div>
+                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Mã Đơn</label>
+                   <div class="flex">
+                       <input type="text" id="editId" class="w-full p-2 text-sm border rounded-l-lg bg-white font-mono font-bold outline-none focus:border-indigo-500">
+                       <button onclick="document.getElementById('editId').value = generateRandomId()" class="bg-slate-200 px-3 text-xs font-bold rounded-r-lg border border-l-0 border-slate-300 hover:bg-slate-300">Tạo mã</button>
+                   </div>
+               </div>
+               <div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Email Khách</label><input type="text" id="editEmail" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500"></div>
+           </div>
+
+           <div class="grid md:grid-cols-2 gap-3 mb-3">
+               <div>
+                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Ngày hết hạn (VD: 30/12/2026)</label>
+                   <input type="text" id="editExpDate" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
+                   <p class="text-[10px] text-indigo-500 font-bold mt-1 italic">*Nhập lần đầu & duyệt Thành Công sẽ tự sinh Code Ref và Lưu bảng Lịch Sử.</p>
+               </div>
+               <div>
+                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
+                   <select id="editPkg" class="w-full p-2 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select>
+               </div>
+           </div>
+
+           <div class="mb-4">
+               <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Trạng Thái Đơn</label>
+               <select id="editStatus" class="w-full p-2.5 text-sm border rounded-lg font-bold outline-none" onchange="toggleStatusFields()">
+                   <option value="pending">⏳ Đang chờ duyệt (Pending)</option>
+                   <option value="success">✅ Kích hoạt Thành công (Cấp Link)</option>
+                   <option value="failed">❌ Bị Từ chối / Lỗi</option>
+               </select>
+           </div>
+
+           <div id="fieldSuccess" class="hidden mb-4 p-3 border-l-4 border-green-500 bg-green-50 rounded-r-lg">
+               <label class="block font-bold text-xs md:text-sm mb-1 text-green-700">Link Đăng Ký (Subscription URL)</label>
+               <input type="text" id="editLink" class="w-full p-2 text-sm border border-green-200 rounded-lg font-mono outline-none" placeholder="Dán link VPN vào đây...">
+           </div>
+
+           <div id="fieldFailed" class="hidden mb-4 p-3 border-l-4 border-red-500 bg-red-50 rounded-r-lg">
+               <label class="block font-bold text-xs md:text-sm mb-1 text-red-700">Lý do từ chối</label>
+               <input type="text" id="editReason" class="w-full p-2 text-sm border border-red-200 rounded-lg outline-none" placeholder="Ví dụ: Chưa nhận được tiền...">
+           </div>
+
+           <div class="flex items-center mb-5 bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
+               <input type="checkbox" id="sendMailCheck" class="w-4 h-4 mr-3 accent-indigo-600" checked>
+               <label for="sendMailCheck" class="font-bold text-xs md:text-sm text-slate-700">Gửi Email thông báo trạng thái cho khách</label>
+           </div>
+
+           <div class="flex gap-2">
+               <button onclick="saveOrderToCloud()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm"><i class="fas fa-save mr-2"></i>LƯU</button>
+               <button onclick="document.getElementById('modalEdit').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-lg hover:bg-slate-300 text-sm"><i class="fas fa-times mr-2"></i>Hủy</button>
+           </div>
+       </div>
+   </div>
+
+   <!-- MODAL THÊM LỊCH SỬ THỦ CÔNG -->
+   <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="glass-card p-6 w-full max-w-lg">
+           <h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3>
+           
+           <div class="mb-4">
+               <label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label>
+               <input type="text" id="histEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500">
+           </div>
+
+           <div class="mb-4">
+               <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
+               <select id="histPkg" class="w-full p-3 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select>
+           </div>
+
+           <div class="grid grid-cols-2 gap-4 mb-4">
+               <div>
+                   <label class="block font-bold text-xs text-slate-600 mb-1">Ngày Hết Hạn</label>
+                   <input type="text" id="histExp" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
+               </div>
+               <div>
+                   <label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref (Để cộng 8%)</label>
+                   <input type="text" id="histRef" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 uppercase" placeholder="Bỏ trống nếu không có">
+               </div>
+           </div>
+
+           <div class="flex gap-2">
+               <button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM LỊCH SỬ</button>
+               <button onclick="document.getElementById('modalHistory').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
+           </div>
+       </div>
+   </div>
+
+   <!-- MODAL SỬA LINK ẨN -->
+   <div id="modalEditLink" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="glass-card p-6 w-full max-w-lg">
+           <h3 class="text-xl font-bold mb-4">Chỉnh sửa Link Sub</h3>
+           <input type="hidden" id="editLinkId">
+           <div class="mb-4">
+               <label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label>
+               <input type="text" id="editLinkEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500">
+           </div>
+           <div class="mb-4">
+               <label class="block font-bold text-xs text-slate-600 mb-1">Link Gốc (Liangxin)</label>
+               <input type="text" id="editLinkOrig" class="w-full p-3 text-sm font-mono border rounded-lg outline-none focus:border-indigo-500">
+           </div>
+           <div class="flex gap-2">
+               <button onclick="saveLinkEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>LƯU THAY ĐỔI</button>
+               <button onclick="document.getElementById('modalEditLink').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
+           </div>
+       </div>
+   </div>
+
+   <!-- MODAL SỬA REFERRAL -->
+   <div id="modalEditRef" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="glass-card p-6 w-full max-w-sm">
+           <h3 class="text-xl font-bold mb-4">Sửa Thống Kê Giới Thiệu</h3>
+           <input type="hidden" id="editRefEmail">
+           <div class="mb-4">
+               <label class="block font-bold text-xs text-slate-600 mb-1">Số lượt hoàn thành</label>
+               <input type="number" id="editRefCount" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 font-bold">
+           </div>
+           <div class="mb-4">
+               <label class="block font-bold text-xs text-slate-600 mb-1">Hoa hồng (VNĐ)</label>
+               <input type="number" id="editRefCommission" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 font-bold">
+           </div>
+           <div class="flex gap-2">
+               <button onclick="saveRefEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>LƯU</button>
+               <button onclick="document.getElementById('modalEditRef').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
+           </div>
+       </div>
+   </div>
+
+   <script>
+       const API_URL = "https://vpntrinhhg.pages.dev"; 
+       const MY_PAGES_DOMAIN = "https://vpntrinhhg.pages.dev"; 
+       const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
+        
+       let ordersDb = []; let cmsDb = {}; let adminDevices = []; let linksDb = []; let refsDb = []; let historyDb = [];
+       let currentCmsDevice = 'android'; let refreshInterval; let myDeviceId = '';
+
+       const packageOptions = [
+           { txt: "Gói 1 tháng - 50.000đ / 2$ / 12.5¥ (100GB)", vnd: 50000, data: "100GB" },
+           { txt: "Gói 1 tháng - 60.000đ / 3$ / 15¥ (500GB)", vnd: 60000, data: "500GB" },
+           { txt: "Gói 1 tháng - 70.000đ / 4$ / 17.5¥ (1000GB)", vnd: 70000, data: "1000GB" },
+           { txt: "Gói Cao Cấp - 200.000đ / 8$ / 50¥ (3000GB)", vnd: 200000, data: "3000GB" },
+           { txt: "Gói 1 Năm - 710.000đ / 27$ / 177.5¥ (200GB/tháng)", vnd: 710000, data: "200GB/tháng" },
+           { txt: "Không Giới Hạn - 70.000đ / 4$ / 17.5¥ (200GB)", vnd: 70000, data: "200GB" },
+           { txt: "Không Giới Hạn - 200.000đ / 8$ / 50¥ (2000GB)", vnd: 200000, data: "2000GB" },
+           { txt: "Không Giới Hạn - 710.000đ / 27$ / 177.5¥ (6000GB)", vnd: 710000, data: "6000GB" }
+       ];
+
+       function showToast(msg, type = 'success') {
+           const container = document.getElementById('toastContainer');
+           const toast = document.createElement('div');
+           const bg = type === 'error' ? 'bg-red-500' : (type === 'info' ? 'bg-blue-500' : 'bg-green-500');
+           const icon = type === 'error' ? 'fa-times-circle' : (type === 'info' ? 'fa-info-circle' : 'fa-check-circle');
+           toast.className = `${bg} text-white px-4 md:px-6 py-3 rounded-xl shadow-xl flex items-center transform transition-all duration-300 translate-x-full opacity-0 w-[90vw] max-w-sm mb-2`;
+           toast.innerHTML = `<i class="fas ${icon} mr-2 shrink-0"></i><span class="font-bold text-xs md:text-sm">${msg}</span>`;
+           container.appendChild(toast);
+           setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
+           setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+       async function apiGet(path) {
+           try {
+               let res = await fetch(API_URL + path + "?_t=" + Date.now());
+               if(!res.ok) throw new Error("HTTP error");
+               let data = await res.json();
+               localStorage.setItem(path.replace(/\//g,'_'), JSON.stringify(data));
+               return data;
+           } catch(e) {
+               return JSON.parse(localStorage.getItem(path.replace(/\//g,'_'))) || [];
+           }
+        }
+       async function apiPost(path, data) {
+           localStorage.setItem(path.replace(/\//g,'_'), JSON.stringify(data)); 
+           try { await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) }); } 
+           catch(e) {}
+        }
+
+       window.onload = async function() {
+           myDeviceId = localStorage.getItem("admin_device_id");
+           if(!myDeviceId) {
+               myDeviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+               localStorage.setItem("admin_device_id", myDeviceId);
+           }
+           adminDevices = await apiGet("/api/devices");
+           if(!Array.isArray(adminDevices)) adminDevices = [];
+           if(adminDevices.find(x => x.id === myDeviceId)) doLoginSuccess();
+        }
+
+       async function checkAdminPassword() {
+           if(document.getElementById('adminPass').value === "572007") {
+               adminDevices = await apiGet("/api/devices");
+               if(!Array.isArray(adminDevices)) adminDevices = [];
+               if(!adminDevices.find(x => x.id === myDeviceId)) {
+                   adminDevices.push({ id: myDeviceId, userAgent: navigator.userAgent.substring(0, 50) + "...", date: new Date().toLocaleString() });
+                   await apiPost("/api/devices", adminDevices);
+               }
+               doLoginSuccess();
+           } else showToast("Sai mật khẩu!", "error");
+        }
+
+       async function doLoginSuccess() {
+           document.getElementById('loginScreen').classList.add('hidden');
+           document.getElementById('adminPanel').classList.remove('hidden');
+           
+           const opts = packageOptions.map((p, idx) => `<option value="${idx}">${p.txt}</option>`).join('');
+           document.getElementById('editPkg').innerHTML = opts;
+           document.getElementById('histPkg').innerHTML = opts;
+
+           showToast("Đăng nhập thành công!", "info");
+           await fetchAllData();
+           refreshInterval = setInterval(async () => {
+               if(document.getElementById('modalEdit').classList.contains('hidden') && document.getElementById('modalEditLink').classList.contains('hidden') && document.getElementById('modalEditRef').classList.contains('hidden') && document.getElementById('modalHistory').classList.contains('hidden')) { 
+                   await fetchOrdersSilently(); 
+               }
+           }, 10000);
+        }
+
+       function logoutAdmin() { localStorage.removeItem("admin_device_id"); location.reload(); }
+
+       function switchTab(t) {
+           ['tab-orders', 'tab-exp', 'tab-history', 'tab-links', 'tab-refs', 'tab-cms', 'tab-devices'].forEach(tab => document.getElementById(tab).classList.add('hidden'));
+           document.getElementById(t).classList.remove('hidden');
+           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links', 'btn-tab-refs', 'btn-tab-cms', 'btn-tab-devices'].forEach(btn => {
+               document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200";
+           });
+           document.getElementById('btn-'+t).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-indigo-600 text-white shadow-md";
+           if(t === 'tab-exp') renderExpTable();
+        }
+
+       async function fetchAllData(showManualToast = false) {
+           ordersDb = await apiGet("/api/orders"); if(!Array.isArray(ordersDb)) ordersDb = []; renderOrders(); 
+           linksDb = await apiGet("/api/links"); if(!Array.isArray(linksDb)) linksDb = []; renderLinks();
+           refsDb = await apiGet("/api/refs"); if(!Array.isArray(refsDb)) refsDb = []; renderRefs();
+           historyDb = await apiGet("/api/history"); if(!Array.isArray(historyDb)) historyDb = []; renderHistory();
+           await fetchCms(); renderDevices();
+           if(showManualToast) showToast("Dữ liệu đã cập nhật!", "success");
+        }
+
+       async function fetchOrdersSilently() {
+           let newOrders = await apiGet("/api/orders"); if(!Array.isArray(newOrders)) newOrders = [];
+           if(JSON.stringify(newOrders) !== JSON.stringify(ordersDb)) { ordersDb = newOrders; renderOrders(); showToast("Đã có Đơn hàng mới!", "info"); }
+           
+           let newRefs = await apiGet("/api/refs"); if(!Array.isArray(newRefs)) newRefs = [];
+           if(JSON.stringify(newRefs) !== JSON.stringify(refsDb)) { refsDb = newRefs; renderRefs(); }
+           
+           let newHist = await apiGet("/api/history"); if(!Array.isArray(newHist)) newHist = [];
+           if(JSON.stringify(newHist) !== JSON.stringify(historyDb)) { historyDb = newHist; renderHistory(); }
+        }
+
+       function parseDateString(dateString) {
+           if (!dateString) return null;
+           const parts = dateString.split('/');
+           if (parts.length >= 3) {
+               return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T23:59:59`);
+           }
+           return null;
+       }
+
+       function renderExpTable() {
+           const tbody = document.getElementById('expTable'); tbody.innerHTML = '';
+           const now = new Date();
+           
+           ordersDb.filter(o => o.status === 'success' && o.expDate).forEach(o => {
+               const exp = parseDateString(o.expDate);
+               if(exp) {
+                   const diffTime = exp - now;
+                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                   
+                   const isDanger = diffDays <= 3;
+                   const rowClass = isDanger ? 'bg-red-50 border-red-200' : 'hover:bg-slate-50 border-b';
+                   const textClass = isDanger ? 'text-red-600 font-black' : 'text-slate-600';
+                   const displayDays = diffDays > 0 ? `${diffDays} Ngày` : 'Đã Hết Hạn';
+
+                   tbody.innerHTML += `<tr class="${rowClass} transition">
+                       <td class="p-4 font-mono font-bold text-indigo-600">${o.id} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.id}')"></i></td>
+                       <td class="p-4 font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i></td>
+                       <td class="p-4 font-bold text-slate-600">${o.expDate}</td>
+                       <td class="p-4 ${textClass}">${displayDays}</td>
+                       <td class="p-4 text-right whitespace-nowrap">
+                           ${isDanger ? `<button onclick="sendExpWarningMail('${o.id}')" class="text-white font-bold px-3 py-1.5 bg-red-500 rounded-lg text-xs hover:bg-red-600 shadow-md"><i class="fas fa-envelope mr-1"></i>Nhắc nạp tiền</button>` : `<span class="text-xs text-slate-400 italic">Chưa đến hạn</span>`}
+                       </td>
+                   </tr>`;
+               }
+           });
+       }
+
+       async function sendExpWarningMail(id) {
+           const o = ordersDb.find(x => x.id === id);
+           if(!o || !o.email) return showToast("Không có email khách!", "error");
+           
+           if(confirm(`Gửi mail nhắc gia hạn cho ${o.email}?`)) {
+               let subject = "VPN Trinh Hg - Thông báo Gói VPN sắp hết hạn";
+               let contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
+                   <p style="margin:0 0 10px 0; color:#475569; font-size:13px; line-height:1.5;">Cần hỗ trợ gia hạn? Đội ngũ của chúng tôi sẵn sàng 24/7</p>
+                   <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0ea5e9; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:5px; font-size:13px;">Chat Zalo</a>
+                   <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#3b82f6; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; font-size:13px;">Messenger</a>
+               </div>`;
+
+               let msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+                   <div style="background:linear-gradient(135deg, #ef4444, #dc2626); padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">GÓI VPN SẮP HẾT HẠN</h2></div>
+                   <div style="padding:20px; box-sizing:border-box;">
+                       <p style="font-size:14px; line-height:1.5;">Xin chào, Gói VPN <b>${o.pkgName}</b> của bạn sắp hết hạn.</p>
+                       <div style="background:#fef2f2; border-left:4px solid #ef4444; padding:15px; border-radius:8px; margin:20px 0; text-align:center; word-break:break-all;">
+                           <p style="margin:0; font-size:11px; color:#991b1b; font-weight:bold;">MÃ ĐƠN HÀNG HIỆN TẠI</p>
+                           <p style="margin:5px 0 0 0; font-size:22px; font-weight:900; color:#dc2626; letter-spacing:1px;">${o.id}</p>
+                           <p style="margin:5px 0 0 0; font-size:12px; color:#991b1b;">Ngày hết hạn: <b>${o.expDate}</b></p>
+                       </div>
+                       <div style="text-align:center; margin:20px 0;">
+                           <a href="https://vpntrinhhg.pages.dev" style="background:#1e293b; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; max-width:100%; box-sizing:border-box; font-size:14px;">GIA HẠN NGAY TẠI CỔNG KHÁCH HÀNG</a>
+                           <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Đăng nhập bằng <b>Mã Đơn Hàng</b> để chọn gia hạn tránh gián đoạn dịch vụ.</i></p>
+                       </div>
+                       ${contactBlock}
+                   </div></div>`;
+
+               showToast("Đang gửi mail...", "info");
+               try { 
+                   await fetch(GOOGLE_MAIL_API, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({to: o.email, subject: subject, html: msg}) }); 
+                   showToast("Đã gửi thông báo gia hạn!", "success");
+               } catch(e){ showToast("Lỗi gửi mail!", "error"); }
+           }
+       }
+
+       function renderHistory() {
+           const tbody = document.getElementById('historyTable'); tbody.innerHTML = '';
+           historyDb.forEach((h, idx) => {
+               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                   <td class="p-4 font-bold text-slate-800">${h.email}</td>
+                   <td class="p-4 font-medium text-slate-600 text-xs">${h.pkgName} <span class="text-indigo-600 font-bold">(${h.data})</span></td>
+                   <td class="p-4 font-mono font-bold text-orange-600">${h.refCode || 'Không'}</td>
+                   <td class="p-4 font-bold text-slate-600">${h.expDate || 'Không có'}</td>
+                   <td class="p-4 text-right">
+                       <button onclick="deleteHistory(${idx})" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button>
+                   </td>
+               </tr>`;
+           });
+       }
+
+       function openHistoryModal() {
+           document.getElementById('histEmail').value = '';
+           document.getElementById('histExp').value = '';
+           document.getElementById('histRef').value = '';
+           document.getElementById('histPkg').selectedIndex = 0;
+           document.getElementById('modalHistory').classList.remove('hidden');
+       }
+
+       async function saveHistory() {
+           const email = document.getElementById('histEmail').value.trim();
+           const pkgIdx = document.getElementById('histPkg').value;
+           const expDate = document.getElementById('histExp').value.trim();
+           const refCode = document.getElementById('histRef').value.trim().toUpperCase();
+
+           if(!email) return showToast("Vui lòng nhập Email", "error");
+
+           const selectedPkg = packageOptions[pkgIdx];
+           const newHist = {
+               email: email,
+               pkgName: selectedPkg.txt.split(' - ')[0],
+               priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0],
+               data: selectedPkg.data,
+               vnd: selectedPkg.vnd,
+               expDate: expDate,
+               refCode: refCode,
+               date: new Date().toLocaleString()
+           };
+
+           if (refCode) {
+               let r = refsDb.find(x => x.code === refCode);
+               if(r) {
+                   r.count = (r.count || 0) + 1;
+                   r.commission = (r.commission || 0) + (selectedPkg.vnd * 0.08);
+                   await apiPost("/api/refs", refsDb);
+                   renderRefs();
+               }
+           }
+
+           historyDb.unshift(newHist);
+           await apiPost("/api/history", historyDb);
+           renderHistory();
+           document.getElementById('modalHistory').classList.add('hidden');
+           showToast("Đã thêm lịch sử mua hàng!", "success");
+       }
+
+       async function deleteHistory(idx) {
+           if(confirm('Xóa lịch sử này?')) {
+               historyDb.splice(idx, 1);
+               await apiPost("/api/history", historyDb);
+               renderHistory();
+               showToast("Đã xóa!", "info");
+           }
+       }
+
+       function renderLinks() {
+           const tbody = document.getElementById('linksTable'); tbody.innerHTML = '';
+           linksDb.forEach((l) => {
+               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                   <td class="p-4 font-bold text-slate-800">${l.email || '<span class="text-slate-400 italic">Trống</span>'}</td>
+                   <td class="p-4">
+                       <div class="flex items-center w-full">
+                           <input type="text" value="${l.orig}" readonly class="bg-transparent border-none outline-none font-mono text-[11px] text-slate-500 w-full min-w-[200px] cursor-text" onclick="this.select()">
+                           <button onclick="copyText('${l.orig}')" class="text-slate-600 hover:text-indigo-600 p-1 shrink-0 ml-1"><i class="fas fa-copy"></i></button>
+                       </div>
+                   </td>
+                   <td class="p-4">
+                       <div class="flex items-center w-full">
+                           <input type="text" value="${l.masked}" readonly class="bg-transparent border-none outline-none font-mono text-[11px] text-blue-600 font-bold w-full min-w-[200px] cursor-text" onclick="this.select()">
+                           <button onclick="copyText('${l.masked}')" class="text-blue-600 hover:text-indigo-600 p-1 shrink-0 ml-1"><i class="fas fa-copy"></i></button>
+                       </div>
+                   </td>
+                   <td class="p-4 text-right whitespace-nowrap">
+                       <button onclick="openEditLink('${l.id}')" class="text-indigo-600 font-bold px-3 py-1.5 bg-indigo-50 rounded-lg text-xs mr-1 hover:bg-indigo-100"><i class="fas fa-pen mr-1"></i>Sửa</button>
+                       <button onclick="deleteLink('${l.id}')" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash mr-1"></i>Xóa</button>
+                   </td>
+               </tr>`;
+           });
+        }
+        
+       function renderRefs() {
+           const tbody = document.getElementById('refsTable'); tbody.innerHTML = '';
+           refsDb.forEach((r) => {
+               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                   <td class="p-4 font-bold text-slate-800">${r.email || 'Không rõ'}</td>
+                   <td class="p-4 font-mono font-bold text-indigo-600 text-base">${r.code}</td>
+                   <td class="p-4"><span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-lg">${r.count || 0}</span></td>
+                   <td class="p-4 font-black text-yellow-600">${(r.commission || 0).toLocaleString('vi-VN')}đ</td>
+                   <td class="p-4 text-right whitespace-nowrap">
+                       <button onclick="openEditRef('${r.email}')" class="text-indigo-600 font-bold px-3 py-1.5 bg-indigo-50 rounded-lg text-xs hover:bg-indigo-100"><i class="fas fa-pen mr-1"></i>Sửa Số Lượng</button>
+                   </td>
+               </tr>`;
+           });
+       }
+
+       function copyText(txt) { navigator.clipboard.writeText(txt); showToast("Đã Copy!", "success"); }
+
+       async function createAndSaveLink() {
+           const orig = document.getElementById('linkOrigInput').value.trim();
+           const email = document.getElementById('linkEmailInput').value.trim();
+           if (!orig) return showToast("Vui lòng dán link gốc!", "error");
+
+           try {
+               const urlObj = new URL(orig);
+               let masked = "";
+               const profileName = "#VPNTrinhHg";
+               
+               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1/VPNTrinhHg" + urlObj.search + profileName;
+               else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2/VPNTrinhHg" + urlObj.search + profileName;
+               else return showToast("Tên miền link gốc chưa được hỗ trợ!", "error");
+
+               const newLink = { id: 'LNK-' + Date.now(), orig, masked, email, date: new Date().toLocaleString() };
+               linksDb.unshift(newLink);
+               await apiPost("/api/links", linksDb);
+               
+               renderLinks();
+               document.getElementById('linkOrigInput').value = '';
+               document.getElementById('linkEmailInput').value = '';
+               showToast("Đã tạo và lưu Link Ẩn!", "success");
+           } catch (error) { showToast("Đường dẫn gốc không hợp lệ!", "error"); }
+        }
+
+       function openEditLink(id) {
+           const l = linksDb.find(x => x.id === id);
+           document.getElementById('editLinkId').value = l.id;
+           document.getElementById('editLinkEmail').value = l.email || '';
+           document.getElementById('editLinkOrig').value = l.orig;
+           document.getElementById('modalEditLink').classList.remove('hidden');
+        }
+
+       async function saveLinkEdit() {
+           const id = document.getElementById('editLinkId').value;
+           const orig = document.getElementById('editLinkOrig').value.trim();
+           const email = document.getElementById('editLinkEmail').value.trim();
+           
+           let masked = "";
+           try {
+               const urlObj = new URL(orig);
+               const profileName = "#VPNTrinhHg";
+               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1/VPNTrinhHg" + urlObj.search + profileName;
+               else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2/VPNTrinhHg" + urlObj.search + profileName;
+               else return showToast("Tên miền gốc chưa được hỗ trợ!", "error");
+           } catch(e) { return showToast("Đường dẫn không hợp lệ!", "error"); }
+
+           const l = linksDb.find(x => x.id === id);
+           l.orig = orig; l.masked = masked; l.email = email;
+           await apiPost("/api/links", linksDb);
+           renderLinks(); document.getElementById('modalEditLink').classList.add('hidden'); showToast("Đã cập nhật!", "success");
+        }
+
+       async function deleteLink(id) {
+           if(confirm('Xóa vĩnh viễn Link Sub này?')) {
+               linksDb = linksDb.filter(x => x.id !== id); await apiPost("/api/links", linksDb);
+               renderLinks(); showToast("Đã xóa Link!", "info");
+           }
+        }
+        
+       function openEditRef(email) {
+           const r = refsDb.find(x => x.email === email);
+           document.getElementById('editRefEmail').value = r.email;
+           document.getElementById('editRefCount').value = r.count || 0;
+           document.getElementById('editRefCommission').value = r.commission || 0;
+           document.getElementById('modalEditRef').classList.remove('hidden');
+       }
+
+       async function saveRefEdit() {
+           const email = document.getElementById('editRefEmail').value;
+           const count = parseInt(document.getElementById('editRefCount').value);
+           const commission = parseInt(document.getElementById('editRefCommission').value);
+           
+           const r = refsDb.find(x => x.email === email);
+           if(r) {
+               r.count = count;
+               r.commission = commission;
+           }
+
+           await apiPost("/api/refs", refsDb);
+           renderRefs(); document.getElementById('modalEditRef').classList.add('hidden'); showToast("Đã cập nhật số lượng giới thiệu!", "success");
+       }
+
+       function renderOrders() {
+           const tbody = document.getElementById('orderTable'); tbody.innerHTML = '';
+           ordersDb.forEach((o) => {
+               let badge = o.status === 'pending' ? '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">⏳ Chờ duyệt</span>' : 
+                           (o.status === 'success' ? '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">✅ Thành công</span>' : 
+                           '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">❌ Từ chối</span>');
+               
+               let supportTag = o.needSupport ? `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-blue-200">Hỗ trợ</span>` : '';
+               let refTag = o.refCode ? `<span class="bg-orange-100 text-orange-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-orange-200" title="Mã giới thiệu">REF: ${o.refCode}</span>` : '';
+
+               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                   <td class="p-4 md:p-5 font-mono font-bold text-indigo-600">${o.id} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.id}')"></i></td>
+                   <td class="p-4 md:p-5"><p class="font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i> ${supportTag} ${refTag}</p><p class="text-xs text-slate-500 mt-1"><i class="fas fa-credit-card mr-1"></i>${o.method || 'Bank'} | Zalo: ${o.zalo || 'Không'}</p></td>
+                   <td class="p-4 md:p-5 font-bold text-slate-600 text-xs truncate max-w-[200px]">${o.pkg} <br><span class="text-indigo-500 text-[10px]">${o.expDate ? 'HSD: '+o.expDate : ''}</span></td><td class="p-4 md:p-5">${badge}</td>
+                   <td class="p-4 md:p-5 text-right whitespace-nowrap">
+                       <button onclick="openEditModal('${o.id}')" class="text-indigo-600 font-bold hover:underline px-3 py-1.5 bg-indigo-50 rounded-lg mr-2 text-xs md:text-sm"><i class="fas fa-pen mr-1"></i>Sửa</button>
+                       <button onclick="deleteOrder('${o.id}')" class="text-red-500 font-bold hover:underline px-3 py-1.5 bg-red-50 rounded-lg text-xs md:text-sm"><i class="fas fa-trash mr-1"></i>Xóa</button>
+                   </td></tr>`;
+           });
+        }
+       function generateRandomId() { return 'DH-' + Math.random().toString(36).substr(2, 9).toUpperCase(); }
+       function openEditModal(id) {
+           let o;
+           if(id) {
+               o = ordersDb.find(x => x.id === id); 
+               document.getElementById('modalTitle').innerText = `Chỉnh sửa Đơn Hàng`; 
+               document.getElementById('editId').value = o.id;
+           } else {
+               o = { id: generateRandomId(), email: '', pkg: packageOptions[0].txt, status: 'pending', info: '', reason: '', expDate: '' };
+               document.getElementById('modalTitle').innerText = `Tạo Đơn Thủ Công`; 
+               document.getElementById('editId').value = o.id;
+           }
+           
+           document.getElementById('editEmail').value = o.email || '';
+           document.getElementById('editExpDate').value = o.expDate || '';
+           
+           let foundPkg = false;
+           for(let i=0; i<document.getElementById('editPkg').options.length; i++) {
+               if(document.getElementById('editPkg').options[i].text.includes(o.pkgName || (o.pkg ? o.pkg.split(' (')[0] : ''))) { 
+                   document.getElementById('editPkg').selectedIndex = i; 
+                   foundPkg = true; 
+                   break; 
+               }
+           }
+           if(!foundPkg) document.getElementById('editPkg').selectedIndex = 0;
+
+           document.getElementById('editStatus').value = o.status; 
+           document.getElementById('editLink').value = o.info || ''; 
+           document.getElementById('editReason').value = o.reason || '';
+           
+           toggleStatusFields(); 
+           document.getElementById('modalEdit').classList.remove('hidden');
+        }
+       function toggleStatusFields() {
+           const s = document.getElementById('editStatus').value;
+           document.getElementById('fieldSuccess').classList.toggle('hidden', s !== 'success');
+           document.getElementById('fieldFailed').classList.toggle('hidden', s !== 'failed');
+        }
+
+       async function saveOrderToCloud() {
+           const originalId = document.getElementById('editId').value.trim();
+           if(!originalId) return showToast("Mã đơn không được rỗng!", "error");
+           
+           let o = ordersDb.find(x => x.id === originalId);
+           if(!o) { 
+               o = { id: originalId, needSupport: false, method: "Manual", date: new Date().toLocaleString() }; 
+               ordersDb.unshift(o); 
+           }
+
+           const oldStatus = o.status;
+           const oldExpDate = o.expDate;
+
+           o.id = originalId;
+           o.email = document.getElementById('editEmail').value.trim(); 
+           const selectedPkgIdx = document.getElementById('editPkg').value;
+           const selectedPkg = packageOptions[selectedPkgIdx];
+           o.pkg = selectedPkg.txt;
+           o.expDate = document.getElementById('editExpDate').value.trim();
+           o.status = document.getElementById('editStatus').value; 
+           o.info = document.getElementById('editLink').value; 
+           o.reason = document.getElementById('editReason').value;
+           o.pkgName = o.pkg.split(' - ')[0];
+
+           const btn = event.target; const oldTxt = btn.innerText; btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
+
+           // LOGIC TẠO MÃ REF & HISTORY TỰ ĐỘNG KHI DUYỆT LẦN ĐẦU CÓ HẠN
+           if (o.status === 'success' && o.expDate && !o.refGenerated && o.email) {
+               
+               const datePart = o.expDate.replace(/\D/g, ''); 
+               const code = (o.id.slice(-4) + datePart).substring(0, 10).toUpperCase(); 
+
+               let myRef = refsDb.find(r => r.email === o.email);
+               if(!myRef) {
+                   myRef = { email: o.email, code: code, count: 0, commission: 0, date: new Date().toLocaleString() };
+                   refsDb.unshift(myRef);
+               }
+
+               let h = {
+                   email: o.email,
+                   pkgName: selectedPkg.txt.split(' - ')[0],
+                   priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0],
+                   data: selectedPkg.data,
+                   vnd: o.totalVnd || selectedPkg.vnd,
+                   expDate: o.expDate,
+                   refCode: o.refCode || '',
+                   date: new Date().toLocaleString()
+               };
+               historyDb.unshift(h);
+               await apiPost("/api/history", historyDb);
+
+               if (o.refCode) {
+                   let r = refsDb.find(x => x.code === o.refCode.toUpperCase());
+                   if(r) {
+                       r.count = (r.count || 0) + 1;
+                       r.commission = (r.commission || 0) + ((o.totalVnd || selectedPkg.vnd) * 0.08);
+                   }
+               }
+
+               await apiPost("/api/refs", refsDb);
+               renderRefs();
+               renderHistory();
+
+               o.refGenerated = true;
+           }
+
+           await apiPost("/api/orders", ordersDb);
+           showToast("Đã đồng bộ đơn hàng!", "success");
+
+           if(document.getElementById('sendMailCheck').checked && o.email) {
+               btn.innerText = "ĐANG BẮN EMAIL...";
+               let subject = "VPN Trinh Hg - Cập nhật đơn hàng"; let msg = "";
+               let contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
+                   <p style="margin:0 0 10px 0; color:#475569; font-size:13px; line-height:1.5;">${o.needSupport ? '<span style="color:#ef4444; font-weight:bold;">Bạn đã yêu cầu Admin hỗ trợ cài đặt!</span> Vui lòng liên hệ:' : 'Cần hỗ trợ? Đội ngũ của chúng tôi sẵn sàng 24/7'}</p>
+                   <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0ea5e9; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:5px; font-size:13px;">Chat Zalo</a>
+                   <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#3b82f6; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; font-size:13px;">Messenger</a>
+               </div>`;
+
+               if(o.status === 'success') {
+                   subject = "VPN Trinh Hg - Kích hoạt thành công";
+                   msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+                       <div style="background:linear-gradient(135deg, #4f46e5, #9333ea); padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">KÍCH HOẠT THÀNH CÔNG</h2></div>
+                       <div style="padding:20px; box-sizing:border-box;">
+                           <p style="font-size:14px; line-height:1.5;">Xin chào, Gói VPN <b>${o.pkgName}</b> của bạn đã sẵn sàng.</p>
+                           <div style="background:#f1f5f9; border-left:4px solid #4f46e5; padding:15px; border-radius:8px; margin:20px 0; text-align:center; word-break:break-all;">
+                               <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold;">MÃ ĐƠN HÀNG</p>
+                               <p style="margin:5px 0 0 0; font-size:22px; font-weight:900; color:#4f46e5; letter-spacing:1px;">${o.id}</p>
+                           </div>
+                           <div style="text-align:center; margin:20px 0;">
+                               <a href="https://vpntrinhhg.pages.dev" style="background:#1e293b; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; max-width:100%; box-sizing:border-box; font-size:14px;">TRUY CẬP CỔNG KHÁCH HÀNG</a>
+                               <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Tra cứu bằng <b>Mã Đơn Hàng</b> hoặc <b>Email</b> để lấy Link VPN.</i></p>
+                           </div>
+                           ${contactBlock}
+                       </div></div>`;
+               } else if(o.status === 'failed') {
+                   subject = "VPN Trinh Hg - Đơn hàng bị từ chối";
+                   msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; border:1px solid #fecaca; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+                       <div style="background:#ef4444; padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">Giao dịch thất bại</h2></div>
+                       <div style="padding:20px; box-sizing:border-box;">
+                           <p style="font-size:14px; line-height:1.5;">Xin chào, Đơn hàng <b>${o.id}</b> của bạn không thể kích hoạt.</p>
+                           <div style="background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:8px; color:#b91c1c; font-weight:bold; margin:20px 0; font-size:14px; word-wrap:break-word;">Lý do: ${o.reason}</div>
+                           ${contactBlock}
+                       </div></div>`;
+               }
+               try { await fetch(GOOGLE_MAIL_API, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({to: o.email, subject: subject, html: msg}) }); } catch(e){}
+           }
+
+           btn.innerText = oldTxt; btn.disabled = false; renderOrders(); document.getElementById('modalEdit').classList.add('hidden');
+        }
+       async function deleteOrder(id) {
+           if(confirm('Xóa vĩnh viễn đơn ' + id + '?')) {
+               ordersDb = ordersDb.filter(x => x.id !== id); await apiPost("/api/orders", ordersDb);
+               renderOrders(); showToast("Đã xóa vĩnh viễn!", "info");
+           }
+        }
+
+       async function fetchCms() { 
+           cmsDb = await apiGet("/api/cms"); 
+           if(typeof cmsDb !== 'object' || Array.isArray(cmsDb)) cmsDb = {};
+           document.getElementById('cmsGuide').value = cmsDb[currentCmsDevice] || ''; 
+        }
+       function changeCmsDevice(dev) {
+           document.querySelectorAll('.dev-btn').forEach(b => { b.classList.remove('active', 'border-indigo-500', 'bg-indigo-50', 'text-indigo-700'); b.classList.add('border-slate-200', 'text-slate-600'); });
+           document.getElementById('cms-btn-' + dev).classList.add('active', 'border-indigo-500', 'bg-indigo-50', 'text-indigo-700'); document.getElementById('cms-btn-' + dev).classList.remove('border-slate-200', 'text-slate-600');
+           currentCmsDevice = dev; document.getElementById('cmsGuide').value = cmsDb[dev] || '';
+        }
+       function insertMacro(type) {
+           const box = document.getElementById('cmsGuide'); 
+           let str = "";
+           
+           if(type === 'btn') str = `<style>@keyframes pulseAppBtnStrong { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(109,40,217, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0); } }</style><div style="display: flex; justify-content: flex-start; margin: 10px 0 10px 30px; width: 100%;"><a href="LINK_TẢI_APP_VÀO_ĐÂY" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color:white; padding:12px 24px; border-radius:12px; font-weight:bold; text-decoration:none; font-size:15px; text-align: center; animation: pulseAppBtnStrong 1.5s infinite; box-shadow: 0 4px 15px rgba(109,40,217, 0.4);"><i class="fas fa-download" style="margin-right: 8px;"></i>TẢI_APP_NGAY</a></div>`;
+           if(type === 'header') str = `<div style="background: linear-gradient(90deg, #4f46e5, #8b5cf6); color: white; padding: 14px 20px; border-radius: 8px; font-size: 16px; font-weight: 900; text-transform: uppercase; margin: 20px 0 15px 0; box-shadow: 0 4px 10px rgba(79,70,229,0.3);"><i class="fas fa-star" style="margin-right:8px;"></i>TIÊU_ĐỀ_CHÍNH</div>`;
+           if(type === 'title') str = `<div style="background: #e0e7ff; border-left: 4px solid #4f46e5; padding: 12px 16px; border-radius: 4px; margin-top: 15px; margin-bottom: 10px;"><h3 style="font-size: 15px; font-weight: 800; color: #3730a3; margin: 0;">TIÊU_ĐỀ_HƯỚNG_DẪN</h3></div>`;
+           if(type === 'step') str = `<div style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;"><span style="background: #4f46e5; color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 0;">SỐ_BƯỚC</span><p style="margin: 0; font-size: 14px; color: #334155; line-height: 24px;">NỘI_DUNG_BƯỚC_CÀI</p></div>`;
+           if(type === 'note') str = `<div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin: 15px 0;"><p style="margin: 0; font-size: 14px; color: #92400e; line-height: 1.5;"><b>LƯU Ý:</b> NHẬP_LƯU_Ý_CỦA_BẠN_VÀO_ĐÂY</p></div>`;
+           if(type === 'img') str = `<div style="padding-left: 36px; margin-bottom: 15px;"><img src="LINK_ẢNH_JPG" style="max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" /></div>`;
+           
+           const startPos = box.selectionStart; const endPos = box.selectionEnd;
+           box.value = box.value.substring(0, startPos) + str + box.value.substring(endPos, box.value.length);
+           box.selectionStart = startPos + str.length; box.selectionEnd = startPos + str.length; box.focus();
+        }
+       async function saveCmsToCloud() {
+           cmsDb[currentCmsDevice] = document.getElementById('cmsGuide').value;
+           const btn = event.target; const oldTxt = btn.innerText; btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
+           await apiPost("/api/cms", cmsDb); showToast('Đã lưu bài viết lên hệ thống Cloud!', "success");
+           btn.innerText = oldTxt; btn.disabled = false;
+        }
+       function renderDevices() {
+           const tbody = document.getElementById('devicesTable'); tbody.innerHTML = '';
+           adminDevices.forEach((d) => {
+               let isMe = d.id === myDeviceId ? '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold ml-2">Bạn</span>' : '';
+               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                   <td class="p-4 font-mono font-bold text-indigo-600 text-xs">${d.id} ${isMe}</td>
+                   <td class="p-4 text-xs text-slate-600 max-w-xs truncate">${d.userAgent}</td>
+                   <td class="p-4 text-xs text-slate-500">${d.date}</td>
+                   <td class="p-4 text-right whitespace-nowrap">
+                       <button onclick="removeDevice('${d.id}')" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash mr-1"></i>Xóa</button>
+                   </td></tr>`;
+           });
+        }
+       async function removeDevice(id) {
+           if(confirm("Xóa thiết bị này khỏi danh sách cho phép?")) {
+               adminDevices = adminDevices.filter(x => x.id !== id); await apiPost("/api/devices", adminDevices);
+               renderDevices(); showToast("Đã xóa thiết bị", "info"); if(id === myDeviceId) logoutAdmin();
+           }
+        }
+   </script>
+</body>
+</html>
