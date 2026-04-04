@@ -8,7 +8,7 @@ export default {
       
       // ⚠️ QUAN TRỌNG: THAY DÒNG NÀY THÀNH TÊN MIỀN WORKER TEST TRÊN CLOUDFLARE CỦA ÔNG
       // Ví dụ: "vpn-api-test.taikhoancuaban.workers.dev"
-      workerUrl.hostname = "TEN-WORKER-CUA-ONG.workers.dev"; 
+      workerUrl.hostname = "vpn-worker-test.doicucden.workers.dev"; 
       
       // Chuyển tiếp toàn bộ gói tin sang Worker xử lý
       const newRequest = new Request(workerUrl.toString(), request);
