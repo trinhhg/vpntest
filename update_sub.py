@@ -32,24 +32,29 @@ def update_all_subs():
         res = requests.get(API_LINKS, timeout=10)
         links_db = res.json()
         
+        # FIX CƠ CHẾ: 1 Token = 1 Link để không bị loop thừa khi đẩy KV
+        processed_tokens = set()
+        
         for item in links_db:
             orig_url = item.get("orig")
             masked_url = item.get("masked")
             
-            # Phải có cả 2 link mới xử lý
             if not orig_url or not masked_url: continue
                 
-            # ✅ FIX ĐÚNG: Lấy token từ MASKED URL để push lên KV khớp với Worker
             parsed_url = urllib.parse.urlparse(masked_url)
             qs = urllib.parse.parse_qs(parsed_url.query)
             token = qs.get("OwO", [None])[0]
             
             if not token: continue
+            
+            # Nếu token đã được xử lý rồi thì bỏ qua luôn
+            if token in processed_tokens:
+                continue
+            processed_tokens.add(token)
                 
-            print(f"-> Đang xử lý Token (từ link ẩn): {token}")
+            print(f"-> Đang xử lý Token: {token}")
             headers = {"User-Agent": "v2rayN/6.23"}
             try:
-                # Vẫn tải config từ link gốc
                 sub_res = requests.get(orig_url, headers=headers, timeout=15)
                 if sub_res.status_code == 200:
                     content = sub_res.text.strip()
@@ -72,7 +77,8 @@ def update_all_subs():
                                     parts = line.split("#", 1)
                                     if len(parts) == 2:
                                         new_name = process_node_name(parts[1])
-                                        new_lines.append(f"{parts[0]}#{urllib.parse.quote(new_name)}")
+                                        # FIX CHÍNH XÁC: KHÔNG URL ENCODE NAME NỮA
+                                        new_lines.append(f"{parts[0]}#{new_name}")
                                     else:
                                         new_lines.append(line)
                                 except:
@@ -87,7 +93,6 @@ def update_all_subs():
                         
                         final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
                         
-                        # Đẩy lên KV với key là token của link ẩn
                         payload = {
                             "key": token,
                             "body": final_b64,
@@ -95,7 +100,7 @@ def update_all_subs():
                         }
                         push_res = requests.post(API_PUSH, json=payload, timeout=10)
                         if push_res.status_code == 200:
-                            print(f"  [OK] Đã push thành công data cho Token ẩn {token}")
+                            print(f"  [OK] Đã push thành công data cho Token {token}")
                         else:
                             print(f"  [FAIL] Push KV lỗi: {push_res.status_code}")
                             
@@ -105,6 +110,5 @@ def update_all_subs():
                 print(f"  [!] Lỗi lấy sub: {e}")
     except Exception as e: print(f"Lỗi hệ thống: {e}")
 
-# ✅ FIX LỖI INDENT
 if __name__ == "__main__":
     update_all_subs()
