@@ -40,8 +40,7 @@ def update_all_subs():
             qs = urllib.parse.parse_qs(parsed_url.query)
             token = qs.get("OwO", [None])[0]
             
-            if not token: 
-                continue
+            if not token: continue
                 
             print(f"-> Đang xử lý Token: {token}")
             headers = {"User-Agent": "v2rayN/6.23"}
@@ -61,7 +60,6 @@ def update_all_subs():
                         new_lines = []
                         
                         for line in lines:
-                            # FIX LỖI TRIM() NGỚ NGẨN BẰNG STRIP()
                             line = line.strip()
                             if not line: continue
                             if "://" in line:
@@ -81,9 +79,17 @@ def update_all_subs():
                         
                         final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
                         
-                        payload = {"key": token, "body": final_b64, "info": user_info}
-                        requests.post(API_PUSH, json=payload, timeout=10)
-                        print(f"  [OK] Đã push thành công data cho Token {token}")
+                        # FIX CHÍNH XÁC: Đẩy đúng key = token lên API KV
+                        payload = {
+                            "key": token,
+                            "body": final_b64,
+                            "info": user_info
+                        }
+                        push_res = requests.post(API_PUSH, json=payload, timeout=10)
+                        if push_res.status_code == 200:
+                            print(f"  [OK] Đã push thành công data cho Token {token}")
+                        else:
+                            print(f"  [FAIL] Push KV lỗi: {push_res.status_code}")
                             
                     except Exception as e: print(f"  [!] Lỗi Base64: {e}")
             except Exception as e: print(f"  [!] Lỗi lấy sub: {e}")
