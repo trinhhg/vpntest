@@ -36,13 +36,11 @@ def update_all_subs():
             orig_url = item.get("orig")
             if not orig_url: continue
                 
-            # BÓC TÁCH TOKEN OwO TỪ LINK GỐC LÀM KEY DUY NHẤT
             parsed_url = urllib.parse.urlparse(orig_url)
             qs = urllib.parse.parse_qs(parsed_url.query)
             token = qs.get("OwO", [None])[0]
             
             if not token: 
-                print(f"  [!] Bỏ qua link không có Token OwO: {orig_url[:50]}...")
                 continue
                 
             print(f"-> Đang xử lý Token: {token}")
@@ -63,7 +61,8 @@ def update_all_subs():
                         new_lines = []
                         
                         for line in lines:
-                            line = line.trim() if hasattr(line, 'trim') else line.strip()
+                            # FIX LỖI TRIM() NGỚ NGẨN BẰNG STRIP()
+                            line = line.strip()
                             if not line: continue
                             if "://" in line:
                                 try:
@@ -82,7 +81,6 @@ def update_all_subs():
                         
                         final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
                         
-                        # PUSH VÀO CLOUDFLARE DÙNG TOKEN LÀM KEY
                         payload = {"key": token, "body": final_b64, "info": user_info}
                         requests.post(API_PUSH, json=payload, timeout=10)
                         print(f"  [OK] Đã push thành công data cho Token {token}")
