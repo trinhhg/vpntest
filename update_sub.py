@@ -13,13 +13,15 @@ def process_node_name(text):
     # Giải mã URL-Encode
     text = urllib.parse.unquote(text)
     
-    # Bóc tách 3 Node thông tin trước (Nếu là node thông tin thì giữ nguyên, không gắn tên thương hiệu)
-    if "剩余流量：" in text: return text.replace("剩余流量：", "Data: ")
-    if "距离下次重置剩余：" in text: return text.replace("距离下次重置剩余：", "Reset: ").replace(" 天", " Days")
-    if "套餐到期：" in text: return text.replace("套餐到期：", "Exp: ")
+    # 1. NẾU LÀ 3 NODE THÔNG TIN -> Dịch và TRẢ VỀ LUÔN (Không thêm tên VPN Trinh Hg)
+    if "剩余流量" in text: return text.replace("剩余流量：", "Data: ").replace("剩余流量:", "Data: ")
+    if "距离下次重置剩余" in text: return text.replace("距离下次重置剩余：", "Reset: ").replace("距离下次重置剩余:", "Reset: ").replace(" 天", " Days")
+    if "套餐到期" in text: return text.replace("套餐到期：", "Exp: ").replace("套餐到期:", "Exp: ")
 
-    # Dịch các thành phần
-    text = text.replace("良心云", "") # Xóa hẳn chữ này
+    # 2. CÁC NODE BÌNH THƯỜNG -> Dịch tiếng Anh
+    text = text.replace("良心云", "") # Xóa chữ Liangxin
+    text = text.replace("自动选择", "Auto Select")
+    text = text.replace("故障转移", "Fallback")
     text = text.replace("🇨🇳台湾", "🇹🇼 Taiwan ")
     text = text.replace("🇭🇰香港", "🇭🇰 Hong Kong ")
     text = text.replace("🇸🇬新加坡", "🇸🇬 Singapore ")
@@ -37,13 +39,15 @@ def process_node_name(text):
     text = text.replace("流媒体", " Streaming")
     text = text.replace("0.1倍", " 0.1x")
     
-    # Dọn dẹp ký tự thừa (BGP, gạch dọc)
+    # 3. Dọn dẹp ký tự thừa (BGP, gạch dọc)
     text = re.sub(r'\|BGP\|', ' ', text)
     text = re.sub(r'\|BGP', ' ', text)
     text = re.sub(r'\|', ' ', text)
     
-    # Chuẩn hóa khoảng trắng và thêm thương hiệu vào cuối
+    # Chuẩn hóa khoảng trắng
     clean_name = " ".join(text.split())
+    
+    # ĐƯA TÊN VPN TRINH HG RA CUỐI
     return f"{clean_name} | VPN Trinh Hg"
 
 def update_all_subs():
@@ -61,6 +65,7 @@ def update_all_subs():
                 continue
                 
             print(f"-> Đang xử lý: {email}")
+            # Phải giả dạng V2rayN thì Liangxin mới nhả dung lượng
             headers = {"User-Agent": "v2rayN/6.23"}
             
             try:
@@ -71,11 +76,10 @@ def update_all_subs():
                     if not content:
                         continue
                         
-                    # Ép lấy Header Info để Cloudflare đọc
+                    # Trích xuất Header dung lượng từ server gốc
                     user_info = sub_res.headers.get("subscription-userinfo", "")
 
                     try:
-                        # Fix chuẩn Base64 Padding
                         content += "=" * ((4 - len(content) % 4) % 4)
                         decoded = base64.b64decode(content).decode('utf-8')
                         lines = decoded.splitlines()
@@ -90,7 +94,7 @@ def update_all_subs():
                                     main_link = parts[0]
                                     new_name = process_node_name(parts[1])
                                     
-                                    # Mã hóa URL lại tên node để tránh lỗi YAML
+                                    # Mã hóa URL lại tên node để tránh lỗi
                                     safe_name = urllib.parse.quote(new_name)
                                     new_lines.append(f"{main_link}#{safe_name}")
                                 else:
@@ -98,9 +102,9 @@ def update_all_subs():
                             except:
                                 pass
                         
-                        # Gộp list và mã hóa Base64 cực chuẩn, loại bỏ ký tự ngắt dòng
+                        # Gộp list và mã hóa Base64 cực chuẩn, xóa mọi ký tự ngắt dòng
                         final_string = "\n".join(new_lines)
-                        final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
+                        final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '').replace('\r', '')
                         
                         filepath = f"subs/{email}.json"
                         with open(filepath, "w", encoding="utf-8") as f:
