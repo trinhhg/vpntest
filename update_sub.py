@@ -70,12 +70,15 @@ def update_all_subs():
                                         new_lines.append(f"{parts[0]}#{urllib.parse.quote(new_name)}")
                                     else:
                                         new_lines.append(line)
-                                except: new_lines.append(line)
+                                except:
+                                    new_lines.append(line)
                             else:
                                 new_lines.append(line)
 
-                        if not new_lines: final_string = decoded
-                        else: final_string = "\n".join(new_lines)
+                        if not new_lines: 
+                            final_string = decoded
+                        else: 
+                            final_string = "\n".join(new_lines)
                         
                         final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
                         
@@ -91,8 +94,10 @@ def update_all_subs():
                         else:
                             print(f"  [FAIL] Push KV lỗi: {push_res.status_code}")
                             
-                    except Exception as e: print(f"  [!] Lỗi Base64: {e}")
-            except Exception as e: print(f"  [!] Lỗi lấy sub: {e}")
+                    except Exception as e:
+                        print(f"  [!] Lỗi Base64: {e}")
+            except Exception as e:
+                print(f"  [!] Lỗi lấy sub: {e}")
     except Exception as e: print(f"Lỗi hệ thống: {e}")
 
 if __name__ == "__main__":
