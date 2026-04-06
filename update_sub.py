@@ -10,21 +10,14 @@ API_PUSH = f"{WORKER_DOMAIN}/api/push_data"
 
 def clean_name_string(text):
     text = urllib.parse.unquote(text)
-    # FIX LỖI YAML: Bỏ toàn bộ dấu : để Clash không hiểu lầm đây là lệnh cấu trúc
-    if "剩余流量" in text: return text.replace("剩余流量：", "Data ").replace("剩余流量:", "Data ")
-    if "距离下次重置剩余" in text: return text.replace("距离下次重置剩余：", "Reset ").replace("距离下次重置剩余:", "Reset ").replace(" 天", " Days")
-    if "套餐到期" in text: return text.replace("套餐到期：", "Exp ").replace("套餐到期:", "Exp ")
-
-    text = text.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
+    # Dịch thuật & Rename
+    text = text.replace("良心云", "VPN Trinh Hg").replace("顶级机场", "VPN Trinh Hg")
+    text = text.replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
     text = text.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
     text = text.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
-    text = text.replace("台湾", "Taiwan ").replace("香港", "Hong Kong ").replace("新加坡", "Singapore ")
-    text = text.replace("日本", "Japan ").replace("美国", "USA ").replace("韩国", "Korea ")
-    text = text.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
     
-    text = re.sub(r'\|BGP\|', ' ', text)
-    text = re.sub(r'\|BGP', ' ', text)
-    text = re.sub(r'\|', ' ', text)
+    # FIX LỖI YAML: Bỏ dấu | và dấu :
+    text = text.replace("|", "-").replace(":", " ")
     
     clean_name = " ".join(text.split())
     return clean_name
@@ -60,28 +53,19 @@ def update_all_subs():
                 content = b64_res.text.strip()
                 user_info = b64_res.headers.get("subscription-userinfo", "")
                 
-                traffic_data = {"used": "0.00", "total": "0.00", "percent": 0, "expire": "Không giới hạn"}
+                # Tính dung lượng cho Web
+                traffic_data = {"used": "0.00", "total": "0.00", "percent": 0, "expire": "Vĩnh viễn"}
                 if user_info:
-                    match_up = re.search(r'upload=(\d+)', user_info)
-                    match_down = re.search(r'download=(\d+)', user_info)
-                    match_total = re.search(r'total=(\d+)', user_info)
-                    match_exp = re.search(r'expire=(\d+)', user_info)
-                    
-                    up = int(match_up.group(1)) if match_up else 0
-                    down = int(match_down.group(1)) if match_down else 0
-                    total = int(match_total.group(1)) if match_total else 0
-                    exp = int(match_exp.group(1)) if match_exp else 0
-                    
-                    used_gb = (up + down) / 1073741824
-                    total_gb = total / 1073741824
+                    match_up = re.search(r'upload=(\d+)', user_info); match_down = re.search(r'download=(\d+)', user_info); match_total = re.search(r'total=(\d+)', user_info); match_exp = re.search(r'expire=(\d+)', user_info)
+                    up = int(match_up.group(1)) if match_up else 0; down = int(match_down.group(1)) if match_down else 0; total = int(match_total.group(1)) if match_total else 0; exp = int(match_exp.group(1)) if match_exp else 0
+                    used_gb = (up + down) / 1073741824; total_gb = total / 1073741824
                     percent = round((used_gb / total_gb) * 100) if total_gb > 0 else 0
                     exp_str = datetime.datetime.fromtimestamp(exp).strftime('%d/%m/%Y') if exp > 0 else "Vĩnh viễn"
-                        
                     traffic_data = {"used": f"{used_gb:.2f}", "total": f"{total_gb:.2f}", "percent": percent, "expire": exp_str}
 
+                # Xử lý Base64
                 missing_padding = len(content) % 4
                 if missing_padding: content += '=' * (4 - missing_padding)
-                
                 decoded = base64.b64decode(content).decode('utf-8', errors='ignore')
                 lines = decoded.splitlines()
                 
@@ -90,63 +74,42 @@ def update_all_subs():
                 
                 for line in lines:
                     line = line.strip()
-                    if not line: continue
                     if "://" in line:
-                        try:
-                            parts = line.split("#", 1)
-                            if len(parts) == 2:
-                                old_name = urllib.parse.unquote(parts[1])
-                                
-                                # BỎ DÒNG DATA, BỎ RESET, CHỈ GIỮ LẠI EXP
-                                if "剩余流量" in old_name or "距离下次重置剩余" in old_name:
-                                    continue
-                                    
-                                new_name = old_name
-                                if "套餐到期" in new_name: 
-                                    new_name = new_name.replace("套餐到期：", "Exp ").replace("套餐到期:", "Exp ")
-                                else:
-                                    new_name = new_name.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
-                                    new_name = new_name.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
-                                    new_name = new_name.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
-                                    new_name = new_name.replace("台湾", "Taiwan ").replace("香港", "Hong Kong ").replace("新加坡", "Singapore ")
-                                    new_name = new_name.replace("日本", "Japan ").replace("美国", "USA ").replace("韩国", "Korea ")
-                                    new_name = new_name.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
-                                    new_name = re.sub(r'\|BGP\|?', ' ', new_name)
-                                    new_name = re.sub(r'\|', ' ', new_name)
-                                
-                                clean_name = " ".join(new_name.split())
-                                final_name = f"{clean_name} | VPN Trinh Hg"
-                                
-                                rename_map[old_name] = final_name
-                                new_lines.append(f"{parts[0]}#{urllib.parse.quote(final_name)}")
-                            else: new_lines.append(line)
-                        except: new_lines.append(line)
+                        parts = line.split("#", 1)
+                        if len(parts) == 2:
+                            old_name = urllib.parse.unquote(parts[1])
+                            if "剩余流量" in old_name or "距离下次重置" in old_name: continue
+                            
+                            new_name = clean_name_string(old_name)
+                            if "套餐到期" in new_name:
+                                new_name = new_name.replace("套餐到期", "Exp ")
+                            
+                            final_name = f"{new_name} - VPN Trinh Hg"
+                            rename_map[old_name] = final_name
+                            new_lines.append(f"{parts[0]}#{urllib.parse.quote(final_name)}")
                     else: new_lines.append(line)
 
-                final_string = "\n".join(new_lines) if new_lines else decoded
-                final_b64 = base64.b64encode(final_string.encode()).decode()
-                missing = len(final_b64) % 4
-                if missing: final_b64 += "=" * (4 - missing)
+                final_b64 = base64.b64encode("\n".join(new_lines).encode()).decode()
                 
+                # Xử lý YAML
                 yaml_text = yaml_res.text
                 if "proxies:" in yaml_text:
+                    # Rename Groups
+                    yaml_text = yaml_text.replace("良心云", "VPN Trinh Hg").replace("顶级机场", "VPN Trinh Hg")
+                    yaml_text = yaml_text.replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
+                    # Xóa node rác
+                    yaml_text = re.sub(r'^\s*-\s*\{?name:\s*[\'"]?.*?(剩余流量|距离下次重置).*?\}?\s*$\n?', '', yaml_text, flags=re.MULTILINE)
+                    # Sửa Exp
+                    yaml_text = re.sub(r'套餐到期[:：]\s*(\d{4}-\d{2}-\d{2})', r'Exp \1 - VPN Trinh Hg', yaml_text)
+                    # Rename Nodes
                     for old_n, new_n in rename_map.items():
-                        yaml_text = yaml_text.replace(old_n, new_n)
-                else:
-                    yaml_text = ""
+                        yaml_text = yaml_text.replace(f"name: {old_n}", f"name: '{new_n}'") # Bọc ngoặc đơn fix lỗi Block Collections
+                        yaml_text = yaml_text.replace(f"name: '{old_n}'", f"name: '{new_n}'")
 
-                payload = {
-                    "key": token,
-                    "body_b64": final_b64,
-                    "body_yaml": yaml_text,
-                    "info": user_info,
-                    "traffic": traffic_data
-                }
-                push_res = requests.post(API_PUSH, json=payload, timeout=10)
-                print(f"  [OK] Đã push thành công: {token}" if push_res.status_code == 200 else f"  [FAIL] Push lỗi")
-            except Exception as e:
-                print(f"  [!] Lỗi xử lý Node: {e}")
-    except Exception as e: print(f"Lỗi hệ thống: {e}")
+                push_res = requests.post(API_PUSH, json={"key": token, "body_b64": final_b64, "body_yaml": yaml_text, "info": user_info, "traffic": traffic_data}, timeout=10)
+                print(f"  [OK] {token}")
+            except Exception as e: print(f"  [!] Error: {e}")
+    except Exception as e: print(f"System Error: {e}")
 
 if __name__ == "__main__":
     update_all_subs()
