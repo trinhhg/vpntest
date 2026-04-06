@@ -32,7 +32,6 @@ def update_all_subs():
         res = requests.get(API_LINKS, timeout=10)
         links_db = res.json()
         
-        # FIX CƠ CHẾ: 1 Token = 1 Link để không bị loop thừa khi đẩy KV
         processed_tokens = set()
         
         for item in links_db:
@@ -47,7 +46,6 @@ def update_all_subs():
             
             if not token: continue
             
-            # Nếu token đã được xử lý rồi thì bỏ qua luôn
             if token in processed_tokens:
                 continue
             processed_tokens.add(token)
@@ -77,7 +75,6 @@ def update_all_subs():
                                     parts = line.split("#", 1)
                                     if len(parts) == 2:
                                         new_name = process_node_name(parts[1])
-                                        # FIX CHÍNH XÁC: KHÔNG URL ENCODE NAME NỮA
                                         new_lines.append(f"{parts[0]}#{new_name}")
                                     else:
                                         new_lines.append(line)
@@ -92,6 +89,11 @@ def update_all_subs():
                             final_string = "\n".join(new_lines)
                         
                         final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
+                        
+                        # FIX CHUẨN: Bù padding '=' cho các parser khó tính trên PC
+                        missing = len(final_b64) % 4
+                        if missing:
+                            final_b64 += "=" * (4 - missing)
                         
                         payload = {
                             "key": token,
@@ -110,5 +112,6 @@ def update_all_subs():
                 print(f"  [!] Lỗi lấy sub: {e}")
     except Exception as e: print(f"Lỗi hệ thống: {e}")
 
+# FIX CHUẨN: Indent (thụt lề) đúng
 if __name__ == "__main__":
     update_all_subs()
