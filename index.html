@@ -345,7 +345,8 @@
     </footer>
 
     <script>
-        const API_URL = ""; // Để trống để tự động lấy local thông qua _worker.js Proxy
+        // BẮT BUỘC ĐỂ TRỐNG API_URL ĐỂ ĐỒNG BỘ DATA, ĐIỀN LINK WOKER Ở ĐÂY SẼ LỖI CORS BLOCK KO CHO LOAD GIỮ LIỆU ĐÂU
+        const API_URL = "";
         const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         const SESSION_KEY = 'vpn_portal_session_24h';
         const DB_KEY = 'vpn_orders_db';
@@ -656,7 +657,7 @@
                     <div class="highlight-copy py-4 px-3 rounded-xl text-center w-full shadow-md cursor-pointer transition" onclick="copyText('${currentOrderId}')">
                         <span class="block text-[11px] font-black mb-2 uppercase tracking-widest">${i18n[lang].copy_memo}</span>
                         <strong class="block w-[95%] mx-auto bg-white font-mono text-2xl md:text-3xl py-3 rounded-xl shadow-inner border-2 border-yellow-400">${currentOrderId} <i class="far fa-copy ml-2 opacity-50"></i></strong>
-                        <p class="text-[10px] mt-2 italic font-bold opacity-80 uppercase">${lang==='zh'?'请手动输入金额和订单号！':(lang==='en'?'Please manually enter the amount and Memo!':'Vui lòng tự nhập số tiền và nội dung chuyển khoản!')}</p>
+                        <p class="text-[10px] mt-2 italic font-bold opacity-80 uppercase">${lang==='zh'?'请手动输入金额和订单号！':(lang==='en'?'Please manually enter the amount and Memo!':'Vui lòng tự nhập số tiền和 nội dung chuyển khoản!')}</p>
                     </div></div>`;
             } else if (m === 'wechat') {
                 col.innerHTML = `<div class="text-center w-full"><h4 class="font-extrabold text-slate-800 text-base md:text-lg mb-4 text-green-600"><i class="fas fa-qrcode mr-2"></i>WeChat Pay</h4>
@@ -760,7 +761,6 @@
                 st.innerHTML = `<span class="text-green-700 bg-green-100 px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold uppercase border border-green-200 inline-block"><i class="fas fa-check-circle mr-1"></i> <span>${i18n[lang].status_success}</span></span>`;
                 document.getElementById('subLink').value = o.info || '';
 
-                // FIX: Thêm thanh Progress Data hiển thị dung lượng từ API
                 if(o.info && (o.info.includes("OwO=") || o.info.includes("token="))) {
                     let tokenMatch = o.info.match(/[?&](OwO|token)=([^&#]+)/);
                     if(tokenMatch) {
