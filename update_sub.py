@@ -8,26 +8,6 @@ WORKER_DOMAIN = "https://vpntest-ad4.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
 API_PUSH = f"{WORKER_DOMAIN}/api/push_data"
 
-def clean_name_string(text):
-    text = urllib.parse.unquote(text)
-    if "剩余流量" in text: return text.replace("剩余流量：", "Data: ").replace("剩余流量:", "Data: ")
-    if "距离下次重置剩余" in text: return text.replace("距离下次重置剩余：", "Reset: ").replace("距离下次重置剩余:", "Reset: ").replace(" 天", " Days")
-    if "套餐到期" in text: return text.replace("套餐到期：", "Exp: ").replace("套餐到期:", "Exp: ")
-
-    text = text.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
-    text = text.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
-    text = text.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
-    text = text.replace("台湾", "Taiwan ").replace("香港", "Hong Kong ").replace("新加坡", "Singapore ")
-    text = text.replace("日本", "Japan ").replace("美国", "USA ").replace("韩国", "Korea ")
-    text = text.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
-    
-    text = re.sub(r'\|BGP\|', ' ', text)
-    text = re.sub(r'\|BGP', ' ', text)
-    text = re.sub(r'\|', ' ', text)
-    
-    clean_name = " ".join(text.split())
-    return clean_name
-
 def update_all_subs():
     try:
         res = requests.get(API_LINKS, timeout=10)
@@ -41,8 +21,6 @@ def update_all_subs():
             
             parsed_url = urllib.parse.urlparse(masked_url)
             qs = urllib.parse.parse_qs(parsed_url.query)
-            
-            # FIX: Bắt được cả link dùng OwO và token
             token_list = qs.get("OwO") or qs.get("token")
             if not token_list: continue
             token = token_list[0]
@@ -53,14 +31,11 @@ def update_all_subs():
             print(f"-> Đang xử lý Token: {token}")
             
             try:
-                # CÚ LỪA 1: Giả vờ là v2rayN để xin file Base64
                 b64_res = requests.get(orig_url, headers={"User-Agent": "v2rayN/6.23"}, timeout=15)
-                # CÚ LỪA 2: Giả vờ là Clash để xin luôn file YAML chuẩn
                 yaml_res = requests.get(orig_url, headers={"User-Agent": "Clash-Verge"}, timeout=15)
                 
                 if b64_res.status_code != 200: continue
                 
-                # --- 1. XỬ LÝ DUNG LƯỢNG VÀ BASE64 ---
                 content = b64_res.text.strip()
                 user_info = b64_res.headers.get("subscription-userinfo", "")
                 
@@ -88,7 +63,10 @@ def update_all_subs():
                 
                 decoded = base64.b64decode(content).decode('utf-8', errors='ignore')
                 lines = decoded.splitlines()
+                
                 new_lines = []
+                rename_map = {} # Bản đồ ánh xạ tên cũ -> tên mới để fix YAML
+                
                 for line in lines:
                     line = line.strip()
                     if not line: continue
@@ -96,8 +74,31 @@ def update_all_subs():
                         try:
                             parts = line.split("#", 1)
                             if len(parts) == 2:
-                                new_name = clean_name_string(parts[1])
-                                new_lines.append(f"{parts[0]}#{new_name} | VPN Trinh Hg")
+                                old_name = urllib.parse.unquote(parts[1])
+                                
+                                # XÓA BỎ DÒNG DATA VÀ RESET (Chỉ giữ Exp)
+                                if "剩余流量" in old_name or "距离下次重置剩余" in old_name:
+                                    continue
+                                
+                                new_name = old_name
+                                if "套餐到期" in new_name: 
+                                    new_name = new_name.replace("套餐到期：", "Exp: ").replace("套餐到期:", "Exp: ")
+                                else:
+                                    # Translate
+                                    new_name = new_name.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
+                                    new_name = new_name.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
+                                    new_name = new_name.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
+                                    new_name = new_name.replace("台湾", "Taiwan ").replace("香港", "Hong Kong ").replace("新加坡", "Singapore ")
+                                    new_name = new_name.replace("日本", "Japan ").replace("美国", "USA ").replace("韩国", "Korea ")
+                                    new_name = new_name.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
+                                    new_name = re.sub(r'\|BGP\|?', ' ', new_name)
+                                    new_name = re.sub(r'\|', ' ', new_name)
+                                
+                                clean_name = " ".join(new_name.split())
+                                final_name = f"{clean_name} | VPN Trinh Hg"
+                                
+                                rename_map[old_name] = final_name
+                                new_lines.append(f"{parts[0]}#{urllib.parse.quote(final_name)}")
                             else: new_lines.append(line)
                         except: new_lines.append(line)
                     else: new_lines.append(line)
@@ -107,17 +108,15 @@ def update_all_subs():
                 missing = len(final_b64) % 4
                 if missing: final_b64 += "=" * (4 - missing)
                 
-                # --- 2. XỬ LÝ YAML ---
+                # --- QUÉT SẠCH YAML BẰNG RENAME MAP ---
                 yaml_text = yaml_res.text
                 if "proxies:" in yaml_text:
-                    # Chạy hàm dọn dẹp tên quốc gia, BGP...
-                    yaml_text = clean_name_string(yaml_text)
-                    # Dùng Regex để tự động nhét " | VPN Trinh Hg" vào cuối tên node trong file YAML
-                    yaml_text = re.sub(r'^( +- name:\s*[\'"]?)(.*?)([\'"]?)$', r'\1\2 | VPN Trinh Hg\3', yaml_text, flags=re.MULTILINE)
+                    # Thay thế toàn bộ tên cũ thành tên mới (Fix luôn cả cụm Proxy-groups)
+                    for old_n, new_n in rename_map.items():
+                        yaml_text = yaml_text.replace(old_n, new_n)
                 else:
                     yaml_text = ""
 
-                # PUSH CẢ 2 BẢN LÊN DATABASE
                 payload = {
                     "key": token,
                     "body_b64": final_b64,
