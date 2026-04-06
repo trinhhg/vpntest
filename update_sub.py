@@ -2,6 +2,7 @@ import requests
 import base64
 import urllib.parse
 import re
+import datetime
 
 WORKER_DOMAIN = "https://vpntest-ad4.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
@@ -59,6 +60,36 @@ def update_all_subs():
                     if not content: continue
                     
                     user_info = sub_res.headers.get("subscription-userinfo", "")
+                    
+                    # BỘ TOÁN HỌC: Tính dung lượng để đẩy lên Web làm thanh Progress
+                    traffic_data = {"used": "0.00", "total": "0.00", "percent": 0, "expire": "Không giới hạn"}
+                    if user_info:
+                        match_up = re.search(r'upload=(\d+)', user_info)
+                        match_down = re.search(r'download=(\d+)', user_info)
+                        match_total = re.search(r'total=(\d+)', user_info)
+                        match_exp = re.search(r'expire=(\d+)', user_info)
+                        
+                        up = int(match_up.group(1)) if match_up else 0
+                        down = int(match_down.group(1)) if match_down else 0
+                        total = int(match_total.group(1)) if match_total else 0
+                        exp = int(match_exp.group(1)) if match_exp else 0
+                        
+                        used_gb = (up + down) / 1073741824
+                        total_gb = total / 1073741824
+                        percent = round((used_gb / total_gb) * 100) if total_gb > 0 else 0
+                        
+                        if exp > 0:
+                            exp_str = datetime.datetime.fromtimestamp(exp).strftime('%d/%m/%Y')
+                        else:
+                            exp_str = "Vĩnh viễn"
+                            
+                        traffic_data = {
+                            "used": f"{used_gb:.2f}",
+                            "total": f"{total_gb:.2f}",
+                            "percent": percent,
+                            "expire": exp_str
+                        }
+
                     missing_padding = len(content) % 4
                     if missing_padding: content += '=' * (4 - missing_padding)
                     
@@ -88,7 +119,6 @@ def update_all_subs():
                         else: 
                             final_string = "\n".join(new_lines)
                         
-                        # FIX CHUẨN: Xử lý bù Padding 100% an toàn cho app PC
                         final_b64 = base64.b64encode(final_string.encode()).decode()
                         missing = len(final_b64) % 4
                         if missing:
@@ -97,11 +127,12 @@ def update_all_subs():
                         payload = {
                             "key": token,
                             "body": final_b64,
-                            "info": user_info
+                            "info": user_info,
+                            "traffic": traffic_data # Đóng gói thêm thông số dung lượng
                         }
                         push_res = requests.post(API_PUSH, json=payload, timeout=10)
                         if push_res.status_code == 200:
-                            print(f"  [OK] Đã push thành công data cho Token {token}")
+                            print(f"  [OK] Đã push thành công data & traffic cho Token {token}")
                         else:
                             print(f"  [FAIL] Push KV lỗi: {push_res.status_code}")
                             
@@ -111,6 +142,5 @@ def update_all_subs():
                 print(f"  [!] Lỗi lấy sub: {e}")
     except Exception as e: print(f"Lỗi hệ thống: {e}")
 
-# FIX INDENT LỖI
 if __name__ == "__main__":
     update_all_subs()
