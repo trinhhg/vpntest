@@ -88,9 +88,8 @@ def update_all_subs():
                         else: 
                             final_string = "\n".join(new_lines)
                         
-                        final_b64 = base64.b64encode(final_string.encode('utf-8')).decode('utf-8').replace('\n', '')
-                        
-                        # FIX CHUẨN: Bù padding '=' cho các parser khó tính trên PC
+                        # FIX CHUẨN: Xử lý bù Padding 100% an toàn cho app PC
+                        final_b64 = base64.b64encode(final_string.encode()).decode()
                         missing = len(final_b64) % 4
                         if missing:
                             final_b64 += "=" * (4 - missing)
@@ -112,6 +111,6 @@ def update_all_subs():
                 print(f"  [!] Lỗi lấy sub: {e}")
     except Exception as e: print(f"Lỗi hệ thống: {e}")
 
-# FIX CHUẨN: Indent (thụt lề) đúng
+# FIX INDENT LỖI
 if __name__ == "__main__":
     update_all_subs()
