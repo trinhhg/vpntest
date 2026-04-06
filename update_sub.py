@@ -8,6 +8,27 @@ WORKER_DOMAIN = "https://vpntest-ad4.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
 API_PUSH = f"{WORKER_DOMAIN}/api/push_data"
 
+def clean_name_string(text):
+    text = urllib.parse.unquote(text)
+    # FIX LỖI YAML: Bỏ toàn bộ dấu : để Clash không hiểu lầm đây là lệnh cấu trúc
+    if "剩余流量" in text: return text.replace("剩余流量：", "Data ").replace("剩余流量:", "Data ")
+    if "距离下次重置剩余" in text: return text.replace("距离下次重置剩余：", "Reset ").replace("距离下次重置剩余:", "Reset ").replace(" 天", " Days")
+    if "套餐到期" in text: return text.replace("套餐到期：", "Exp ").replace("套餐到期:", "Exp ")
+
+    text = text.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
+    text = text.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
+    text = text.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
+    text = text.replace("台湾", "Taiwan ").replace("香港", "Hong Kong ").replace("新加坡", "Singapore ")
+    text = text.replace("日本", "Japan ").replace("美国", "USA ").replace("韩国", "Korea ")
+    text = text.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
+    
+    text = re.sub(r'\|BGP\|', ' ', text)
+    text = re.sub(r'\|BGP', ' ', text)
+    text = re.sub(r'\|', ' ', text)
+    
+    clean_name = " ".join(text.split())
+    return clean_name
+
 def update_all_subs():
     try:
         res = requests.get(API_LINKS, timeout=10)
@@ -65,7 +86,7 @@ def update_all_subs():
                 lines = decoded.splitlines()
                 
                 new_lines = []
-                rename_map = {} # Bản đồ ánh xạ tên cũ -> tên mới để fix YAML
+                rename_map = {}
                 
                 for line in lines:
                     line = line.strip()
@@ -76,15 +97,14 @@ def update_all_subs():
                             if len(parts) == 2:
                                 old_name = urllib.parse.unquote(parts[1])
                                 
-                                # XÓA BỎ DÒNG DATA VÀ RESET (Chỉ giữ Exp)
+                                # BỎ DÒNG DATA, BỎ RESET, CHỈ GIỮ LẠI EXP
                                 if "剩余流量" in old_name or "距离下次重置剩余" in old_name:
                                     continue
-                                
+                                    
                                 new_name = old_name
                                 if "套餐到期" in new_name: 
-                                    new_name = new_name.replace("套餐到期：", "Exp: ").replace("套餐到期:", "Exp: ")
+                                    new_name = new_name.replace("套餐到期：", "Exp ").replace("套餐到期:", "Exp ")
                                 else:
-                                    # Translate
                                     new_name = new_name.replace("良心云", "").replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
                                     new_name = new_name.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("🇸🇬新加坡", "🇸🇬 Singapore ")
                                     new_name = new_name.replace("🇯🇵日本", "🇯🇵 Japan ").replace("🇺🇸美国", "🇺🇸 USA ").replace("🇰🇷韩国", "🇰🇷 Korea ")
@@ -108,10 +128,8 @@ def update_all_subs():
                 missing = len(final_b64) % 4
                 if missing: final_b64 += "=" * (4 - missing)
                 
-                # --- QUÉT SẠCH YAML BẰNG RENAME MAP ---
                 yaml_text = yaml_res.text
                 if "proxies:" in yaml_text:
-                    # Thay thế toàn bộ tên cũ thành tên mới (Fix luôn cả cụm Proxy-groups)
                     for old_n, new_n in rename_map.items():
                         yaml_text = yaml_text.replace(old_n, new_n)
                 else:
