@@ -8,17 +8,14 @@ WORKER_DOMAIN = "https://vpntest-ad4.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
 API_PUSH = f"{WORKER_DOMAIN}/api/push_data"
 
-def clean_text_global(text):
+def clean_name_string(text):
     text = urllib.parse.unquote(text)
     
-    # 1. Bỏ BGP
-    text = text.replace("-BGP-", "-").replace("BGP-", "").replace("-BGP", "").replace("BGP", "")
+    # Bỏ hẳn tên nhà mạng cũ ra khỏi Node để không bị lặp
+    text = text.replace("良心云", "").replace("顶级机场", "")
     
-    # 2. Đổi tên Group / Nhà cung cấp
-    text = text.replace("顶级机场", "VPN Trinh Hg").replace("良心云", "VPN Trinh Hg")
+    # Dịch thuật
     text = text.replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
-    
-    # 3. Dịch thuật chuẩn
     text = text.replace("🇨🇳台湾", "🇹🇼 Taiwan ").replace("台湾", "Taiwan ")
     text = text.replace("🇭🇰香港", "🇭🇰 Hong Kong ").replace("香港", "Hong Kong ")
     text = text.replace("🇸🇬新加坡", "🇸🇬 Singapore ").replace("新加坡", "Singapore ")
@@ -27,12 +24,15 @@ def clean_text_global(text):
     text = text.replace("🇰🇷韩国", "🇰🇷 Korea ").replace("韩国", "Korea ")
     text = text.replace("高速", " High Speed ").replace("专线", " Private ").replace("流媒体", " Streaming").replace("0.1倍", " 0.1x")
     
-    # 4. FIX LỖI YAML CHÍ MẠNG: Đổi | thành - (Khắc phục lỗi Block Collections)
-    text = text.replace("|", "-")
+    # TIÊU DIỆT BGP
+    text = re.sub(r'(?i)bgp', '', text)
     
-    # 5. Fix dòng Exp: Bỏ luôn dấu hai chấm (:) để YAML không bị ngáo
-    text = re.sub(r'套餐到期[：:]\s*', 'Exp ', text)
+    # CHUẨN HÓA DẤU GẠCH NGANG (Xóa |-- trùng lặp)
+    text = re.sub(r'[|\-]+', '-', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    text = text.replace(" -", "-").replace("- ", "-").replace("-", " - ")
     
+    if text.endswith("-"): text = text[:-1].strip()
     return text
 
 def update_all_subs():
@@ -66,7 +66,7 @@ def update_all_subs():
                 content = b64_res.text.strip()
                 user_info = b64_res.headers.get("subscription-userinfo", "")
                 
-                # Tính dung lượng cho Web
+                # Xử lý % Dung Lượng
                 traffic_data = {"used": "0.00", "total": "0.00", "percent": 0, "expire": "Vĩnh viễn"}
                 if user_info:
                     match_up = re.search(r'upload=(\d+)', user_info); match_down = re.search(r'download=(\d+)', user_info); match_total = re.search(r'total=(\d+)', user_info); match_exp = re.search(r'expire=(\d+)', user_info)
@@ -76,24 +76,38 @@ def update_all_subs():
                     exp_str = datetime.datetime.fromtimestamp(exp).strftime('%d/%m/%Y') if exp > 0 else "Vĩnh viễn"
                     traffic_data = {"used": f"{used_gb:.2f}", "total": f"{total_gb:.2f}", "percent": percent, "expire": exp_str}
 
-                # --- 1. XỬ LÝ BASE64 ---
+                # ==========================
+                # 1. BUILD BASE64 SIÊU SẠCH
+                # ==========================
                 missing_padding = len(content) % 4
                 if missing_padding: content += '=' * (4 - missing_padding)
                 decoded = base64.b64decode(content).decode('utf-8', errors='ignore')
                 
                 new_lines = []
+                rename_map = {} # Lưu lại map để dò thay thế trong YAML
+                
                 for line in decoded.splitlines():
                     line = line.strip()
+                    if not line: continue
                     if "://" in line:
                         parts = line.split("#", 1)
                         if len(parts) == 2:
                             old_name = urllib.parse.unquote(parts[1])
-                            # TIÊU DIỆT HOÀN TOÀN DATA & RESET
+                            
+                            # DIỆT CỎ TẬN GỐC DÒNG DATA VÀ RESET
                             if "剩余流量" in old_name or "距离下次重置" in old_name:
                                 continue
-                            new_name = clean_text_global(old_name)
-                            new_name = " ".join(new_name.split()) # Dọn khoảng trắng thừa
-                            new_lines.append(f"{parts[0]}#{urllib.parse.quote(new_name)}")
+                                
+                            new_name = old_name
+                            if "套餐到期" in new_name: 
+                                new_name = new_name.replace("套餐到期：", "Exp ").replace("套餐到期:", "Exp ")
+                                final_name = f"{new_name.strip()} - VPN Trinh Hg"
+                            else:
+                                clean_n = clean_name_string(old_name)
+                                final_name = f"{clean_n} - VPN Trinh Hg" if clean_n else "VPN Trinh Hg"
+                            
+                            rename_map[old_name] = final_name
+                            new_lines.append(f"{parts[0]}#{urllib.parse.quote(final_name)}")
                         else: new_lines.append(line)
                     else: new_lines.append(line)
 
@@ -101,19 +115,36 @@ def update_all_subs():
                 missing = len(final_b64) % 4
                 if missing: final_b64 += "=" * (4 - missing)
                 
-                # --- 2. XỬ LÝ YAML (QUÉT TOÀN CỤC CHỐNG LỖI NOT FOUND) ---
+                # ==========================
+                # 2. BUILD YAML ĐỒNG BỘ 100%
+                # ==========================
                 yaml_text = yaml_res.text
                 if "proxies:" in yaml_text:
-                    # 1. Chém bay màu MỌI DÒNG chứa Data / Reset trong YAML (Xóa cả ở proxy và proxy-groups)
+                    # Chém bay dòng Data và Reset trong YAML bằng Regex
                     yaml_text = re.sub(r'^.*?(?:剩余流量|距离下次重置).*?\r?\n', '', yaml_text, flags=re.MULTILINE)
-                    # 2. Thay thế Text đồng loạt để Group và Node giống hệt tên nhau
-                    yaml_text = clean_text_global(yaml_text)
+                    
+                    # Đổi đồng loạt Tên Provider (áp dụng cho Group và Rule)
+                    yaml_text = yaml_text.replace("顶级机场", "VPN Trinh Hg").replace("良心云", "VPN Trinh Hg")
+                    yaml_text = yaml_text.replace("自动选择", "Auto Select").replace("故障转移", "Fallback")
+                    
+                    # Sửa Exp trong YAML không có dấu hai chấm (:)
+                    yaml_text = re.sub(r'套餐到期[:：]\s*(\d{4}-\d{2}-\d{2})', r'Exp \1 - VPN Trinh Hg', yaml_text)
+                    
+                    # Đổi tên Proxy y hệt Base64
+                    for old_n, new_n in rename_map.items():
+                        yaml_text = yaml_text.replace(old_n, new_n)
                 else:
                     yaml_text = ""
 
-                payload = {"key": token, "body_b64": final_b64, "body_yaml": yaml_text, "info": user_info, "traffic": traffic_data}
-                push_res = requests.post(API_PUSH, json=payload, timeout=10)
-                print(f"  [OK] {token}" if push_res.status_code == 200 else f"  [FAIL] Push lỗi")
+                payload = {
+                    "key": token,
+                    "body_b64": final_b64,
+                    "body_yaml": yaml_text,
+                    "info": user_info,
+                    "traffic": traffic_data
+                }
+                requests.post(API_PUSH, json=payload, timeout=10)
+                print(f"  [OK] {token}")
             except Exception as e: print(f"  [!] Lỗi: {e}")
     except Exception as e: print(f"Hệ thống lỗi: {e}")
 
