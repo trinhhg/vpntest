@@ -110,6 +110,8 @@
                             </div>
                             <button onclick="switchPortalTab('p-store')" class="w-full xl:w-auto bg-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white font-bold py-2 px-6 rounded-xl transition text-sm flex items-center justify-center shrink-0 shadow-sm"><i class="fas fa-redo-alt mr-2"></i> <span data-i18n="btn_renew">Gia hạn</span></button>
                         </div>
+                        
+                        <div id="trafficVisualBarContainer" class="w-full mb-4"></div>
 
                         <div class="bg-green-50 border border-green-200 p-4 md:p-6 rounded-2xl mb-4 w-full">
                             <h3 class="text-green-900 font-bold mb-3 text-xs md:text-sm"><i class="fas fa-link mr-1"></i> Link Subscription URL:</h3>
@@ -241,6 +243,97 @@
 
         </div>
 
+        <div id="view-store" class="view-section active mb-20 w-full">
+            <div id="welcomeBanner" class="text-center mb-8 mt-2 md:mt-4 px-2 w-full">
+                <h1 class="text-3xl md:text-5xl font-extrabold mb-3 text-slate-800 leading-tight" data-i18n="hero_title">Vượt rào cản. <span class="text-indigo-600">Kết nối thế giới.</span></h1>
+                <p class="text-xs md:text-base text-slate-600 font-medium px-4 mb-5" data-i18n="hero_desc">Trải nghiệm VPN chất lượng cao từ ba nhà mạng viễn thông lớn.</p>
+                
+                <div class="flex justify-center w-full overflow-hidden">
+                    <div class="flex items-center gap-2 bg-yellow-50 px-5 py-2.5 rounded-full border border-yellow-200 shadow-sm w-fit max-w-[95vw]">
+                        <span class="text-[11px] md:text-sm font-black text-slate-800 text-wrap text-center" data-i18n="header_contact">Cần test tốc độ truy cập app nào thì hãy liên hệ Admin qua Mess hoặc Zalo</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-10 w-full">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center"><i class="fas fa-globe text-2xl md:text-3xl text-blue-500 mb-2"></i><h4 class="font-bold text-xs md:text-sm text-slate-800" data-i18n="feat_1">Mở khóa mọi Nền tảng</h4></div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center"><i class="fas fa-gamepad text-2xl md:text-3xl text-purple-500 mb-2"></i><h4 class="font-bold text-xs md:text-sm text-slate-800" data-i18n="feat_2">Ping thấp, Tối ưu Game</h4></div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center"><i class="fas fa-user-secret text-2xl md:text-3xl text-slate-800 mb-2"></i><h4 class="font-bold text-xs md:text-sm text-slate-800" data-i18n="feat_3">Không lưu Nhật ký</h4></div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center"><i class="fas fa-laptop-house text-2xl md:text-3xl text-indigo-500 mb-2"></i><h4 class="font-bold text-xs md:text-sm text-slate-800" data-i18n="feat_4">Đa hệ điều hành</h4></div>
+            </div>
+
+            <div class="flex justify-start md:justify-center gap-2 mb-6 bg-white p-1.5 md:px-2 rounded-xl w-full md:w-fit mx-auto border border-slate-100 shadow-sm overflow-x-auto pkg-filters max-w-full">
+                <button onclick="renderPackages('all')" id="htab-all" class="tab-btn active text-slate-600 px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm whitespace-nowrap flex-1" data-i18n="tab_all">Tất cả</button>
+                <button onclick="renderPackages('travel')" id="htab-travel" class="tab-btn text-slate-600 px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm whitespace-nowrap flex-1" data-i18n="tab_travel">Du lịch</button>
+                <button onclick="renderPackages('cycle')" id="htab-cycle" class="tab-btn text-slate-600 px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm whitespace-nowrap flex-1" data-i18n="tab_cycle">Chu kỳ</button>
+                <button onclick="renderPackages('usage')" id="htab-usage" class="tab-btn text-slate-600 px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm whitespace-nowrap flex-1" data-i18n="tab_usage">Dung lượng</button>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6 mb-10 w-full" id="packagesContainerHome"></div>
+
+            <div id="checkoutSection" class="hidden mt-6 scroll-mt-24 w-full">
+                <div class="text-center mb-6"><h3 class="text-xl md:text-3xl font-extrabold text-slate-800" data-i18n="checkout_title">Thanh toán Đơn hàng</h3></div>
+                
+                <form id="orderForm" onsubmit="submitOrder(event)" class="w-full">
+                    <div class="grid lg:grid-cols-2 gap-6 items-stretch w-full">
+                        
+                        <div class="bg-white border border-slate-200 p-5 md:p-8 rounded-2xl md:rounded-3xl flex flex-col h-full shadow-sm relative overflow-hidden">
+                            <div class="bg-indigo-50 px-5 py-4 rounded-xl mb-5 flex justify-between items-center border border-indigo-100">
+                                <div>
+                                    <p class="text-sm md:text-base font-black text-slate-800 uppercase" id="selectedPackageName"></p>
+                                    <p class="text-[11px] md:text-xs font-bold text-slate-500 mt-0.5" id="selectedPackageData"></p>
+                                </div>
+                                <p class="text-lg md:text-xl font-black text-indigo-600" id="selectedPackagePrice"></p>
+                            </div>
+                            
+                            <input type="email" id="cusEmail" class="w-full border border-slate-200 rounded-xl p-3.5 outline-none text-sm focus:border-indigo-500 mb-4 bg-slate-50" data-i18n-placeholder="email_placeholder" placeholder="Nhập Email nhận đơn" required>
+                            
+                            <input type="text" id="refCodeInput" class="w-full border border-slate-200 rounded-xl p-3.5 outline-none text-sm focus:border-indigo-500 mb-4 bg-slate-50 uppercase placeholder-slate-400" placeholder="Mã giới thiệu (nếu có)">
+
+                            <select id="payMethod" class="w-full border border-slate-200 rounded-xl p-3.5 font-bold outline-none bg-slate-50 text-sm focus:border-indigo-500 mb-4" onchange="renderPaymentBox()">
+                                <option value="bank" data-i18n="pay_vn">Ngân hàng Việt Nam (VietQR)</option>
+                                <option value="alipay" data-i18n="pay_alipay">Alipay</option>
+                                <option value="wechat" data-i18n="pay_wechat">WeChat Pay</option>
+                            </select>
+
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4">
+                                <label class="flex items-start space-x-2 cursor-pointer">
+                                    <input type="checkbox" id="needSupport" onchange="toggleZalo()" class="mt-1 w-4 h-4 accent-indigo-600">
+                                    <span class="font-bold text-xs md:text-sm text-slate-800 pt-0.5" data-i18n="need_support">Cần Hỗ trợ Zalo/Tele cài đặt</span>
+                                </label>
+                                <input type="text" id="cusZalo" class="w-full border border-slate-300 rounded-lg p-2.5 mt-3 hidden outline-none text-xs" placeholder="Nhập Zalo / Telegram của bạn...">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold text-xs text-slate-700 mb-2" data-i18n="choose_dur">Chọn thời gian:</label>
+                                <div class="grid grid-cols-4 gap-2 text-center">
+                                    <button type="button" onclick="selectDuration(1)" id="dur-btn-1" class="dur-btn active bg-indigo-600 text-white font-bold py-2 rounded-lg text-sm shadow-sm transition">1 <span class="text-[10px] font-normal" data-i18n="month_lbl">Tháng</span></button>
+                                    <button type="button" onclick="selectDuration(3)" id="dur-btn-3" class="dur-btn bg-white border border-slate-200 text-slate-600 font-bold py-2 rounded-lg text-sm shadow-sm hover:bg-slate-50 transition">3 <span class="text-[10px] font-normal" data-i18n="month_lbl">Tháng</span></button>
+                                    <button type="button" onclick="selectDuration(6)" id="dur-btn-6" class="dur-btn bg-white border border-slate-200 text-slate-600 font-bold py-2 rounded-lg text-sm shadow-sm hover:bg-slate-50 transition">6 <span class="text-[10px] font-normal" data-i18n="month_lbl">Tháng</span></button>
+                                    <button type="button" onclick="selectDuration(12)" id="dur-btn-12" class="dur-btn bg-white border border-slate-200 text-slate-600 font-bold py-2 rounded-lg text-sm shadow-sm hover:bg-slate-50 transition">12 <span class="text-[10px] font-normal" data-i18n="month_lbl">Tháng</span></button>
+                                </div>
+                                <div id="priceCalculation" class="mt-3 text-sm font-black text-indigo-700 bg-indigo-50 border border-indigo-100 p-2.5 rounded-lg text-center"></div>
+                            </div>
+
+                            <div class="bg-red-50 border border-red-200 p-3 rounded-xl mt-auto mb-4 flex items-start gap-2 shadow-sm">
+                                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
+                                <p class="text-[11px] md:text-xs text-red-700 font-bold leading-snug" data-i18n="email_warning">Vui lòng nhập đúng Email của bạn và đảm bảo Email có tồn tại vì chúng tôi sẽ gửi mail kích hoạt về Email này.</p>
+                            </div>
+
+                            <button type="submit" id="btnConfirm" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 md:py-4 rounded-xl text-sm md:text-base uppercase transition shadow-md shrink-0">TẠO MÃ QR CHUYỂN KHOẢN</button>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 p-5 md:p-8 rounded-2xl md:rounded-3xl h-full flex flex-col justify-start shadow-sm overflow-hidden" id="checkoutRightCol"></div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="mt-16 mb-4 w-full">
+                <h3 class="text-xl md:text-2xl font-extrabold text-center mb-6 text-slate-800" data-i18n="faq_title">Câu hỏi thường gặp (FAQ)</h3>
+                <div class="space-y-3" id="faqStoreContainer"></div>
+            </div>
+        </div>
+
     </main>
 
     <footer id="footerArea" class="bg-white border-t border-slate-200 py-4 z-10 w-full mt-auto">
@@ -254,8 +347,7 @@
     </footer>
 
     <script>
-        // BẮT BUỘC ĐỂ TRỐNG API_URL ĐỂ ĐỒNG BỘ DATA QUA PROXY. WORKER.JS SẼ TỰ CHUYỂN TIẾP
-        const API_URL = "";
+        const API_URL = "https://vpn-worker-test.doicucden.workers.dev"; // API của Admin
         const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         const SESSION_KEY = 'vpn_portal_session_24h';
         const DB_KEY = 'vpn_orders_db';
@@ -430,6 +522,7 @@
                 return JSON.parse(localStorage.getItem(path === '/api/orders' ? DB_KEY : path.replace(/\//g,'_'))) || (path === '/api/orders' ? [] : {});
             }
         }
+        
         async function apiPost(path, data) {
             localStorage.setItem(path === '/api/orders' ? DB_KEY : path.replace(/\//g,'_'), JSON.stringify(data)); 
             try { await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) }); } catch(e) {}
@@ -685,7 +778,7 @@
                         
                         trafficBar.innerHTML = `<p class="text-xs text-center text-slate-500 animate-pulse"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải dữ liệu dung lượng...</p>`;
 
-                        fetch("/api/traffic?token=" + token)
+                        fetch(API_URL + "/api/traffic?token=" + token)
                         .then(r => r.json())
                         .then(traffic => {
                             if(traffic.total && traffic.total !== "0.00") {
@@ -719,78 +812,83 @@
         }
 
         async function login(isManualRefresh = false, isAutoPoll = false) {
-            const input = document.getElementById('loginInput').value.trim().toUpperCase(); if(!input) return;
+            try {
+                const input = document.getElementById('loginInput').value.trim().toUpperCase(); 
+                if(!input) return;
 
-            let db = await apiGet("/api/orders");
-            if(!Array.isArray(db)) db = [];
-            let o = db.find(x => x.id.toUpperCase() === input || (x.email && x.email.toUpperCase() === input));
-            if(!o) { 
-                if(!isAutoPoll) showToast(lang==='vi'?'Không tìm thấy Đơn hàng/Email này!':(lang==='en'?'Order not found!':'未找到订单'), 'error'); 
-                return; 
-            }
+                let db = await apiGet("/api/orders");
+                if(!Array.isArray(db)) db = [];
+                let o = db.find(x => x.id.toUpperCase() === input || (x.email && x.email.toUpperCase() === input));
+                if(!o) { 
+                    if(!isAutoPoll) showToast(lang==='vi'?'Không tìm thấy Đơn hàng/Email này!':(lang==='en'?'Order not found!':'未找到订单'), 'error'); 
+                    return; 
+                }
 
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ id: o.id, time: new Date().getTime() }));
-            if(!isManualRefresh && !isAutoPoll) showToast(lang==='vi'?'Vào cổng thành công!':(lang==='en'?'Login success!':'登录成功'), "info");
+                localStorage.setItem(SESSION_KEY, JSON.stringify({ id: o.id, time: new Date().getTime() }));
+                if(!isManualRefresh && !isAutoPoll) showToast(lang==='vi'?'Vào cổng thành công!':(lang==='en'?'Login success!':'登录成功'), "info");
 
-            document.getElementById('view-store').classList.remove('active'); document.getElementById('view-portal').classList.add('active');
-            document.getElementById('userMenu').classList.remove('hidden'); document.getElementById('checkoutSection').classList.add('hidden');
-            
-            document.getElementById('portalNav').classList.remove('hidden'); 
-            document.getElementById('desktopPortalNav').classList.remove('opacity-0', 'pointer-events-none'); 
-            
-            if(!isAutoPoll && !isManualRefresh) switchPortalTab('p-home');
-
-            updatePortalInfo(o);
-
-            if (o.status === 'success') {
-                cmsCache = await apiGet("/api/cms");
-                showGuide('android');
-
-                let refsDb = await apiGet("/api/refs");
-                if(!Array.isArray(refsDb)) refsDb = [];
-                let myRef = refsDb.find(r => r.email === o.email);
+                document.getElementById('view-store').classList.remove('active'); document.getElementById('view-portal').classList.add('active');
+                document.getElementById('userMenu').classList.remove('hidden'); document.getElementById('checkoutSection').classList.add('hidden');
                 
-                if(myRef && myRef.code) {
-                    document.getElementById('myRefCode').innerText = myRef.code;
-                    document.getElementById('myRefLink').value = `${window.location.origin}/?ref=${myRef.code}`;
-                    document.getElementById('myRefCount').innerText = myRef.count || 0;
-                    document.getElementById('myRefCommission').innerText = (myRef.commission || 0).toLocaleString('vi-VN') + 'đ';
-                    myCurrentRefCount = myRef.count || 0;
+                document.getElementById('portalNav').classList.remove('hidden'); 
+                document.getElementById('desktopPortalNav').classList.remove('opacity-0', 'pointer-events-none'); 
+                
+                if(!isAutoPoll && !isManualRefresh) switchPortalTab('p-home');
+
+                updatePortalInfo(o);
+
+                if (o.status === 'success') {
+                    cmsCache = await apiGet("/api/cms");
+                    showGuide('android');
+
+                    let refsDb = await apiGet("/api/refs");
+                    if(!Array.isArray(refsDb)) refsDb = [];
+                    let myRef = refsDb.find(r => r.email === o.email);
                     
-                    const btnW = document.getElementById('btnWithdraw');
-                    const iconW = document.getElementById('iconWithdraw');
-                    if (myCurrentRefCount >= 10) {
-                        btnW.className = "bg-green-600 text-white font-bold px-4 py-3 rounded-xl hover:bg-green-700 transition flex items-center justify-center flex-1 max-w-[200px] text-xs md:text-sm shadow-md cursor-pointer";
-                        iconW.className = "fas fa-unlock mr-2";
+                    if(myRef && myRef.code) {
+                        document.getElementById('myRefCode').innerText = myRef.code;
+                        document.getElementById('myRefLink').value = `${window.location.origin}/?ref=${myRef.code}`;
+                        document.getElementById('myRefCount').innerText = myRef.count || 0;
+                        document.getElementById('myRefCommission').innerText = (myRef.commission || 0).toLocaleString('vi-VN') + 'đ';
+                        myCurrentRefCount = myRef.count || 0;
+                        
+                        const btnW = document.getElementById('btnWithdraw');
+                        const iconW = document.getElementById('iconWithdraw');
+                        if (myCurrentRefCount >= 10) {
+                            btnW.className = "bg-green-600 text-white font-bold px-4 py-3 rounded-xl hover:bg-green-700 transition flex items-center justify-center flex-1 max-w-[200px] text-xs md:text-sm shadow-md cursor-pointer";
+                            iconW.className = "fas fa-unlock mr-2";
+                        } else {
+                            btnW.className = "bg-slate-200 text-slate-500 font-bold px-4 py-3 rounded-xl transition flex items-center justify-center flex-1 max-w-[200px] text-xs md:text-sm cursor-not-allowed shadow-sm";
+                            iconW.className = "fas fa-lock mr-2";
+                        }
                     } else {
-                        btnW.className = "bg-slate-200 text-slate-500 font-bold px-4 py-3 rounded-xl transition flex items-center justify-center flex-1 max-w-[200px] text-xs md:text-sm cursor-not-allowed shadow-sm";
-                        iconW.className = "fas fa-lock mr-2";
+                        document.getElementById('myRefCode').innerText = 'CHƯA CÓ';
+                        document.getElementById('myRefLink').value = 'Hệ thống đang cập nhật...';
                     }
-                } else {
-                    document.getElementById('myRefCode').innerText = 'CHƯA CÓ';
-                    document.getElementById('myRefLink').value = 'Hệ thống đang cập nhật...';
-                }
 
-                historiesDb = await apiGet("/api/history");
-                if(!Array.isArray(historiesDb)) historiesDb = [];
-                let myHistory = historiesDb.filter(h => h.email === o.email);
-                const historyBody = document.getElementById('historyTablePortal');
-                historyBody.innerHTML = '';
-                
-                if(myHistory.length > 0) {
-                    myHistory.forEach(h => {
-                        historyBody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
-                            <td class="p-3 font-bold text-slate-800">${h.email}</td>
-                            <td class="p-3 font-medium text-slate-600 text-xs">${h.pkgName} <span class="text-indigo-600 font-bold">(${h.data})</span><br><span class="text-[10px] text-slate-400">${h.priceStr}</span></td>
-                            <td class="p-3 font-bold text-slate-600">${h.expDate || 'Vĩnh viễn'}</td>
-                        </tr>`;
-                    });
-                } else {
-                    historyBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 italic text-sm">Chưa có dữ liệu lịch sử</td></tr>`;
+                    historiesDb = await apiGet("/api/history");
+                    if(!Array.isArray(historiesDb)) historiesDb = [];
+                    let myHistory = historiesDb.filter(h => h.email === o.email);
+                    const historyBody = document.getElementById('historyTablePortal');
+                    historyBody.innerHTML = '';
+                    
+                    if(myHistory.length > 0) {
+                        myHistory.forEach(h => {
+                            historyBody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
+                                <td class="p-3 font-bold text-slate-800">${h.email}</td>
+                                <td class="p-3 font-medium text-slate-600 text-xs">${h.pkgName} <span class="text-indigo-600 font-bold">(${h.data})</span><br><span class="text-[10px] text-slate-400">${h.priceStr}</span></td>
+                                <td class="p-3 font-bold text-slate-600">${h.expDate || 'Vĩnh viễn'}</td>
+                            </tr>`;
+                        });
+                    } else {
+                        historyBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 italic text-sm">Chưa có dữ liệu lịch sử</td></tr>`;
+                    }
                 }
+                
+                renderPackages('all'); if(!isManualRefresh && !isAutoPoll) window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch(e) {
+                console.error("Lỗi khi login:", e);
             }
-            
-            renderPackages('all'); if(!isManualRefresh && !isAutoPoll) window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function withdrawCommission() {
@@ -819,12 +917,29 @@
             });
         }
 
+        // BIẾN TOÀN CỤC BẢO VỆ CHỐNG LỖI CLASSLIST NULL
         function logout() {
-            localStorage.removeItem(SESSION_KEY); document.getElementById('view-portal').classList.remove('active'); document.getElementById('view-store').classList.add('active');
-            document.getElementById('userMenu').classList.add('hidden'); document.getElementById('loginInput').value = '';
-            document.getElementById('portalNav').classList.add('hidden');
-            document.getElementById('desktopPortalNav').classList.add('opacity-0', 'pointer-events-none');
-            oCache = null; myCurrentRefCount = 0;
+            try {
+                localStorage.removeItem(SESSION_KEY); 
+                const vp = document.getElementById('view-portal');
+                const vs = document.getElementById('view-store');
+                if (vp) vp.classList.remove('active'); 
+                if (vs) vs.classList.add('active');
+                
+                const um = document.getElementById('userMenu');
+                if(um) um.classList.add('hidden'); 
+                
+                const li = document.getElementById('loginInput');
+                if(li) li.value = '';
+                
+                const pn = document.getElementById('portalNav');
+                if(pn) pn.classList.add('hidden');
+                
+                const dpn = document.getElementById('desktopPortalNav');
+                if(dpn) dpn.classList.add('opacity-0', 'pointer-events-none');
+                
+                oCache = null; myCurrentRefCount = 0;
+            } catch(e) { console.log("Lỗi thoát: ", e); }
         }
 
         function showGuide(dev) {
