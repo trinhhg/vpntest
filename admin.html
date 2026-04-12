@@ -97,42 +97,29 @@
        </div>
 
        <div id="tab-links" class="hidden glass-card p-5 md:p-8">
-           <h2 class="text-xl font-bold mb-2">Quản lý Link Sub Ẩn (Masked Link)</h2>
-           <p class="text-xs text-slate-500 mb-6">Chỉ cần dán Link gốc (Liangxin). Hệ thống sẽ bẻ lái (Redirect 302) để đảm bảo độ ổn định tuyệt đối.</p>
+           <h2 class="text-xl font-bold mb-2">Quản lý Cụm Link Ẩn (Oversell)</h2>
+           <p class="text-xs text-slate-500 mb-6">Chung 1 Link Gốc có thể đẻ ra nhiều Link Ẩn khác nhau. Xóa Link Ẩn thì người đó chết mạng, người khác không ảnh hưởng.</p>
            
            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6">
                <div class="grid md:grid-cols-3 gap-4 mb-4">
                    <div>
                        <label class="block font-bold text-xs text-slate-700 mb-1">Link Gốc (Liangxin / Djjc)</label>
-                       <input type="text" id="linkOrigInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm" placeholder="https://liangxin.xyz/api/v1/liangxin?OwO=...">
+                       <input type="text" id="linkOrigInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm" placeholder="Nhập URL có OwO=...">
                    </div>
                    <div>
-                       <label class="block font-bold text-xs text-slate-700 mb-1">Email Khách Hàng (Tùy chọn)</label>
-                       <input type="text" id="linkEmailInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="Ví dụ: khachhang@gmail.com">
+                       <label class="block font-bold text-xs text-slate-700 mb-1">Email Khách Hàng</label>
+                       <input type="text" id="linkEmailInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="khachA@gmail.com">
                    </div>
                    <div>
-                       <label class="block font-bold text-xs text-slate-700 mb-1">Số thứ tự chia sẻ (Mặc định: 1)</label>
-                       <input type="number" id="linkIndexInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="VD: 1, 2, 3..." value="1" min="1">
-                       <p class="text-[10px] text-slate-500 mt-1 italic">Nhập ≥ 2 để tạo mã Sub-ID ảo, không lộ quy luật.</p>
+                       <label class="block font-bold text-xs text-slate-700 mb-1">Số máy phụ (Index)</label>
+                       <input type="number" id="linkIndexInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="1, 2, 3422..." min="1" value="1">
                    </div>
                </div>
-               <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> TẠO & LƯU LINK ẨN</button>
+               <p class="text-[10px] text-slate-500 mb-3 italic">* Nếu nhập 1 hoặc trống, nó sẽ lấy y nguyên Token Gốc. Nhập các số ngẫu nhiên khác (vd: 3422) nó sẽ tự động băm ra 1 mã ẩn riêng biệt cho khách đó.</p>
+               <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> ĐẺ LINK ẨN CHO KHÁCH</button>
            </div>
 
-           <div class="overflow-x-auto border border-slate-200 rounded-xl">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[700px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr>
-                           <th class="p-4 w-1/4">Email Khách</th>
-                           <th class="p-4 w-1/4">Index</th>
-                           <th class="p-4 w-1/3">Link Gốc</th>
-                           <th class="p-4 w-1/3">Link Đã Ẩn (Gửi Khách)</th>
-                           <th class="p-4 text-right">Hành động</th>
-                       </tr>
-                   </thead>
-                   <tbody id="linksTable" class="divide-y divide-slate-100 bg-white"></tbody>
-               </table>
-           </div>
+           <div id="groupedLinksContainer" class="flex flex-col gap-4"></div>
        </div>
 
        <div id="tab-refs" class="hidden glass-card p-5 md:p-8">
@@ -206,7 +193,6 @@
                <div>
                    <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Ngày hết hạn (VD: 30/12/2026)</label>
                    <input type="text" id="editExpDate" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
-                   <p class="text-[10px] text-indigo-500 font-bold mt-1 italic">*Nhập lần đầu & duyệt Thành Công sẽ tự sinh Code Ref và Lưu bảng Lịch Sử.</p>
                </div>
                <div>
                    <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
@@ -233,11 +219,6 @@
                <input type="text" id="editReason" class="w-full p-2 text-sm border border-red-200 rounded-lg outline-none" placeholder="Ví dụ: Chưa nhận được tiền...">
            </div>
 
-           <div class="flex items-center mb-5 bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
-               <input type="checkbox" id="sendMailCheck" class="w-4 h-4 mr-3 accent-indigo-600" checked>
-               <label for="sendMailCheck" class="font-bold text-xs md:text-sm text-slate-700">Gửi Email thông báo trạng thái cho khách</label>
-           </div>
-
            <div class="flex gap-2">
                <button onclick="saveOrderToCloud()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm"><i class="fas fa-save mr-2"></i>LƯU</button>
                <button onclick="document.getElementById('modalEdit').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-lg hover:bg-slate-300 text-sm"><i class="fas fa-times mr-2"></i>Hủy</button>
@@ -248,50 +229,27 @@
    <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
        <div class="glass-card p-6 w-full max-w-lg">
            <h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3>
-           
            <div class="mb-4">
                <label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label>
                <input type="text" id="histEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500">
            </div>
-
            <div class="mb-4">
                <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
                <select id="histPkg" class="w-full p-3 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select>
            </div>
-
            <div class="grid grid-cols-2 gap-4 mb-4">
                <div>
                    <label class="block font-bold text-xs text-slate-600 mb-1">Ngày Hết Hạn</label>
                    <input type="text" id="histExp" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
                </div>
                <div>
-                   <label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref (Để cộng 8%)</label>
+                   <label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref</label>
                    <input type="text" id="histRef" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 uppercase" placeholder="Bỏ trống nếu không có">
                </div>
            </div>
-
            <div class="flex gap-2">
-               <button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM LỊCH SỬ</button>
+               <button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM</button>
                <button onclick="document.getElementById('modalHistory').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
-           </div>
-       </div>
-   </div>
-
-   <div id="modalEditLink" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-       <div class="glass-card p-6 w-full max-w-lg">
-           <h3 class="text-xl font-bold mb-4">Chỉnh sửa Link Sub</h3>
-           <input type="hidden" id="editLinkId">
-           <div class="mb-4">
-               <label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label>
-               <input type="text" id="editLinkEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500">
-           </div>
-           <div class="mb-4">
-               <label class="block font-bold text-xs text-slate-600 mb-1">Link Gốc (Liangxin)</label>
-               <input type="text" id="editLinkOrig" class="w-full p-3 text-sm font-mono border rounded-lg outline-none focus:border-indigo-500">
-           </div>
-           <div class="flex gap-2">
-               <button onclick="saveLinkEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>LƯU THAY ĐỔI</button>
-               <button onclick="document.getElementById('modalEditLink').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
            </div>
        </div>
    </div>
@@ -316,12 +274,11 @@
    </div>
 
    <script>
-       const API_URL = ""; 
+       const API_URL = "https://vpn-worker-test.doicucden.workers.dev"; 
        const MY_PAGES_DOMAIN = "https://vpntest-ad4.pages.dev"; 
-       const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         
-       let ordersDb = []; let cmsDb = {}; let adminDevices = []; let linksDb = []; let refsDb = []; let historyDb = [];
-       let currentCmsDevice = 'android'; let refreshInterval; let myDeviceId = '';
+       let ordersDb = []; let adminDevices = []; let linksDb = []; let historyDb = []; let refsDb = [];
+       let myDeviceId = ''; let currentCmsDevice = 'android';
 
        const packageOptions = [
            { txt: "Gói 1 tháng - 50.000đ / 2$ / 12.5¥ (100GB)", vnd: 50000, data: "100GB" },
@@ -338,9 +295,8 @@
            const container = document.getElementById('toastContainer');
            const toast = document.createElement('div');
            const bg = type === 'error' ? 'bg-red-500' : (type === 'info' ? 'bg-blue-500' : 'bg-green-500');
-           const icon = type === 'error' ? 'fa-times-circle' : (type === 'info' ? 'fa-info-circle' : 'fa-check-circle');
            toast.className = `${bg} text-white px-4 md:px-6 py-3 rounded-xl shadow-xl flex items-center transform transition-all duration-300 translate-x-full opacity-0 w-[90vw] max-w-sm mb-2`;
-           toast.innerHTML = `<i class="fas ${icon} mr-2 shrink-0"></i><span class="font-bold text-xs md:text-sm">${msg}</span>`;
+           toast.innerHTML = `<span class="font-bold text-xs md:text-sm">${msg}</span>`;
            container.appendChild(toast);
            setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
            setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
@@ -350,17 +306,11 @@
            try {
                let res = await fetch(API_URL + path + "?_t=" + Date.now());
                if(!res.ok) throw new Error("HTTP error");
-               let data = await res.json();
-               localStorage.setItem(path.replace(/\//g,'_'), JSON.stringify(data));
-               return data;
-           } catch(e) {
-               return JSON.parse(localStorage.getItem(path.replace(/\//g,'_'))) || [];
-           }
+               return await res.json();
+           } catch(e) { return []; }
         }
        async function apiPost(path, data) {
-           localStorage.setItem(path.replace(/\//g,'_'), JSON.stringify(data)); 
-           try { await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) }); } 
-           catch(e) {}
+           try { await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) }); } catch(e) {}
         }
 
        window.onload = async function() {
@@ -379,7 +329,7 @@
                adminDevices = await apiGet("/api/devices");
                if(!Array.isArray(adminDevices)) adminDevices = [];
                if(!adminDevices.find(x => x.id === myDeviceId)) {
-                   adminDevices.push({ id: myDeviceId, userAgent: navigator.userAgent.substring(0, 50) + "...", date: new Date().toLocaleString() });
+                   adminDevices.push({ id: myDeviceId, userAgent: navigator.userAgent.substring(0, 50), date: new Date().toLocaleString() });
                    await apiPost("/api/devices", adminDevices);
                }
                doLoginSuccess();
@@ -389,16 +339,15 @@
        async function doLoginSuccess() {
            document.getElementById('loginScreen').classList.add('hidden');
            document.getElementById('adminPanel').classList.remove('hidden');
-           
            const opts = packageOptions.map((p, idx) => `<option value="${idx}">${p.txt}</option>`).join('');
            document.getElementById('editPkg').innerHTML = opts;
            document.getElementById('histPkg').innerHTML = opts;
-
            showToast("Đăng nhập thành công!", "info");
            await fetchAllData();
-           refreshInterval = setInterval(async () => {
-               if(document.getElementById('modalEdit').classList.contains('hidden') && document.getElementById('modalEditLink').classList.contains('hidden') && document.getElementById('modalEditRef').classList.contains('hidden') && document.getElementById('modalHistory').classList.contains('hidden')) { 
-                   await fetchOrdersSilently(); 
+           setInterval(async () => {
+               if(document.getElementById('modalEdit').classList.contains('hidden') && document.getElementById('modalHistory').classList.contains('hidden')) { 
+                   let newOrders = await apiGet("/api/orders");
+                   if(JSON.stringify(newOrders) !== JSON.stringify(ordersDb)) { ordersDb = newOrders; renderOrders(); }
                }
            }, 10000);
         }
@@ -408,9 +357,7 @@
        function switchTab(t) {
            ['tab-orders', 'tab-exp', 'tab-history', 'tab-links', 'tab-refs', 'tab-cms', 'tab-devices'].forEach(tab => document.getElementById(tab).classList.add('hidden'));
            document.getElementById(t).classList.remove('hidden');
-           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links', 'btn-tab-refs', 'btn-tab-cms', 'btn-tab-devices'].forEach(btn => {
-               document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200";
-           });
+           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links', 'btn-tab-refs', 'btn-tab-cms', 'btn-tab-devices'].forEach(btn => { document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"; });
            document.getElementById('btn-'+t).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-indigo-600 text-white shadow-md";
            if(t === 'tab-exp') renderExpTable();
         }
@@ -424,88 +371,125 @@
            if(showManualToast) showToast("Dữ liệu đã cập nhật!", "success");
         }
 
-       async function fetchOrdersSilently() {
-           let newOrders = await apiGet("/api/orders"); if(!Array.isArray(newOrders)) newOrders = [];
-           if(JSON.stringify(newOrders) !== JSON.stringify(ordersDb)) { ordersDb = newOrders; renderOrders(); showToast("Đã có Đơn hàng mới!", "info"); }
+       // ================= CƠ CHẾ HASH TOKEN ĐẺ LINK ẨN =================
+       async function hashToken(token, index) {
+           const msgBuffer = new TextEncoder().encode(token + "TRINHHG" + index);
+           const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+           const hashArray = Array.from(new Uint8Array(hashBuffer));
+           return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 12);
+       }
+
+       function renderLinks() {
+           const container = document.getElementById('groupedLinksContainer'); container.innerHTML = '';
+           const groups = {};
+           linksDb.forEach(l => {
+               if (!groups[l.orig]) groups[l.orig] = [];
+               groups[l.orig].push(l);
+           });
+
+           for (const orig in groups) {
+               const subs = groups[orig];
+               let subsHtml = subs.map(l => `
+                   <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-3 ml-6 mb-2 bg-white rounded-lg border border-slate-100 hover:shadow-sm">
+                       <div class="flex-1 w-full overflow-hidden">
+                           <p class="font-bold text-sm text-slate-800"><span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-[10px] mr-2">Máy #${l.index || 1}</span>${l.email}</p>
+                           <div class="flex items-center mt-1">
+                               <input type="text" value="${l.masked}" readonly class="bg-transparent border-none outline-none font-mono text-[11px] text-blue-600 font-bold w-full min-w-[200px] cursor-text" onclick="this.select()">
+                               <button onclick="copyText('${l.masked}')" class="text-blue-600 hover:text-indigo-600 p-1 shrink-0 ml-1"><i class="fas fa-copy"></i></button>
+                           </div>
+                       </div>
+                       <button onclick="deleteLink('${l.id}')" class="mt-2 md:mt-0 text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100 shrink-0"><i class="fas fa-trash mr-1"></i>Ngắt Mạng</button>
+                   </div>
+               `).join('');
+
+               container.innerHTML += `
+                   <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                       <p class="font-bold text-xs text-slate-500 mb-2 uppercase"><i class="fas fa-link mr-1"></i> LINK GỐC LIANGXIN</p>
+                       <p class="font-mono text-xs text-slate-700 bg-white p-2 rounded border border-slate-100 mb-3 truncate w-full cursor-pointer" onclick="copyText('${orig}')">${orig}</p>
+                       ${subsHtml}
+                   </div>
+               `;
+           }
+       }
+
+       async function createAndSaveLink() {
+           const orig = document.getElementById('linkOrigInput').value.trim();
+           const email = document.getElementById('linkEmailInput').value.trim();
+           let indexInput = document.getElementById('linkIndexInput').value.trim();
+           let index = indexInput === "" ? 1 : parseInt(indexInput);
            
-           let newRefs = await apiGet("/api/refs"); if(!Array.isArray(newRefs)) newRefs = [];
-           if(JSON.stringify(newRefs) !== JSON.stringify(refsDb)) { refsDb = newRefs; renderRefs(); }
-           
-           let newHist = await apiGet("/api/history"); if(!Array.isArray(newHist)) newHist = [];
-           if(JSON.stringify(newHist) !== JSON.stringify(historyDb)) { historyDb = newHist; renderHistory(); }
+           if (!orig) return showToast("Vui lòng dán link gốc!", "error");
+
+           try {
+               const urlObj = new URL(orig);
+               const origToken = urlObj.searchParams.get("OwO") || urlObj.searchParams.get("token");
+               if (!origToken) return showToast("Không tìm thấy token trong link gốc!", "error");
+
+               let finalToken = origToken;
+               if (index > 1) {
+                   finalToken = await hashToken(origToken, index);
+               }
+
+               const isDuplicate = linksDb.some(l => {
+                   let extT = new URL(l.masked).searchParams.get("OwO") || new URL(l.masked).searchParams.get("token");
+                   return extT === finalToken;
+               });
+               if (isDuplicate) return showToast(`Mã số máy phụ ${index} này đã được tạo cho link gốc này rồi! Vui lòng điền số khác.`, "error");
+
+               let masked = "";
+               const profileName = "#VPNTrinhHg";
+               
+               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1?token=" + finalToken + profileName;
+               else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2?token=" + finalToken + profileName;
+               else return showToast("Tên miền link gốc chưa được hỗ trợ!", "error");
+
+               const newLink = { id: 'LNK-' + Date.now(), orig, masked, email, index, date: new Date().toLocaleString() };
+               linksDb.unshift(newLink);
+               await apiPost("/api/links", linksDb);
+               
+               renderLinks();
+               document.getElementById('linkOrigInput').value = '';
+               document.getElementById('linkEmailInput').value = '';
+               document.getElementById('linkIndexInput').value = '1';
+               showToast("Đã tạo và cấp quyền Link Ẩn!", "success");
+           } catch (error) { showToast("Đường dẫn gốc không hợp lệ!", "error"); }
+        }
+
+       async function deleteLink(id) {
+           if(confirm('Khách hàng này sẽ bị cắt mạng lập tức. Xác nhận Ngắt Mạng?')) {
+               linksDb = linksDb.filter(x => x.id !== id); 
+               await apiPost("/api/links", linksDb);
+               renderLinks(); 
+               showToast("Đã cắt mạng thành công!", "info");
+           }
         }
 
        function parseDateString(dateString) {
            if (!dateString) return null;
            const parts = dateString.split('/');
-           if (parts.length >= 3) {
-               return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T23:59:59`);
-           }
+           if (parts.length >= 3) return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T23:59:59`);
            return null;
        }
 
        function renderExpTable() {
            const tbody = document.getElementById('expTable'); tbody.innerHTML = '';
            const now = new Date();
-           
            ordersDb.filter(o => o.status === 'success' && o.expDate).forEach(o => {
                const exp = parseDateString(o.expDate);
                if(exp) {
-                   const diffTime = exp - now;
-                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                   
+                   const diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
                    const isDanger = diffDays <= 3;
-                   const rowClass = isDanger ? 'bg-red-50 border-red-200' : 'hover:bg-slate-50 border-b';
-                   const textClass = isDanger ? 'text-red-600 font-black' : 'text-slate-600';
-                   const displayDays = diffDays > 0 ? `${diffDays} Ngày` : 'Đã Hết Hạn';
-
-                   tbody.innerHTML += `<tr class="${rowClass} transition">
-                       <td class="p-4 font-mono font-bold text-indigo-600">${o.id} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.id}')"></i></td>
-                       <td class="p-4 font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i></td>
-                       <td class="p-4 font-bold text-slate-600">${o.expDate}</td>
-                       <td class="p-4 ${textClass}">${displayDays}</td>
-                       <td class="p-4 text-right whitespace-nowrap">
-                           ${isDanger ? `<button onclick="sendExpWarningMail('${o.id}')" class="text-white font-bold px-3 py-1.5 bg-red-500 rounded-lg text-xs hover:bg-red-600 shadow-md"><i class="fas fa-envelope mr-1"></i>Nhắc nạp tiền</button>` : `<span class="text-xs text-slate-400 italic">Chưa đến hạn</span>`}
-                       </td>
-                   </tr>`;
+                   if (isDanger) {
+                       tbody.innerHTML += `<tr class="bg-red-50 border-red-200 transition">
+                           <td class="p-4 font-mono font-bold text-indigo-600">${o.id}</td>
+                           <td class="p-4 font-bold text-slate-800">${o.email}</td>
+                           <td class="p-4 font-bold text-slate-600">${o.expDate}</td>
+                           <td class="p-4 text-red-600 font-black">${diffDays > 0 ? diffDays + ' Ngày' : 'Đã Hết Hạn'}</td>
+                           <td class="p-4 text-right whitespace-nowrap"><span class="text-xs text-red-500 font-bold">Cần thu phí</span></td>
+                       </tr>`;
+                   }
                }
            });
-       }
-
-       async function sendExpWarningMail(id) {
-           const o = ordersDb.find(x => x.id === id);
-           if(!o || !o.email) return showToast("Không có email khách!", "error");
-           
-           if(confirm(`Gửi mail nhắc gia hạn cho ${o.email}?`)) {
-               let subject = "VPN Trinh Hg - Thông báo Gói VPN sắp hết hạn";
-               let contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
-                   <p style="margin:0 0 10px 0; color:#475569; font-size:13px; line-height:1.5;">Cần hỗ trợ gia hạn? Đội ngũ của chúng tôi sẵn sàng 24/7</p>
-                   <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0ea5e9; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:5px; font-size:13px;">Chat Zalo</a>
-                   <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#3b82f6; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; font-size:13px;">Messenger</a>
-               </div>`;
-
-               let msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
-                   <div style="background:linear-gradient(135deg, #ef4444, #dc2626); padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">GÓI VPN SẮP HẾT HẠN</h2></div>
-                   <div style="padding:20px; box-sizing:border-box;">
-                       <p style="font-size:14px; line-height:1.5;">Xin chào, Gói VPN <b>${o.pkgName}</b> của bạn sắp hết hạn.</p>
-                       <div style="background:#fef2f2; border-left:4px solid #ef4444; padding:15px; border-radius:8px; margin:20px 0; text-align:center; word-break:break-all;">
-                           <p style="margin:0; font-size:11px; color:#991b1b; font-weight:bold;">MÃ ĐƠN HÀNG HIỆN TẠI</p>
-                           <p style="margin:5px 0 0 0; font-size:22px; font-weight:900; color:#dc2626; letter-spacing:1px;">${o.id}</p>
-                           <p style="margin:5px 0 0 0; font-size:12px; color:#991b1b;">Ngày hết hạn: <b>${o.expDate}</b></p>
-                       </div>
-                       <div style="text-align:center; margin:20px 0;">
-                           <a href="https://vpntrinhhg.pages.dev" style="background:#1e293b; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; max-width:100%; box-sizing:border-box; font-size:14px;">GIA HẠN NGAY TẠI CỔNG KHÁCH HÀNG</a>
-                           <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Đăng nhập bằng <b>Mã Đơn Hàng</b> để chọn gia hạn tránh gián đoạn dịch vụ.</i></p>
-                       </div>
-                       ${contactBlock}
-                   </div></div>`;
-
-               showToast("Đang gửi mail...", "info");
-               try { 
-                   await fetch(GOOGLE_MAIL_API, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({to: o.email, subject: subject, html: msg}) }); 
-                   showToast("Đã gửi thông báo gia hạn!", "success");
-               } catch(e){ showToast("Lỗi gửi mail!", "error"); }
-           }
        }
 
        function renderHistory() {
@@ -516,93 +500,29 @@
                    <td class="p-4 font-medium text-slate-600 text-xs">${h.pkgName} <span class="text-indigo-600 font-bold">(${h.data})</span></td>
                    <td class="p-4 font-mono font-bold text-orange-600">${h.refCode || 'Không'}</td>
                    <td class="p-4 font-bold text-slate-600">${h.expDate || 'Không có'}</td>
-                   <td class="p-4 text-right">
-                       <button onclick="deleteHistory(${idx})" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button>
-                   </td>
+                   <td class="p-4 text-right"><button onclick="deleteHistory(${idx})" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button></td>
                </tr>`;
            });
        }
 
        function openHistoryModal() {
-           document.getElementById('histEmail').value = '';
-           document.getElementById('histExp').value = '';
-           document.getElementById('histRef').value = '';
-           document.getElementById('histPkg').selectedIndex = 0;
-           document.getElementById('modalHistory').classList.remove('hidden');
+           document.getElementById('histEmail').value = ''; document.getElementById('histExp').value = ''; document.getElementById('histRef').value = ''; document.getElementById('modalHistory').classList.remove('hidden');
        }
 
        async function saveHistory() {
            const email = document.getElementById('histEmail').value.trim();
            const pkgIdx = document.getElementById('histPkg').value;
            const expDate = document.getElementById('histExp').value.trim();
-           const refCode = document.getElementById('histRef').value.trim().toUpperCase();
-
            if(!email) return showToast("Vui lòng nhập Email", "error");
-
            const selectedPkg = packageOptions[pkgIdx];
-           const newHist = {
-               email: email,
-               pkgName: selectedPkg.txt.split(' - ')[0],
-               priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0],
-               data: selectedPkg.data,
-               vnd: selectedPkg.vnd,
-               expDate: expDate,
-               refCode: refCode,
-               date: new Date().toLocaleString()
-           };
-
-           if (refCode) {
-               let r = refsDb.find(x => x.code === refCode);
-               if(r) {
-                   r.count = (r.count || 0) + 1;
-                   r.commission = (r.commission || 0) + (selectedPkg.vnd * 0.08);
-                   await apiPost("/api/refs", refsDb);
-                   renderRefs();
-               }
-           }
-
-           historyDb.unshift(newHist);
-           await apiPost("/api/history", historyDb);
-           renderHistory();
-           document.getElementById('modalHistory').classList.add('hidden');
-           showToast("Đã thêm lịch sử mua hàng!", "success");
+           historyDb.unshift({ email: email, pkgName: selectedPkg.txt.split(' - ')[0], priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0], data: selectedPkg.data, vnd: selectedPkg.vnd, expDate: expDate, refCode: "", date: new Date().toLocaleString() });
+           await apiPost("/api/history", historyDb); renderHistory(); document.getElementById('modalHistory').classList.add('hidden'); showToast("Đã thêm lịch sử mua hàng!", "success");
        }
 
        async function deleteHistory(idx) {
-           if(confirm('Xóa lịch sử này?')) {
-               historyDb.splice(idx, 1);
-               await apiPost("/api/history", historyDb);
-               renderHistory();
-               showToast("Đã xóa!", "info");
-           }
+           if(confirm('Xóa lịch sử này?')) { historyDb.splice(idx, 1); await apiPost("/api/history", historyDb); renderHistory(); showToast("Đã xóa!", "info"); }
        }
 
-       function renderLinks() {
-           const tbody = document.getElementById('linksTable'); tbody.innerHTML = '';
-           linksDb.forEach((l) => {
-               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
-                   <td class="p-4 font-bold text-slate-800">${l.email || '<span class="text-slate-400 italic">Trống</span>'}</td>
-                   <td class="p-4 font-bold text-slate-500">${l.index || 1}</td>
-                   <td class="p-4">
-                       <div class="flex items-center w-full">
-                           <input type="text" value="${l.orig}" readonly class="bg-transparent border-none outline-none font-mono text-[11px] text-slate-500 w-full min-w-[200px] cursor-text" onclick="this.select()">
-                           <button onclick="copyText('${l.orig}')" class="text-slate-600 hover:text-indigo-600 p-1 shrink-0 ml-1"><i class="fas fa-copy"></i></button>
-                       </div>
-                   </td>
-                   <td class="p-4">
-                       <div class="flex items-center w-full">
-                           <input type="text" value="${l.masked}" readonly class="bg-transparent border-none outline-none font-mono text-[11px] text-blue-600 font-bold w-full min-w-[200px] cursor-text" onclick="this.select()">
-                           <button onclick="copyText('${l.masked}')" class="text-blue-600 hover:text-indigo-600 p-1 shrink-0 ml-1"><i class="fas fa-copy"></i></button>
-                       </div>
-                   </td>
-                   <td class="p-4 text-right whitespace-nowrap">
-                       <button onclick="openEditLink('${l.id}')" class="text-indigo-600 font-bold px-3 py-1.5 bg-indigo-50 rounded-lg text-xs mr-1 hover:bg-indigo-100"><i class="fas fa-pen mr-1"></i>Sửa</button>
-                       <button onclick="deleteLink('${l.id}')" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash mr-1"></i>Xóa</button>
-                   </td>
-               </tr>`;
-           });
-        }
-        
        function renderRefs() {
            const tbody = document.getElementById('refsTable'); tbody.innerHTML = '';
            refsDb.forEach((r) => {
@@ -618,99 +538,6 @@
            });
        }
 
-       function copyText(txt) { navigator.clipboard.writeText(txt); showToast("Đã Copy!", "success"); }
-
-       // HÀM BĂM (HASH) MÃ TOKEN KẾT HỢP INDEX ĐỂ ĐẺ LINK ẨN DANH CỐ ĐỊNH
-       async function generateDeterministicSubId(origToken, index) {
-           if (index <= 1) return origToken;
-           const msgUint8 = new TextEncoder().encode(origToken + "_TRINHHG_" + index);
-           const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-           const hashArray = Array.from(new Uint8Array(hashBuffer));
-           return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 12);
-       }
-
-       async function createAndSaveLink() {
-           const orig = document.getElementById('linkOrigInput').value.trim();
-           const email = document.getElementById('linkEmailInput').value.trim();
-           const index = parseInt(document.getElementById('linkIndexInput').value) || 1;
-           
-           if (!orig) return showToast("Vui lòng dán link gốc!", "error");
-
-           try {
-               const urlObj = new URL(orig);
-               const origToken = urlObj.searchParams.get("OwO") || urlObj.searchParams.get("token");
-               if (!origToken) return showToast("Không tìm thấy token trong link gốc!", "error");
-
-               let masked = "";
-               const profileName = "#VPNTrinhHg";
-               
-               // ĐẺ LINK DỰA TRÊN INDEX (Oversell)
-               const finalToken = await generateDeterministicSubId(origToken, index);
-               
-               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1?token=" + finalToken + profileName;
-               else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2?token=" + finalToken + profileName;
-               else return showToast("Tên miền link gốc chưa được hỗ trợ!", "error");
-
-               const newLink = { 
-                   id: 'LNK-' + Date.now(), 
-                   orig: orig, 
-                   masked: masked, 
-                   email: email, 
-                   index: index,
-                   date: new Date().toLocaleString() 
-               };
-               
-               linksDb.unshift(newLink);
-               await apiPost("/api/links", linksDb);
-               
-               renderLinks();
-               document.getElementById('linkOrigInput').value = '';
-               document.getElementById('linkEmailInput').value = '';
-               document.getElementById('linkIndexInput').value = '1';
-               showToast("Đã tạo và lưu Link Ẩn!", "success");
-           } catch (error) { showToast("Đường dẫn gốc không hợp lệ!", "error"); }
-        }
-
-       function openEditLink(id) {
-           const l = linksDb.find(x => x.id === id);
-           document.getElementById('editLinkId').value = l.id;
-           document.getElementById('editLinkEmail').value = l.email || '';
-           document.getElementById('editLinkOrig').value = l.orig;
-           document.getElementById('modalEditLink').classList.remove('hidden');
-        }
-
-       async function saveLinkEdit() {
-           const id = document.getElementById('editLinkId').value;
-           const orig = document.getElementById('editLinkOrig').value.trim();
-           const email = document.getElementById('editLinkEmail').value.trim();
-           
-           let masked = "";
-           try {
-               const urlObj = new URL(orig);
-               const profileName = "#VPNTrinhHg";
-               const origToken = urlObj.searchParams.get("OwO") || urlObj.searchParams.get("token");
-               
-               const l = linksDb.find(x => x.id === id);
-               const finalToken = await generateDeterministicSubId(origToken, l.index || 1);
-               
-               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1?token=" + finalToken + profileName;
-               else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2?token=" + finalToken + profileName;
-               else return showToast("Tên miền gốc chưa được hỗ trợ!", "error");
-               
-               l.orig = orig; l.masked = masked; l.email = email;
-           } catch(e) { return showToast("Đường dẫn không hợp lệ!", "error"); }
-
-           await apiPost("/api/links", linksDb);
-           renderLinks(); document.getElementById('modalEditLink').classList.add('hidden'); showToast("Đã cập nhật!", "success");
-        }
-
-       async function deleteLink(id) {
-           if(confirm('Xóa vĩnh viễn Link Sub này? Khách sẽ bị tắt mạng.')) {
-               linksDb = linksDb.filter(x => x.id !== id); await apiPost("/api/links", linksDb);
-               renderLinks(); showToast("Đã xóa Link!", "info");
-           }
-        }
-        
        function openEditRef(email) {
            const r = refsDb.find(x => x.email === email);
            document.getElementById('editRefEmail').value = r.email;
@@ -723,13 +550,8 @@
            const email = document.getElementById('editRefEmail').value;
            const count = parseInt(document.getElementById('editRefCount').value);
            const commission = parseInt(document.getElementById('editRefCommission').value);
-           
            const r = refsDb.find(x => x.email === email);
-           if(r) {
-               r.count = count;
-               r.commission = commission;
-           }
-
+           if(r) { r.count = count; r.commission = commission; }
            await apiPost("/api/refs", refsDb);
            renderRefs(); document.getElementById('modalEditRef').classList.add('hidden'); showToast("Đã cập nhật số lượng giới thiệu!", "success");
        }
@@ -742,11 +564,9 @@
                            '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">❌ Từ chối</span>');
                
                let supportTag = o.needSupport ? `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-blue-200">Hỗ trợ</span>` : '';
-               let refTag = o.refCode ? `<span class="bg-orange-100 text-orange-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-orange-200" title="Mã giới thiệu">REF: ${o.refCode}</span>` : '';
-
                tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
                    <td class="p-4 md:p-5 font-mono font-bold text-indigo-600">${o.id} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.id}')"></i></td>
-                   <td class="p-4 md:p-5"><p class="font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i> ${supportTag} ${refTag}</p><p class="text-xs text-slate-500 mt-1"><i class="fas fa-credit-card mr-1"></i>${o.method || 'Bank'} | Zalo: ${o.zalo || 'Không'}</p></td>
+                   <td class="p-4 md:p-5"><p class="font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i> ${supportTag}</p><p class="text-xs text-slate-500 mt-1"><i class="fas fa-credit-card mr-1"></i>${o.method || 'Bank'} | Zalo: ${o.zalo || 'Không'}</p></td>
                    <td class="p-4 md:p-5 font-bold text-slate-600 text-xs truncate max-w-[200px]">${o.pkg} <br><span class="text-indigo-500 text-[10px]">${o.expDate ? 'HSD: '+o.expDate : ''}</span></td><td class="p-4 md:p-5">${badge}</td>
                    <td class="p-4 md:p-5 text-right whitespace-nowrap">
                        <button onclick="openEditModal('${o.id}')" class="text-indigo-600 font-bold hover:underline px-3 py-1.5 bg-indigo-50 rounded-lg mr-2 text-xs md:text-sm"><i class="fas fa-pen mr-1"></i>Sửa</button>
@@ -757,35 +577,18 @@
        function generateRandomId() { return 'DH-' + Math.random().toString(36).substr(2, 9).toUpperCase(); }
        function openEditModal(id) {
            let o;
-           if(id) {
-               o = ordersDb.find(x => x.id === id); 
-               document.getElementById('modalTitle').innerText = `Chỉnh sửa Đơn Hàng`; 
-               document.getElementById('editId').value = o.id;
-           } else {
-               o = { id: generateRandomId(), email: '', pkg: packageOptions[0].txt, status: 'pending', info: '', reason: '', expDate: '' };
-               document.getElementById('modalTitle').innerText = `Tạo Đơn Thủ Công`; 
-               document.getElementById('editId').value = o.id;
-           }
-           
-           document.getElementById('editEmail').value = o.email || '';
-           document.getElementById('editExpDate').value = o.expDate || '';
+           if(id) { o = ordersDb.find(x => x.id === id); document.getElementById('modalTitle').innerText = `Chỉnh sửa Đơn Hàng`; document.getElementById('editId').value = o.id; } 
+           else { o = { id: generateRandomId(), email: '', pkg: packageOptions[0].txt, status: 'pending', info: '', reason: '', expDate: '' }; document.getElementById('modalTitle').innerText = `Tạo Đơn Thủ Công`; document.getElementById('editId').value = o.id; }
+           document.getElementById('editEmail').value = o.email || ''; document.getElementById('editExpDate').value = o.expDate || '';
            
            let foundPkg = false;
            for(let i=0; i<document.getElementById('editPkg').options.length; i++) {
-               if(document.getElementById('editPkg').options[i].text.includes(o.pkgName || (o.pkg ? o.pkg.split(' (')[0] : ''))) { 
-                   document.getElementById('editPkg').selectedIndex = i; 
-                   foundPkg = true; 
-                   break; 
-               }
+               if(document.getElementById('editPkg').options[i].text.includes(o.pkgName || (o.pkg ? o.pkg.split(' (')[0] : ''))) { document.getElementById('editPkg').selectedIndex = i; foundPkg = true; break; }
            }
            if(!foundPkg) document.getElementById('editPkg').selectedIndex = 0;
 
-           document.getElementById('editStatus').value = o.status; 
-           document.getElementById('editLink').value = o.info || ''; 
-           document.getElementById('editReason').value = o.reason || '';
-           
-           toggleStatusFields(); 
-           document.getElementById('modalEdit').classList.remove('hidden');
+           document.getElementById('editStatus').value = o.status; document.getElementById('editLink').value = o.info || ''; document.getElementById('editReason').value = o.reason || '';
+           toggleStatusFields(); document.getElementById('modalEdit').classList.remove('hidden');
         }
        function toggleStatusFields() {
            const s = document.getElementById('editStatus').value;
@@ -796,112 +599,26 @@
        async function saveOrderToCloud() {
            const originalId = document.getElementById('editId').value.trim();
            if(!originalId) return showToast("Mã đơn không được rỗng!", "error");
-           
            let o = ordersDb.find(x => x.id === originalId);
-           if(!o) { 
-               o = { id: originalId, needSupport: false, method: "Manual", date: new Date().toLocaleString() }; 
-               ordersDb.unshift(o); 
-           }
+           if(!o) { o = { id: originalId, needSupport: false, method: "Manual", date: new Date().toLocaleString() }; ordersDb.unshift(o); }
 
-           const oldStatus = o.status;
-           const oldExpDate = o.expDate;
-
-           o.id = originalId;
-           o.email = document.getElementById('editEmail').value.trim(); 
-           const selectedPkgIdx = document.getElementById('editPkg').value;
-           const selectedPkg = packageOptions[selectedPkgIdx];
-           o.pkg = selectedPkg.txt;
-           o.expDate = document.getElementById('editExpDate').value.trim();
-           o.status = document.getElementById('editStatus').value; 
-           o.info = document.getElementById('editLink').value; 
-           o.reason = document.getElementById('editReason').value;
+           o.id = originalId; o.email = document.getElementById('editEmail').value.trim(); 
+           const selectedPkg = packageOptions[document.getElementById('editPkg').value];
+           o.pkg = selectedPkg.txt; o.expDate = document.getElementById('editExpDate').value.trim();
+           o.status = document.getElementById('editStatus').value; o.info = document.getElementById('editLink').value; o.reason = document.getElementById('editReason').value;
            o.pkgName = o.pkg.split(' - ')[0];
 
            const btn = event.target; const oldTxt = btn.innerText; btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
 
-           // LOGIC TẠO MÃ REF & HISTORY TỰ ĐỘNG KHI DUYỆT LẦN ĐẦU CÓ HẠN
-           if (o.status === 'success' && o.expDate && !o.refGenerated && o.email) {
-               
-               const datePart = o.expDate.replace(/\D/g, ''); 
-               const code = (o.id.slice(-4) + datePart).substring(0, 10).toUpperCase(); 
-
-               let myRef = refsDb.find(r => r.email === o.email);
-               if(!myRef) {
-                   myRef = { email: o.email, code: code, count: 0, commission: 0, date: new Date().toLocaleString() };
-                   refsDb.unshift(myRef);
-               }
-
-               let h = {
-                   email: o.email,
-                   pkgName: selectedPkg.txt.split(' - ')[0],
-                   priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0],
-                   data: selectedPkg.data,
-                   vnd: o.totalVnd || selectedPkg.vnd,
-                   expDate: o.expDate,
-                   refCode: o.refCode || '',
-                   date: new Date().toLocaleString()
-               };
-               historyDb.unshift(h);
-               await apiPost("/api/history", historyDb);
-
-               if (o.refCode) {
-                   let r = refsDb.find(x => x.code === o.refCode.toUpperCase());
-                   if(r) {
-                       r.count = (r.count || 0) + 1;
-                       r.commission = (r.commission || 0) + ((o.totalVnd || selectedPkg.vnd) * 0.08);
-                   }
-               }
-
-               await apiPost("/api/refs", refsDb);
-               renderRefs();
-               renderHistory();
-
-               o.refGenerated = true;
-           }
-
            await apiPost("/api/orders", ordersDb);
            showToast("Đã đồng bộ đơn hàng!", "success");
 
-           if(document.getElementById('sendMailCheck').checked && o.email) {
-               btn.innerText = "ĐANG BẮN EMAIL...";
-               let subject = "VPN Trinh Hg - Cập nhật đơn hàng"; let msg = "";
-               let contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
-                   <p style="margin:0 0 10px 0; color:#475569; font-size:13px; line-height:1.5;">${o.needSupport ? '<span style="color:#ef4444; font-weight:bold;">Bạn đã yêu cầu Admin hỗ trợ cài đặt!</span> Vui lòng liên hệ:' : 'Cần hỗ trợ? Đội ngũ của chúng tôi sẵn sàng 24/7'}</p>
-                   <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0ea5e9; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:5px; font-size:13px;">Chat Zalo</a>
-                   <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#3b82f6; color:white; padding:10px 16px; text-decoration:none; border-radius:6px; font-weight:bold; font-size:13px;">Messenger</a>
-               </div>`;
-
-               if(o.status === 'success') {
-                   subject = "VPN Trinh Hg - Kích hoạt thành công";
-                   msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
-                       <div style="background:linear-gradient(135deg, #4f46e5, #9333ea); padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">KÍCH HOẠT THÀNH CÔNG</h2></div>
-                       <div style="padding:20px; box-sizing:border-box;">
-                           <p style="font-size:14px; line-height:1.5;">Xin chào, Gói VPN <b>${o.pkgName}</b> của bạn đã sẵn sàng.</p>
-                           <div style="background:#f1f5f9; border-left:4px solid #4f46e5; padding:15px; border-radius:8px; margin:20px 0; text-align:center; word-break:break-all;">
-                               <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold;">MÃ ĐƠN HÀNG</p>
-                               <p style="margin:5px 0 0 0; font-size:22px; font-weight:900; color:#4f46e5; letter-spacing:1px;">${o.id}</p>
-                           </div>
-                           <div style="text-align:center; margin:20px 0;">
-                               <a href="https://vpntrinhhg.pages.dev" style="background:#1e293b; color:white; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; max-width:100%; box-sizing:border-box; font-size:14px;">TRUY CẬP CỔNG KHÁCH HÀNG</a>
-                               <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Tra cứu bằng <b>Mã Đơn Hàng</b> hoặc <b>Email</b> để lấy Link VPN.</i></p>
-                           </div>
-                           ${contactBlock}
-                       </div></div>`;
-               } else if(o.status === 'failed') {
-                   subject = "VPN Trinh Hg - Đơn hàng bị từ chối";
-                   msg = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; border:1px solid #fecaca; border-radius:12px; overflow:hidden; box-sizing:border-box;">
-                       <div style="background:#ef4444; padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:20px;">Giao dịch thất bại</h2></div>
-                       <div style="padding:20px; box-sizing:border-box;">
-                           <p style="font-size:14px; line-height:1.5;">Xin chào, Đơn hàng <b>${o.id}</b> của bạn không thể kích hoạt.</p>
-                           <div style="background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:8px; color:#b91c1c; font-weight:bold; margin:20px 0; font-size:14px; word-wrap:break-word;">Lý do: ${o.reason}</div>
-                           ${contactBlock}
-                       </div></div>`;
-               }
-               try { await fetch(GOOGLE_MAIL_API, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({to: o.email, subject: subject, html: msg}) }); } catch(e){}
-           }
-
            btn.innerText = oldTxt; btn.disabled = false; renderOrders(); document.getElementById('modalEdit').classList.add('hidden');
         }
+       async function deleteOrder(id) {
+           if(confirm('Xóa vĩnh viễn đơn ' + id + '?')) { ordersDb = ordersDb.filter(x => x.id !== id); await apiPost("/api/orders", ordersDb); renderOrders(); showToast("Đã xóa vĩnh viễn!", "info"); }
+        }
+       function copyText(txt) { navigator.clipboard.writeText(txt); showToast("Đã Copy!", "success"); }
 
        async function fetchCms() { 
            cmsDb = await apiGet("/api/cms"); 
@@ -916,14 +633,12 @@
        function insertMacro(type) {
            const box = document.getElementById('cmsGuide'); 
            let str = "";
-           
            if(type === 'btn') str = `<style>@keyframes pulseAppBtnStrong { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(109,40,217, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0); } }</style><div style="display: flex; justify-content: flex-start; margin: 10px 0 10px 30px; width: 100%;"><a href="LINK_TẢI_APP_VÀO_ĐÂY" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color:white; padding:12px 24px; border-radius:12px; font-weight:bold; text-decoration:none; font-size:15px; text-align: center; animation: pulseAppBtnStrong 1.5s infinite; box-shadow: 0 4px 15px rgba(109,40,217, 0.4);"><i class="fas fa-download" style="margin-right: 8px;"></i>TẢI_APP_NGAY</a></div>`;
            if(type === 'header') str = `<div style="background: linear-gradient(90deg, #4f46e5, #8b5cf6); color: white; padding: 14px 20px; border-radius: 8px; font-size: 16px; font-weight: 900; text-transform: uppercase; margin: 20px 0 15px 0; box-shadow: 0 4px 10px rgba(79,70,229,0.3);"><i class="fas fa-star" style="margin-right:8px;"></i>TIÊU_ĐỀ_CHÍNH</div>`;
            if(type === 'title') str = `<div style="background: #e0e7ff; border-left: 4px solid #4f46e5; padding: 12px 16px; border-radius: 4px; margin-top: 15px; margin-bottom: 10px;"><h3 style="font-size: 15px; font-weight: 800; color: #3730a3; margin: 0;">TIÊU_ĐỀ_HƯỚNG_DẪN</h3></div>`;
            if(type === 'step') str = `<div style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;"><span style="background: #4f46e5; color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 0;">SỐ_BƯỚC</span><p style="margin: 0; font-size: 14px; color: #334155; line-height: 24px;">NỘI_DUNG_BƯỚC_CÀI</p></div>`;
            if(type === 'note') str = `<div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin: 15px 0;"><p style="margin: 0; font-size: 14px; color: #92400e; line-height: 1.5;"><b>LƯU Ý:</b> NHẬP_LƯU_Ý_CỦA_BẠN_VÀO_ĐÂY</p></div>`;
            if(type === 'img') str = `<div style="padding-left: 36px; margin-bottom: 15px;"><img src="LINK_ẢNH_JPG" style="max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" /></div>`;
-           
            const startPos = box.selectionStart; const endPos = box.selectionEnd;
            box.value = box.value.substring(0, startPos) + str + box.value.substring(endPos, box.value.length);
            box.selectionStart = startPos + str.length; box.selectionEnd = startPos + str.length; box.focus();
@@ -956,6 +671,3 @@
    </script>
 </body>
 </html>
-Mày kiểm tra xem code tạo hash link chưa nhé, tao thấy có vấn đề khi bấm vào link ẩn trên trang admin thì báo lỗi 403 không tồn tại hoặc do mày xóa đó. và nếu tạo link mới nhưng lại gõ 1 ở ô số thứ tự thì sao, phải hiện thông báo là nếu muốn tạo ra link khác thì gõ khác đi chứ và nếu muốn tạo link hash bảo mật thì gõ ngẫu nhiên 1 số chứ ko phải giới hạn từ 2 trở đi để tao ko phải gõ nhiều số nếu đông khách hàng mà chỉ cần gõ đại vd 3422 vào ô là nó tạo ra 1 mã hash khó đoán dựa theo link gốc + 3422, và có thể lấy lại bằng cách gõ 3422 vào là lại tạo ra 1 link y chang. Nếu gõ 1 hoặc ô số để trông sthif nó tạo ra link y chang link gốc và đuôi là token gốc. Nhập lại số 1 thì nó thông báo link này đã được tạo. Chẳng hạn số 3422 đã tạo mà ng khác cũng dùng link đó xong nhập ô số 3422 thì nó cũng báo y chang là đã được tạo.
-Mày xem xét và fix đi nhé. Cả các file ở trên tao đưa, nếu ko có lỗi hay ko phải chỉnh thì thôi ko gửi lại nữa, chỉ gửi file fix thôi. 
-Gửi luôn code đi ko cần phải thảo luận logic cái cc gì hết. Đang vội
