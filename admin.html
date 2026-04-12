@@ -38,21 +38,11 @@
            <button onclick="switchTab('tab-exp')" id="btn-tab-exp" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-clock mr-2"></i>Hết hạn</button>
            <button onclick="switchTab('tab-history')" id="btn-tab-history" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-history mr-2"></i>Lịch sử</button>
            <button onclick="switchTab('tab-links')" id="btn-tab-links" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-link mr-2"></i>Link Sub</button>
-           <button onclick="switchTab('tab-refs')" id="btn-tab-refs" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-users mr-2"></i>Mời Bạn</button>
-           <button onclick="switchTab('tab-cms')" id="btn-tab-cms" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-book mr-2"></i>Hướng dẫn</button>
-           <button onclick="switchTab('tab-devices')" id="btn-tab-devices" class="flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"><i class="fas fa-laptop mr-2"></i>Thiết bị</button>
        </div>
 
        <div id="tab-orders">
            <button onclick="openEditModal(null)" class="mb-4 bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-indigo-200 transition"><i class="fas fa-plus mr-2"></i>Tạo Đơn Thủ Công</button>
-           <div class="glass-card overflow-x-auto">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[900px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr><th class="p-4 md:p-5">Mã Đơn</th><th class="p-4 md:p-5">Thông tin Khách</th><th class="p-4 md:p-5">Gói VPN</th><th class="p-4 md:p-5">Trạng Thái</th><th class="p-4 md:p-5 text-right">Hành động</th></tr>
-                   </thead>
-                   <tbody id="orderTable" class="divide-y divide-slate-100"></tbody>
-               </table>
-           </div>
+           <div class="glass-card overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap min-w-[900px]"><thead class="bg-slate-50 text-slate-500 border-b border-slate-200"><tr><th class="p-4 md:p-5">Mã Đơn</th><th class="p-4 md:p-5">Thông tin Khách</th><th class="p-4 md:p-5">Gói VPN</th><th class="p-4 md:p-5">Trạng Thái</th><th class="p-4 md:p-5 text-right">Hành động</th></tr></thead><tbody id="orderTable" class="divide-y divide-slate-100"></tbody></table></div>
        </div>
 
        <div id="tab-history" class="hidden glass-card p-5 md:p-8">
@@ -60,45 +50,17 @@
                <h2 class="text-xl font-bold">Lịch sử Mua hàng (Thêm Thủ Công)</h2>
                <button onclick="openHistoryModal()" class="bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-indigo-200 transition"><i class="fas fa-plus mr-2"></i>Thêm Lịch Sử</button>
            </div>
-           <p class="text-xs text-slate-500 mb-6">Thêm lịch sử vào đây để khách hàng thấy được bảng lịch sử trong tab Trang Chủ ở Cổng Khách Hàng. Sẽ tự cộng 8% hoa hồng cho mã Code Ref nếu có nhập.</p>
-           <div class="overflow-x-auto border border-slate-200 rounded-xl">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr>
-                           <th class="p-4">Email Khách</th>
-                           <th class="p-4">Gói & Dung Lượng</th>
-                           <th class="p-4">Mã Ref Tác Động</th>
-                           <th class="p-4">Ngày Hết Hạn</th>
-                           <th class="p-4 text-right">Xóa</th>
-                       </tr>
-                   </thead>
-                   <tbody id="historyTable" class="divide-y divide-slate-100 bg-white"></tbody>
-               </table>
-           </div>
+           <div class="overflow-x-auto border border-slate-200 rounded-xl"><table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]"><thead class="bg-slate-50 text-slate-500 border-b border-slate-200"><tr><th class="p-4">Email Khách</th><th class="p-4">Gói & Dung Lượng</th><th class="p-4">Mã Ref Tác Động</th><th class="p-4">Ngày Hết Hạn</th><th class="p-4 text-right">Xóa</th></tr></thead><tbody id="historyTable" class="divide-y divide-slate-100 bg-white"></tbody></table></div>
        </div>
 
        <div id="tab-exp" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-4">Quản lý Đơn hàng sắp hết hạn</h2>
-           <p class="text-xs text-slate-500 mb-6">Hệ thống sẽ bôi đỏ các đơn hàng còn <= 3 ngày sử dụng để nhắc nhở gửi Email.</p>
-           <div class="overflow-x-auto border border-slate-200 rounded-xl">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr>
-                           <th class="p-4">Mã Đơn</th>
-                           <th class="p-4">Email Khách</th>
-                           <th class="p-4">Ngày Hết Hạn</th>
-                           <th class="p-4">Còn lại</th>
-                           <th class="p-4 text-right">Nhắc nhở</th>
-                       </tr>
-                   </thead>
-                   <tbody id="expTable" class="divide-y divide-slate-100 bg-white"></tbody>
-               </table>
-           </div>
+           <div class="overflow-x-auto border border-slate-200 rounded-xl"><table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]"><thead class="bg-slate-50 text-slate-500 border-b border-slate-200"><tr><th class="p-4">Mã Đơn</th><th class="p-4">Email Khách</th><th class="p-4">Ngày Hết Hạn</th><th class="p-4">Còn lại</th><th class="p-4 text-right">Nhắc nhở</th></tr></thead><tbody id="expTable" class="divide-y divide-slate-100 bg-white"></tbody></table></div>
        </div>
 
        <div id="tab-links" class="hidden glass-card p-5 md:p-8">
            <h2 class="text-xl font-bold mb-2">Quản lý Cụm Link Ẩn (Oversell)</h2>
-           <p class="text-xs text-slate-500 mb-6">Chung 1 Link Gốc có thể đẻ ra nhiều Link Ẩn khác nhau. Xóa Link Ẩn thì người đó chết mạng, người khác không ảnh hưởng.</p>
+           <p class="text-xs text-slate-500 mb-6">Chung 1 Link Gốc đẻ ra nhiều Link Ẩn. Xóa Link Ẩn thì người đó ăn node rác 1.1.1.1 chết mạng ngay lập tức.</p>
            
            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6">
                <div class="grid md:grid-cols-3 gap-4 mb-4">
@@ -111,174 +73,30 @@
                        <input type="text" id="linkEmailInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="khachA@gmail.com">
                    </div>
                    <div>
-                       <label class="block font-bold text-xs text-slate-700 mb-1">Số máy phụ (Index)</label>
-                       <input type="number" id="linkIndexInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="1, 2, 3422..." min="1" value="1">
+                       <label class="block font-bold text-xs text-slate-700 mb-1">Số máy phụ (Ví dụ: 2, 3422)</label>
+                       <input type="number" id="linkIndexInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="Để trống = 1" min="1" value="1">
                    </div>
                </div>
-               <p class="text-[10px] text-slate-500 mb-3 italic">* Nếu nhập 1 hoặc trống, nó sẽ lấy y nguyên Token Gốc. Nhập các số ngẫu nhiên khác (vd: 3422) nó sẽ tự động băm ra 1 mã ẩn riêng biệt cho khách đó.</p>
-               <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> ĐẺ LINK ẨN CHO KHÁCH</button>
+               <p class="text-[10px] text-slate-500 mb-3 italic">* Nhập Số thứ tự $\ge$ 2 hệ thống sẽ tự băm ra mã Sub-ID ẩn danh cho khách đó.</p>
+               <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> TẠO & LƯU LINK ẨN</button>
            </div>
 
            <div id="groupedLinksContainer" class="flex flex-col gap-4"></div>
        </div>
 
-       <div id="tab-refs" class="hidden glass-card p-5 md:p-8">
-           <h2 class="text-xl font-bold mb-4">Quản lý chương trình Mời Bạn (Referral)</h2>
-           <p class="text-xs text-slate-500 mb-6">Hệ thống tính tự động 8% tiền hoa hồng cho mã. Bạn có thể chỉnh sửa thủ công nếu cần.</p>
-           <div class="overflow-x-auto border border-slate-200 rounded-xl">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr>
-                           <th class="p-4">Email Khách</th>
-                           <th class="p-4">Mã Giới Thiệu Của Khách</th>
-                           <th class="p-4">Số lượng hoàn thành</th>
-                           <th class="p-4">Hoa Hồng (VNĐ)</th>
-                           <th class="p-4 text-right">Hành động</th>
-                       </tr>
-                   </thead>
-                   <tbody id="refsTable" class="divide-y divide-slate-100 bg-white"></tbody>
-               </table>
-           </div>
-       </div>
-
-       <div id="tab-cms" class="hidden glass-card p-5 md:p-8">
-           <h2 class="text-xl font-bold mb-4">Soạn thảo Hướng dẫn (CMS Editor)</h2>
-           <div class="flex flex-wrap gap-2 mb-4">
-               <button onclick="changeCmsDevice('android')" id="cms-btn-android" class="dev-btn active border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-android text-green-500 mr-2"></i> Android</button>
-               <button onclick="changeCmsDevice('windows')" id="cms-btn-windows" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-windows text-blue-500 mr-2"></i> Windows</button>
-               <button onclick="changeCmsDevice('macos')" id="cms-btn-macos" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-apple text-slate-800 mr-2"></i> MacOS</button>
-               <button onclick="changeCmsDevice('ios')" id="cms-btn-ios" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-app-store-ios text-blue-400 mr-2"></i> iOS</button>
-           </div>
-           <div class="bg-slate-50 p-3 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
-               <button onclick="insertMacro('header')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-purple-600 hover:bg-purple-50 transition"><i class="fas fa-layer-group mr-1"></i> Header Tổng</button>
-               <button onclick="insertMacro('title')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-heading mr-1"></i> Mục Nhỏ</button>
-               <button onclick="insertMacro('step')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-list-ol mr-1"></i> Bước Cài</button>
-               <button onclick="insertMacro('note')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-orange-600 hover:bg-orange-50 transition"><i class="fas fa-exclamation-triangle mr-1"></i> Lưu ý</button>
-               <button onclick="insertMacro('btn')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition"><i class="fas fa-download mr-1"></i> Nút Tải Động</button>
-               <button onclick="insertMacro('img')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-pink-600 hover:bg-pink-50 transition"><i class="fas fa-image mr-1"></i> Ảnh</button>
-           </div>
-           <textarea id="cmsGuide" rows="16" class="w-full p-4 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-sm leading-relaxed resize-y overflow-x-hidden" placeholder="Soạn nội dung HTML..."></textarea>
-           <button onclick="saveCmsToCloud()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-md w-full md:w-auto transition"><i class="fas fa-save mr-2"></i> LƯU LÊN MÁY CHỦ</button>
-       </div>
-
-       <div id="tab-devices" class="hidden glass-card p-5 md:p-8">
-           <h2 class="text-xl font-bold mb-4">Các thiết bị được phép vào Admin</h2>
-           <div class="overflow-x-auto">
-               <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
-                   <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                       <tr><th class="p-4">ID Thiết bị</th><th class="p-4">Trình duyệt / Thiết bị</th><th class="p-4">Ngày cấp</th><th class="p-4 text-right">Xóa</th></tr>
-                   </thead>
-                   <tbody id="devicesTable" class="divide-y divide-slate-100"></tbody>
-               </table>
-           </div>
-       </div>
    </div>
 
-   <div id="modalEdit" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-       <div class="glass-card p-5 md:p-8 w-full max-w-2xl max-h-[95vh] overflow-y-auto">
-           <h3 class="text-xl md:text-2xl font-bold mb-4" id="modalTitle">Chỉnh sửa Đơn Hàng</h3>
-           
-           <div class="grid md:grid-cols-2 gap-3 mb-3">
-               <div>
-                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Mã Đơn</label>
-                   <div class="flex">
-                       <input type="text" id="editId" class="w-full p-2 text-sm border rounded-l-lg bg-white font-mono font-bold outline-none focus:border-indigo-500">
-                       <button onclick="document.getElementById('editId').value = generateRandomId()" class="bg-slate-200 px-3 text-xs font-bold rounded-r-lg border border-l-0 border-slate-300 hover:bg-slate-300">Tạo mã</button>
-                   </div>
-               </div>
-               <div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Email Khách</label><input type="text" id="editEmail" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500"></div>
-           </div>
+   <div id="modalEdit" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"><div class="glass-card p-5 md:p-8 w-full max-w-2xl max-h-[95vh] overflow-y-auto"><h3 class="text-xl md:text-2xl font-bold mb-4" id="modalTitle">Chỉnh sửa Đơn Hàng</h3><div class="grid md:grid-cols-2 gap-3 mb-3"><div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Mã Đơn</label><div class="flex"><input type="text" id="editId" class="w-full p-2 text-sm border rounded-l-lg bg-white font-mono font-bold outline-none focus:border-indigo-500"><button onclick="document.getElementById('editId').value = generateRandomId()" class="bg-slate-200 px-3 text-xs font-bold rounded-r-lg border border-l-0 border-slate-300 hover:bg-slate-300">Tạo mã</button></div></div><div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Email Khách</label><input type="text" id="editEmail" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500"></div></div><div class="grid md:grid-cols-2 gap-3 mb-3"><div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Ngày hết hạn (VD: 30/12/2026)</label><input type="text" id="editExpDate" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026"></div><div><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label><select id="editPkg" class="w-full p-2 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select></div></div><div class="mb-4"><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Trạng Thái Đơn</label><select id="editStatus" class="w-full p-2.5 text-sm border rounded-lg font-bold outline-none" onchange="toggleStatusFields()"><option value="pending">⏳ Đang chờ duyệt (Pending)</option><option value="success">✅ Kích hoạt Thành công (Cấp Link)</option><option value="failed">❌ Bị Từ chối / Lỗi</option></select></div><div id="fieldSuccess" class="hidden mb-4 p-3 border-l-4 border-green-500 bg-green-50 rounded-r-lg"><label class="block font-bold text-xs md:text-sm mb-1 text-green-700">Link Đăng Ký (Subscription URL)</label><input type="text" id="editLink" class="w-full p-2 text-sm border border-green-200 rounded-lg font-mono outline-none" placeholder="Dán link VPN vào đây..."></div><div id="fieldFailed" class="hidden mb-4 p-3 border-l-4 border-red-500 bg-red-50 rounded-r-lg"><label class="block font-bold text-xs md:text-sm mb-1 text-red-700">Lý do từ chối</label><input type="text" id="editReason" class="w-full p-2 text-sm border border-red-200 rounded-lg outline-none" placeholder="Ví dụ: Chưa nhận được tiền..."></div><div class="flex items-center mb-5 bg-slate-50 border border-slate-200 p-2.5 rounded-lg"><input type="checkbox" id="sendMailCheck" class="w-4 h-4 mr-3 accent-indigo-600" checked><label for="sendMailCheck" class="font-bold text-xs md:text-sm text-slate-700">Gửi Email thông báo trạng thái cho khách</label></div><div class="flex gap-2"><button onclick="saveOrderToCloud()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm"><i class="fas fa-save mr-2"></i>LƯU</button><button onclick="document.getElementById('modalEdit').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-lg hover:bg-slate-300 text-sm"><i class="fas fa-times mr-2"></i>Hủy</button></div></div></div>
 
-           <div class="grid md:grid-cols-2 gap-3 mb-3">
-               <div>
-                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Ngày hết hạn (VD: 30/12/2026)</label>
-                   <input type="text" id="editExpDate" class="w-full p-2 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
-               </div>
-               <div>
-                   <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
-                   <select id="editPkg" class="w-full p-2 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select>
-               </div>
-           </div>
-
-           <div class="mb-4">
-               <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Trạng Thái Đơn</label>
-               <select id="editStatus" class="w-full p-2.5 text-sm border rounded-lg font-bold outline-none" onchange="toggleStatusFields()">
-                   <option value="pending">⏳ Đang chờ duyệt (Pending)</option>
-                   <option value="success">✅ Kích hoạt Thành công (Cấp Link)</option>
-                   <option value="failed">❌ Bị Từ chối / Lỗi</option>
-               </select>
-           </div>
-
-           <div id="fieldSuccess" class="hidden mb-4 p-3 border-l-4 border-green-500 bg-green-50 rounded-r-lg">
-               <label class="block font-bold text-xs md:text-sm mb-1 text-green-700">Link Đăng Ký (Subscription URL)</label>
-               <input type="text" id="editLink" class="w-full p-2 text-sm border border-green-200 rounded-lg font-mono outline-none" placeholder="Dán link VPN vào đây...">
-           </div>
-
-           <div id="fieldFailed" class="hidden mb-4 p-3 border-l-4 border-red-500 bg-red-50 rounded-r-lg">
-               <label class="block font-bold text-xs md:text-sm mb-1 text-red-700">Lý do từ chối</label>
-               <input type="text" id="editReason" class="w-full p-2 text-sm border border-red-200 rounded-lg outline-none" placeholder="Ví dụ: Chưa nhận được tiền...">
-           </div>
-
-           <div class="flex gap-2">
-               <button onclick="saveOrderToCloud()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm"><i class="fas fa-save mr-2"></i>LƯU</button>
-               <button onclick="document.getElementById('modalEdit').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-lg hover:bg-slate-300 text-sm"><i class="fas fa-times mr-2"></i>Hủy</button>
-           </div>
-       </div>
-   </div>
-
-   <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-       <div class="glass-card p-6 w-full max-w-lg">
-           <h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3>
-           <div class="mb-4">
-               <label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label>
-               <input type="text" id="histEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500">
-           </div>
-           <div class="mb-4">
-               <label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label>
-               <select id="histPkg" class="w-full p-3 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select>
-           </div>
-           <div class="grid grid-cols-2 gap-4 mb-4">
-               <div>
-                   <label class="block font-bold text-xs text-slate-600 mb-1">Ngày Hết Hạn</label>
-                   <input type="text" id="histExp" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026">
-               </div>
-               <div>
-                   <label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref</label>
-                   <input type="text" id="histRef" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 uppercase" placeholder="Bỏ trống nếu không có">
-               </div>
-           </div>
-           <div class="flex gap-2">
-               <button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM</button>
-               <button onclick="document.getElementById('modalHistory').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
-           </div>
-       </div>
-   </div>
-
-   <div id="modalEditRef" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-       <div class="glass-card p-6 w-full max-w-sm">
-           <h3 class="text-xl font-bold mb-4">Sửa Thống Kê Giới Thiệu</h3>
-           <input type="hidden" id="editRefEmail">
-           <div class="mb-4">
-               <label class="block font-bold text-xs text-slate-600 mb-1">Số lượt hoàn thành</label>
-               <input type="number" id="editRefCount" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 font-bold">
-           </div>
-           <div class="mb-4">
-               <label class="block font-bold text-xs text-slate-600 mb-1">Hoa hồng (VNĐ)</label>
-               <input type="number" id="editRefCommission" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 font-bold">
-           </div>
-           <div class="flex gap-2">
-               <button onclick="saveRefEdit()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>LƯU</button>
-               <button onclick="document.getElementById('modalEditRef').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button>
-           </div>
-       </div>
-   </div>
+   <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"><div class="glass-card p-6 w-full max-w-lg"><h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3><div class="mb-4"><label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label><input type="text" id="histEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500"></div><div class="mb-4"><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label><select id="histPkg" class="w-full p-3 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select></div><div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block font-bold text-xs text-slate-600 mb-1">Ngày Hết Hạn</label><input type="text" id="histExp" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026"></div><div><label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref (Để cộng 8%)</label><input type="text" id="histRef" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 uppercase" placeholder="Bỏ trống nếu không có"></div></div><div class="flex gap-2"><button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM LỊCH SỬ</button><button onclick="document.getElementById('modalHistory').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button></div></div></div>
 
    <script>
        const API_URL = "https://vpn-worker-test.doicucden.workers.dev"; 
        const MY_PAGES_DOMAIN = "https://vpntest-ad4.pages.dev"; 
+       const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         
        let ordersDb = []; let adminDevices = []; let linksDb = []; let historyDb = []; let refsDb = [];
-       let myDeviceId = ''; let currentCmsDevice = 'android';
+       let myDeviceId = '';
 
        const packageOptions = [
            { txt: "Gói 1 tháng - 50.000đ / 2$ / 12.5¥ (100GB)", vnd: 50000, data: "100GB" },
@@ -294,7 +112,7 @@
        function showToast(msg, type = 'success') {
            const container = document.getElementById('toastContainer');
            const toast = document.createElement('div');
-           const bg = type === 'error' ? 'bg-red-500' : (type === 'info' ? 'bg-blue-500' : 'bg-green-500');
+           const bg = type === 'error' ? 'bg-red-500' : 'bg-green-500';
            toast.className = `${bg} text-white px-4 md:px-6 py-3 rounded-xl shadow-xl flex items-center transform transition-all duration-300 translate-x-full opacity-0 w-[90vw] max-w-sm mb-2`;
            toast.innerHTML = `<span class="font-bold text-xs md:text-sm">${msg}</span>`;
            container.appendChild(toast);
@@ -339,9 +157,11 @@
        async function doLoginSuccess() {
            document.getElementById('loginScreen').classList.add('hidden');
            document.getElementById('adminPanel').classList.remove('hidden');
+           
            const opts = packageOptions.map((p, idx) => `<option value="${idx}">${p.txt}</option>`).join('');
            document.getElementById('editPkg').innerHTML = opts;
            document.getElementById('histPkg').innerHTML = opts;
+
            showToast("Đăng nhập thành công!", "info");
            await fetchAllData();
            setInterval(async () => {
@@ -355,9 +175,9 @@
        function logoutAdmin() { localStorage.removeItem("admin_device_id"); location.reload(); }
 
        function switchTab(t) {
-           ['tab-orders', 'tab-exp', 'tab-history', 'tab-links', 'tab-refs', 'tab-cms', 'tab-devices'].forEach(tab => document.getElementById(tab).classList.add('hidden'));
+           ['tab-orders', 'tab-exp', 'tab-history', 'tab-links'].forEach(tab => document.getElementById(tab).classList.add('hidden'));
            document.getElementById(t).classList.remove('hidden');
-           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links', 'btn-tab-refs', 'btn-tab-cms', 'btn-tab-devices'].forEach(btn => { document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"; });
+           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links'].forEach(btn => { document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"; });
            document.getElementById('btn-'+t).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-indigo-600 text-white shadow-md";
            if(t === 'tab-exp') renderExpTable();
         }
@@ -365,14 +185,13 @@
        async function fetchAllData(showManualToast = false) {
            ordersDb = await apiGet("/api/orders"); if(!Array.isArray(ordersDb)) ordersDb = []; renderOrders(); 
            linksDb = await apiGet("/api/links"); if(!Array.isArray(linksDb)) linksDb = []; renderLinks();
-           refsDb = await apiGet("/api/refs"); if(!Array.isArray(refsDb)) refsDb = []; renderRefs();
            historyDb = await apiGet("/api/history"); if(!Array.isArray(historyDb)) historyDb = []; renderHistory();
-           await fetchCms(); renderDevices();
            if(showManualToast) showToast("Dữ liệu đã cập nhật!", "success");
         }
 
-       // ================= CƠ CHẾ HASH TOKEN ĐẺ LINK ẨN =================
+       // ================= BĂM TOKEN CHO LINK ẨN =================
        async function hashToken(token, index) {
+           if (index <= 1) return token;
            const msgBuffer = new TextEncoder().encode(token + "TRINHHG" + index);
            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
            const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -381,6 +200,7 @@
 
        function renderLinks() {
            const container = document.getElementById('groupedLinksContainer'); container.innerHTML = '';
+           
            const groups = {};
            linksDb.forEach(l => {
                if (!groups[l.orig]) groups[l.orig] = [];
@@ -425,16 +245,14 @@
                const origToken = urlObj.searchParams.get("OwO") || urlObj.searchParams.get("token");
                if (!origToken) return showToast("Không tìm thấy token trong link gốc!", "error");
 
-               let finalToken = origToken;
-               if (index > 1) {
-                   finalToken = await hashToken(origToken, index);
-               }
+               let finalToken = await hashToken(origToken, index);
 
+               // Validate: Mã phụ này đã được tạo chưa?
                const isDuplicate = linksDb.some(l => {
-                   let extT = new URL(l.masked).searchParams.get("OwO") || new URL(l.masked).searchParams.get("token");
+                   let extT = new URL(l.masked).searchParams.get("token");
                    return extT === finalToken;
                });
-               if (isDuplicate) return showToast(`Mã số máy phụ ${index} này đã được tạo cho link gốc này rồi! Vui lòng điền số khác.`, "error");
+               if (isDuplicate) return showToast(`Mã máy phụ ${index} này đã được tạo! Vui lòng điền số khác.`, "error");
 
                let masked = "";
                const profileName = "#VPNTrinhHg";
@@ -451,7 +269,7 @@
                document.getElementById('linkOrigInput').value = '';
                document.getElementById('linkEmailInput').value = '';
                document.getElementById('linkIndexInput').value = '1';
-               showToast("Đã tạo và cấp quyền Link Ẩn!", "success");
+               showToast("Đã tạo Link Ẩn!", "success");
            } catch (error) { showToast("Đường dẫn gốc không hợp lệ!", "error"); }
         }
 
@@ -460,7 +278,7 @@
                linksDb = linksDb.filter(x => x.id !== id); 
                await apiPost("/api/links", linksDb);
                renderLinks(); 
-               showToast("Đã cắt mạng thành công!", "info");
+               showToast("Đã cắt mạng!", "info");
            }
         }
 
@@ -521,39 +339,6 @@
 
        async function deleteHistory(idx) {
            if(confirm('Xóa lịch sử này?')) { historyDb.splice(idx, 1); await apiPost("/api/history", historyDb); renderHistory(); showToast("Đã xóa!", "info"); }
-       }
-
-       function renderRefs() {
-           const tbody = document.getElementById('refsTable'); tbody.innerHTML = '';
-           refsDb.forEach((r) => {
-               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
-                   <td class="p-4 font-bold text-slate-800">${r.email || 'Không rõ'}</td>
-                   <td class="p-4 font-mono font-bold text-indigo-600 text-base">${r.code}</td>
-                   <td class="p-4"><span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-lg">${r.count || 0}</span></td>
-                   <td class="p-4 font-black text-yellow-600">${(r.commission || 0).toLocaleString('vi-VN')}đ</td>
-                   <td class="p-4 text-right whitespace-nowrap">
-                       <button onclick="openEditRef('${r.email}')" class="text-indigo-600 font-bold px-3 py-1.5 bg-indigo-50 rounded-lg text-xs hover:bg-indigo-100"><i class="fas fa-pen mr-1"></i>Sửa Số Lượng</button>
-                   </td>
-               </tr>`;
-           });
-       }
-
-       function openEditRef(email) {
-           const r = refsDb.find(x => x.email === email);
-           document.getElementById('editRefEmail').value = r.email;
-           document.getElementById('editRefCount').value = r.count || 0;
-           document.getElementById('editRefCommission').value = r.commission || 0;
-           document.getElementById('modalEditRef').classList.remove('hidden');
-       }
-
-       async function saveRefEdit() {
-           const email = document.getElementById('editRefEmail').value;
-           const count = parseInt(document.getElementById('editRefCount').value);
-           const commission = parseInt(document.getElementById('editRefCommission').value);
-           const r = refsDb.find(x => x.email === email);
-           if(r) { r.count = count; r.commission = commission; }
-           await apiPost("/api/refs", refsDb);
-           renderRefs(); document.getElementById('modalEditRef').classList.add('hidden'); showToast("Đã cập nhật số lượng giới thiệu!", "success");
        }
 
        function renderOrders() {
@@ -619,55 +404,6 @@
            if(confirm('Xóa vĩnh viễn đơn ' + id + '?')) { ordersDb = ordersDb.filter(x => x.id !== id); await apiPost("/api/orders", ordersDb); renderOrders(); showToast("Đã xóa vĩnh viễn!", "info"); }
         }
        function copyText(txt) { navigator.clipboard.writeText(txt); showToast("Đã Copy!", "success"); }
-
-       async function fetchCms() { 
-           cmsDb = await apiGet("/api/cms"); 
-           if(typeof cmsDb !== 'object' || Array.isArray(cmsDb)) cmsDb = {};
-           document.getElementById('cmsGuide').value = cmsDb[currentCmsDevice] || ''; 
-        }
-       function changeCmsDevice(dev) {
-           document.querySelectorAll('.dev-btn').forEach(b => { b.classList.remove('active', 'border-indigo-500', 'bg-indigo-50', 'text-indigo-700'); b.classList.add('border-slate-200', 'text-slate-600'); });
-           document.getElementById('cms-btn-' + dev).classList.add('active', 'border-indigo-500', 'bg-indigo-50', 'text-indigo-700'); document.getElementById('cms-btn-' + dev).classList.remove('border-slate-200', 'text-slate-600');
-           currentCmsDevice = dev; document.getElementById('cmsGuide').value = cmsDb[dev] || '';
-        }
-       function insertMacro(type) {
-           const box = document.getElementById('cmsGuide'); 
-           let str = "";
-           if(type === 'btn') str = `<style>@keyframes pulseAppBtnStrong { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(109,40,217, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(109,40,217, 0); } }</style><div style="display: flex; justify-content: flex-start; margin: 10px 0 10px 30px; width: 100%;"><a href="LINK_TẢI_APP_VÀO_ĐÂY" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color:white; padding:12px 24px; border-radius:12px; font-weight:bold; text-decoration:none; font-size:15px; text-align: center; animation: pulseAppBtnStrong 1.5s infinite; box-shadow: 0 4px 15px rgba(109,40,217, 0.4);"><i class="fas fa-download" style="margin-right: 8px;"></i>TẢI_APP_NGAY</a></div>`;
-           if(type === 'header') str = `<div style="background: linear-gradient(90deg, #4f46e5, #8b5cf6); color: white; padding: 14px 20px; border-radius: 8px; font-size: 16px; font-weight: 900; text-transform: uppercase; margin: 20px 0 15px 0; box-shadow: 0 4px 10px rgba(79,70,229,0.3);"><i class="fas fa-star" style="margin-right:8px;"></i>TIÊU_ĐỀ_CHÍNH</div>`;
-           if(type === 'title') str = `<div style="background: #e0e7ff; border-left: 4px solid #4f46e5; padding: 12px 16px; border-radius: 4px; margin-top: 15px; margin-bottom: 10px;"><h3 style="font-size: 15px; font-weight: 800; color: #3730a3; margin: 0;">TIÊU_ĐỀ_HƯỚNG_DẪN</h3></div>`;
-           if(type === 'step') str = `<div style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;"><span style="background: #4f46e5; color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 0;">SỐ_BƯỚC</span><p style="margin: 0; font-size: 14px; color: #334155; line-height: 24px;">NỘI_DUNG_BƯỚC_CÀI</p></div>`;
-           if(type === 'note') str = `<div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin: 15px 0;"><p style="margin: 0; font-size: 14px; color: #92400e; line-height: 1.5;"><b>LƯU Ý:</b> NHẬP_LƯU_Ý_CỦA_BẠN_VÀO_ĐÂY</p></div>`;
-           if(type === 'img') str = `<div style="padding-left: 36px; margin-bottom: 15px;"><img src="LINK_ẢNH_JPG" style="max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" /></div>`;
-           const startPos = box.selectionStart; const endPos = box.selectionEnd;
-           box.value = box.value.substring(0, startPos) + str + box.value.substring(endPos, box.value.length);
-           box.selectionStart = startPos + str.length; box.selectionEnd = startPos + str.length; box.focus();
-        }
-       async function saveCmsToCloud() {
-           cmsDb[currentCmsDevice] = document.getElementById('cmsGuide').value;
-           const btn = event.target; const oldTxt = btn.innerText; btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
-           await apiPost("/api/cms", cmsDb); showToast('Đã lưu bài viết lên hệ thống Cloud!', "success");
-           btn.innerText = oldTxt; btn.disabled = false;
-        }
-       function renderDevices() {
-           const tbody = document.getElementById('devicesTable'); tbody.innerHTML = '';
-           adminDevices.forEach((d) => {
-               let isMe = d.id === myDeviceId ? '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold ml-2">Bạn</span>' : '';
-               tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
-                   <td class="p-4 font-mono font-bold text-indigo-600 text-xs">${d.id} ${isMe}</td>
-                   <td class="p-4 text-xs text-slate-600 max-w-xs truncate">${d.userAgent}</td>
-                   <td class="p-4 text-xs text-slate-500">${d.date}</td>
-                   <td class="p-4 text-right whitespace-nowrap">
-                       <button onclick="removeDevice('${d.id}')" class="text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash mr-1"></i>Xóa</button>
-                   </td></tr>`;
-           });
-        }
-       async function removeDevice(id) {
-           if(confirm("Xóa thiết bị này khỏi danh sách cho phép?")) {
-               adminDevices = adminDevices.filter(x => x.id !== id); await apiPost("/api/devices", adminDevices);
-               renderDevices(); showToast("Đã xóa thiết bị", "info"); if(id === myDeviceId) logoutAdmin();
-           }
-        }
    </script>
 </body>
 </html>
