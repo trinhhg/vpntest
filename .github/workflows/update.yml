@@ -2,8 +2,8 @@ name: Update VPN Subs Automatically
 
 on:
   schedule:
-    - cron: '*/60 * * * *' # Chạy mỗi 60 phút
-  workflow_dispatch:      # Có nút bấm chạy bằng tay lúc cần test
+    - cron: '*/60 * * * *'
+  workflow_dispatch:
 
 jobs:
   update-subs:
@@ -20,5 +20,5 @@ jobs:
       - name: Install Dependencies
         run: pip install requests pyyaml
 
-      - name: Run Script Rename Nodes
+      - name: Run Script
         run: python update_sub.py
