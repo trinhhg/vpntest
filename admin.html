@@ -77,7 +77,7 @@
                        <input type="number" id="linkIndexInput" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm" placeholder="Để trống = 1" min="1" value="1">
                    </div>
                </div>
-               <p class="text-[10px] text-slate-500 mb-3 italic">* Nhập Số thứ tự $\ge$ 2 hệ thống sẽ tự băm ra mã Sub-ID ẩn danh cho khách đó.</p>
+               <p class="text-[10px] text-slate-500 mb-3 italic">* Nhập Số thứ tự ≥ 2 hệ thống sẽ tự băm ra mã Sub-ID ẩn danh cho khách đó.</p>
                <button onclick="createAndSaveLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition"><i class="fas fa-magic mr-2"></i> TẠO & LƯU LINK ẨN</button>
            </div>
 
@@ -91,8 +91,12 @@
    <div id="modalHistory" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"><div class="glass-card p-6 w-full max-w-lg"><h3 class="text-xl font-bold mb-4">Thêm Lịch Sử Mua Hàng</h3><div class="mb-4"><label class="block font-bold text-xs text-slate-600 mb-1">Email Khách</label><input type="text" id="histEmail" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500"></div><div class="mb-4"><label class="block font-bold text-xs md:text-sm mb-1 text-slate-600">Gói VPN</label><select id="histPkg" class="w-full p-3 text-sm border rounded-lg font-bold text-indigo-700 bg-indigo-50 outline-none"></select></div><div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block font-bold text-xs text-slate-600 mb-1">Ngày Hết Hạn</label><input type="text" id="histExp" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500" placeholder="VD: 30/12/2026"></div><div><label class="block font-bold text-xs text-slate-600 mb-1">Mã Ref (Để cộng 8%)</label><input type="text" id="histRef" class="w-full p-3 text-sm border rounded-lg outline-none focus:border-indigo-500 uppercase" placeholder="Bỏ trống nếu không có"></div></div><div class="flex gap-2"><button onclick="saveHistory()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg"><i class="fas fa-save mr-2"></i>THÊM LỊCH SỬ</button><button onclick="document.getElementById('modalHistory').classList.add('hidden')" class="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg"><i class="fas fa-times mr-2"></i>Hủy</button></div></div></div>
 
    <script>
-       const API_URL = "https://vpn-worker-test.doicucden.workers.dev"; 
-       const MY_PAGES_DOMAIN = "https://vpntest-ad4.pages.dev"; 
+       // ================================================================
+       // FIX QUAN TRỌNG: Dùng "" (rỗng) để tự proxy qua _worker.js
+       // KHÔNG gọi trực tiếp Worker URL vì sẽ bị CORS/timeout
+       // ================================================================
+       const API_URL = "";
+       const MY_PAGES_DOMAIN = "https://vpntest-ad4.pages.dev";
        const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
         
        let ordersDb = []; let adminDevices = []; let linksDb = []; let historyDb = []; let refsDb = [];
@@ -118,41 +122,51 @@
            container.appendChild(toast);
            setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
            setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
-        }
+       }
 
        async function apiGet(path) {
            try {
                let res = await fetch(API_URL + path + "?_t=" + Date.now());
-               if(!res.ok) throw new Error("HTTP error");
+               if (!res.ok) throw new Error("HTTP " + res.status);
                return await res.json();
-           } catch(e) { return []; }
-        }
+           } catch(e) {
+               console.error("apiGet lỗi:", path, e.message);
+               return [];
+           }
+       }
+
        async function apiPost(path, data) {
-           try { await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) }); } catch(e) {}
-        }
+           try {
+               await fetch(API_URL + path, { method: "POST", body: JSON.stringify(data) });
+           } catch(e) {
+               console.error("apiPost lỗi:", path, e.message);
+           }
+       }
 
        window.onload = async function() {
            myDeviceId = localStorage.getItem("admin_device_id");
-           if(!myDeviceId) {
+           if (!myDeviceId) {
                myDeviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
                localStorage.setItem("admin_device_id", myDeviceId);
            }
            adminDevices = await apiGet("/api/devices");
-           if(!Array.isArray(adminDevices)) adminDevices = [];
-           if(adminDevices.find(x => x.id === myDeviceId)) doLoginSuccess();
-        }
+           if (!Array.isArray(adminDevices)) adminDevices = [];
+           if (adminDevices.find(x => x.id === myDeviceId)) doLoginSuccess();
+       }
 
        async function checkAdminPassword() {
-           if(document.getElementById('adminPass').value === "572007") {
+           if (document.getElementById('adminPass').value === "572007") {
                adminDevices = await apiGet("/api/devices");
-               if(!Array.isArray(adminDevices)) adminDevices = [];
-               if(!adminDevices.find(x => x.id === myDeviceId)) {
+               if (!Array.isArray(adminDevices)) adminDevices = [];
+               if (!adminDevices.find(x => x.id === myDeviceId)) {
                    adminDevices.push({ id: myDeviceId, userAgent: navigator.userAgent.substring(0, 50), date: new Date().toLocaleString() });
                    await apiPost("/api/devices", adminDevices);
                }
                doLoginSuccess();
-           } else showToast("Sai mật khẩu!", "error");
-        }
+           } else {
+               showToast("Sai mật khẩu!", "error");
+           }
+       }
 
        async function doLoginSuccess() {
            document.getElementById('loginScreen').classList.add('hidden');
@@ -162,32 +176,41 @@
            document.getElementById('editPkg').innerHTML = opts;
            document.getElementById('histPkg').innerHTML = opts;
 
-           showToast("Đăng nhập thành công!", "info");
+           showToast("Đăng nhập thành công!");
            await fetchAllData();
            setInterval(async () => {
-               if(document.getElementById('modalEdit').classList.contains('hidden') && document.getElementById('modalHistory').classList.contains('hidden')) { 
+               if (document.getElementById('modalEdit').classList.contains('hidden') &&
+                   document.getElementById('modalHistory').classList.contains('hidden')) {
                    let newOrders = await apiGet("/api/orders");
-                   if(JSON.stringify(newOrders) !== JSON.stringify(ordersDb)) { ordersDb = newOrders; renderOrders(); }
+                   if (JSON.stringify(newOrders) !== JSON.stringify(ordersDb)) {
+                       ordersDb = newOrders;
+                       renderOrders();
+                   }
                }
            }, 10000);
-        }
+       }
 
-       function logoutAdmin() { localStorage.removeItem("admin_device_id"); location.reload(); }
+       function logoutAdmin() {
+           localStorage.removeItem("admin_device_id");
+           location.reload();
+       }
 
        function switchTab(t) {
            ['tab-orders', 'tab-exp', 'tab-history', 'tab-links'].forEach(tab => document.getElementById(tab).classList.add('hidden'));
            document.getElementById(t).classList.remove('hidden');
-           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links'].forEach(btn => { document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200"; });
+           ['btn-tab-orders', 'btn-tab-exp', 'btn-tab-history', 'btn-tab-links'].forEach(btn => {
+               document.getElementById(btn).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200";
+           });
            document.getElementById('btn-'+t).className = "flex-1 md:flex-none px-5 py-3 rounded-xl font-bold text-sm bg-indigo-600 text-white shadow-md";
-           if(t === 'tab-exp') renderExpTable();
-        }
+           if (t === 'tab-exp') renderExpTable();
+       }
 
        async function fetchAllData(showManualToast = false) {
-           ordersDb = await apiGet("/api/orders"); if(!Array.isArray(ordersDb)) ordersDb = []; renderOrders(); 
-           linksDb = await apiGet("/api/links"); if(!Array.isArray(linksDb)) linksDb = []; renderLinks();
-           historyDb = await apiGet("/api/history"); if(!Array.isArray(historyDb)) historyDb = []; renderHistory();
-           if(showManualToast) showToast("Dữ liệu đã cập nhật!", "success");
-        }
+           ordersDb  = await apiGet("/api/orders");  if (!Array.isArray(ordersDb))  ordersDb  = []; renderOrders();
+           linksDb   = await apiGet("/api/links");   if (!Array.isArray(linksDb))   linksDb   = []; renderLinks();
+           historyDb = await apiGet("/api/history"); if (!Array.isArray(historyDb)) historyDb = []; renderHistory();
+           if (showManualToast) showToast("Dữ liệu đã cập nhật!");
+       }
 
        // ================= BĂM TOKEN CHO LINK ẨN =================
        async function hashToken(token, index) {
@@ -199,14 +222,13 @@
        }
 
        function renderLinks() {
-           const container = document.getElementById('groupedLinksContainer'); container.innerHTML = '';
-           
+           const container = document.getElementById('groupedLinksContainer');
+           container.innerHTML = '';
            const groups = {};
            linksDb.forEach(l => {
                if (!groups[l.orig]) groups[l.orig] = [];
                groups[l.orig].push(l);
            });
-
            for (const orig in groups) {
                const subs = groups[orig];
                let subsHtml = subs.map(l => `
@@ -221,10 +243,9 @@
                        <button onclick="deleteLink('${l.id}')" class="mt-2 md:mt-0 text-red-500 font-bold px-3 py-1.5 bg-red-50 rounded-lg text-xs hover:bg-red-100 shrink-0"><i class="fas fa-trash mr-1"></i>Ngắt Mạng</button>
                    </div>
                `).join('');
-
                container.innerHTML += `
                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                       <p class="font-bold text-xs text-slate-500 mb-2 uppercase"><i class="fas fa-link mr-1"></i> LINK GỐC LIANGXIN</p>
+                       <p class="font-bold text-xs text-slate-500 mb-2 uppercase"><i class="fas fa-link mr-1"></i> LINK GỐC</p>
                        <p class="font-mono text-xs text-slate-700 bg-white p-2 rounded border border-slate-100 mb-3 truncate w-full cursor-pointer" onclick="copyText('${orig}')">${orig}</p>
                        ${subsHtml}
                    </div>
@@ -247,17 +268,15 @@
 
                let finalToken = await hashToken(origToken, index);
 
-               // Validate: Mã phụ này đã được tạo chưa?
                const isDuplicate = linksDb.some(l => {
-                   let extT = new URL(l.masked).searchParams.get("token");
-                   return extT === finalToken;
+                   try { return new URL(l.masked).searchParams.get("token") === finalToken; } catch { return false; }
                });
-               if (isDuplicate) return showToast(`Mã máy phụ ${index} này đã được tạo! Vui lòng điền số khác.`, "error");
+               if (isDuplicate) return showToast(`Mã máy phụ ${index} đã tồn tại! Điền số khác.`, "error");
 
                let masked = "";
                const profileName = "#VPNTrinhHg";
                
-               if (orig.includes("liangxin.xyz")) masked = MY_PAGES_DOMAIN + "/v1?token=" + finalToken + profileName;
+               if (orig.includes("liangxin.xyz"))  masked = MY_PAGES_DOMAIN + "/v1?token=" + finalToken + profileName;
                else if (orig.includes("djjc.cfd")) masked = MY_PAGES_DOMAIN + "/v2?token=" + finalToken + profileName;
                else return showToast("Tên miền link gốc chưa được hỗ trợ!", "error");
 
@@ -269,18 +288,20 @@
                document.getElementById('linkOrigInput').value = '';
                document.getElementById('linkEmailInput').value = '';
                document.getElementById('linkIndexInput').value = '1';
-               showToast("Đã tạo Link Ẩn!", "success");
-           } catch (error) { showToast("Đường dẫn gốc không hợp lệ!", "error"); }
-        }
+               showToast("Đã tạo Link Ẩn!");
+           } catch (error) {
+               showToast("Đường dẫn gốc không hợp lệ!", "error");
+           }
+       }
 
        async function deleteLink(id) {
-           if(confirm('Khách hàng này sẽ bị cắt mạng lập tức. Xác nhận Ngắt Mạng?')) {
-               linksDb = linksDb.filter(x => x.id !== id); 
+           if (confirm('Khách hàng này sẽ bị cắt mạng lập tức. Xác nhận Ngắt Mạng?')) {
+               linksDb = linksDb.filter(x => x.id !== id);
                await apiPost("/api/links", linksDb);
-               renderLinks(); 
-               showToast("Đã cắt mạng!", "info");
+               renderLinks();
+               showToast("Đã cắt mạng!");
            }
-        }
+       }
 
        function parseDateString(dateString) {
            if (!dateString) return null;
@@ -290,20 +311,20 @@
        }
 
        function renderExpTable() {
-           const tbody = document.getElementById('expTable'); tbody.innerHTML = '';
+           const tbody = document.getElementById('expTable');
+           tbody.innerHTML = '';
            const now = new Date();
            ordersDb.filter(o => o.status === 'success' && o.expDate).forEach(o => {
                const exp = parseDateString(o.expDate);
-               if(exp) {
+               if (exp) {
                    const diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-                   const isDanger = diffDays <= 3;
-                   if (isDanger) {
+                   if (diffDays <= 3) {
                        tbody.innerHTML += `<tr class="bg-red-50 border-red-200 transition">
                            <td class="p-4 font-mono font-bold text-indigo-600">${o.id}</td>
                            <td class="p-4 font-bold text-slate-800">${o.email}</td>
                            <td class="p-4 font-bold text-slate-600">${o.expDate}</td>
                            <td class="p-4 text-red-600 font-black">${diffDays > 0 ? diffDays + ' Ngày' : 'Đã Hết Hạn'}</td>
-                           <td class="p-4 text-right whitespace-nowrap"><span class="text-xs text-red-500 font-bold">Cần thu phí</span></td>
+                           <td class="p-4 text-right"><span class="text-xs text-red-500 font-bold">Cần thu phí</span></td>
                        </tr>`;
                    }
                }
@@ -311,7 +332,8 @@
        }
 
        function renderHistory() {
-           const tbody = document.getElementById('historyTable'); tbody.innerHTML = '';
+           const tbody = document.getElementById('historyTable');
+           tbody.innerHTML = '';
            historyDb.forEach((h, idx) => {
                tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
                    <td class="p-4 font-bold text-slate-800">${h.email}</td>
@@ -324,86 +346,150 @@
        }
 
        function openHistoryModal() {
-           document.getElementById('histEmail').value = ''; document.getElementById('histExp').value = ''; document.getElementById('histRef').value = ''; document.getElementById('modalHistory').classList.remove('hidden');
+           document.getElementById('histEmail').value = '';
+           document.getElementById('histExp').value = '';
+           document.getElementById('histRef').value = '';
+           document.getElementById('modalHistory').classList.remove('hidden');
        }
 
        async function saveHistory() {
            const email = document.getElementById('histEmail').value.trim();
            const pkgIdx = document.getElementById('histPkg').value;
            const expDate = document.getElementById('histExp').value.trim();
-           if(!email) return showToast("Vui lòng nhập Email", "error");
+           if (!email) return showToast("Vui lòng nhập Email", "error");
            const selectedPkg = packageOptions[pkgIdx];
-           historyDb.unshift({ email: email, pkgName: selectedPkg.txt.split(' - ')[0], priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0], data: selectedPkg.data, vnd: selectedPkg.vnd, expDate: expDate, refCode: "", date: new Date().toLocaleString() });
-           await apiPost("/api/history", historyDb); renderHistory(); document.getElementById('modalHistory').classList.add('hidden'); showToast("Đã thêm lịch sử mua hàng!", "success");
+           historyDb.unshift({
+               email, expDate, refCode: "",
+               pkgName: selectedPkg.txt.split(' - ')[0],
+               priceStr: selectedPkg.txt.split(' - ')[1].split(' (')[0],
+               data: selectedPkg.data,
+               vnd: selectedPkg.vnd,
+               date: new Date().toLocaleString()
+           });
+           await apiPost("/api/history", historyDb);
+           renderHistory();
+           document.getElementById('modalHistory').classList.add('hidden');
+           showToast("Đã thêm lịch sử mua hàng!");
        }
 
        async function deleteHistory(idx) {
-           if(confirm('Xóa lịch sử này?')) { historyDb.splice(idx, 1); await apiPost("/api/history", historyDb); renderHistory(); showToast("Đã xóa!", "info"); }
+           if (confirm('Xóa lịch sử này?')) {
+               historyDb.splice(idx, 1);
+               await apiPost("/api/history", historyDb);
+               renderHistory();
+               showToast("Đã xóa!");
+           }
        }
 
        function renderOrders() {
-           const tbody = document.getElementById('orderTable'); tbody.innerHTML = '';
+           const tbody = document.getElementById('orderTable');
+           tbody.innerHTML = '';
            ordersDb.forEach((o) => {
-               let badge = o.status === 'pending' ? '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">⏳ Chờ duyệt</span>' : 
-                           (o.status === 'success' ? '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">✅ Thành công</span>' : 
-                           '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">❌ Từ chối</span>');
-               
-               let supportTag = o.needSupport ? `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-blue-200">Hỗ trợ</span>` : '';
+               let badge = o.status === 'pending'
+                   ? '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">⏳ Chờ duyệt</span>'
+                   : (o.status === 'success'
+                       ? '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">✅ Thành công</span>'
+                       : '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">❌ Từ chối</span>');
+               let supportTag = o.needSupport
+                   ? `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded ml-2 font-bold uppercase border border-blue-200">Hỗ trợ</span>`
+                   : '';
                tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition">
                    <td class="p-4 md:p-5 font-mono font-bold text-indigo-600">${o.id} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.id}')"></i></td>
                    <td class="p-4 md:p-5"><p class="font-bold text-slate-800">${o.email} <i class="fas fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer ml-1" onclick="copyText('${o.email}')"></i> ${supportTag}</p><p class="text-xs text-slate-500 mt-1"><i class="fas fa-credit-card mr-1"></i>${o.method || 'Bank'} | Zalo: ${o.zalo || 'Không'}</p></td>
-                   <td class="p-4 md:p-5 font-bold text-slate-600 text-xs truncate max-w-[200px]">${o.pkg} <br><span class="text-indigo-500 text-[10px]">${o.expDate ? 'HSD: '+o.expDate : ''}</span></td><td class="p-4 md:p-5">${badge}</td>
+                   <td class="p-4 md:p-5 font-bold text-slate-600 text-xs truncate max-w-[200px]">${o.pkg} <br><span class="text-indigo-500 text-[10px]">${o.expDate ? 'HSD: '+o.expDate : ''}</span></td>
+                   <td class="p-4 md:p-5">${badge}</td>
                    <td class="p-4 md:p-5 text-right whitespace-nowrap">
                        <button onclick="openEditModal('${o.id}')" class="text-indigo-600 font-bold hover:underline px-3 py-1.5 bg-indigo-50 rounded-lg mr-2 text-xs md:text-sm"><i class="fas fa-pen mr-1"></i>Sửa</button>
                        <button onclick="deleteOrder('${o.id}')" class="text-red-500 font-bold hover:underline px-3 py-1.5 bg-red-50 rounded-lg text-xs md:text-sm"><i class="fas fa-trash mr-1"></i>Xóa</button>
-                   </td></tr>`;
+                   </td>
+               </tr>`;
            });
-        }
-       function generateRandomId() { return 'DH-' + Math.random().toString(36).substr(2, 9).toUpperCase(); }
+       }
+
+       function generateRandomId() {
+           return 'DH-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+       }
+
        function openEditModal(id) {
            let o;
-           if(id) { o = ordersDb.find(x => x.id === id); document.getElementById('modalTitle').innerText = `Chỉnh sửa Đơn Hàng`; document.getElementById('editId').value = o.id; } 
-           else { o = { id: generateRandomId(), email: '', pkg: packageOptions[0].txt, status: 'pending', info: '', reason: '', expDate: '' }; document.getElementById('modalTitle').innerText = `Tạo Đơn Thủ Công`; document.getElementById('editId').value = o.id; }
-           document.getElementById('editEmail').value = o.email || ''; document.getElementById('editExpDate').value = o.expDate || '';
-           
-           let foundPkg = false;
-           for(let i=0; i<document.getElementById('editPkg').options.length; i++) {
-               if(document.getElementById('editPkg').options[i].text.includes(o.pkgName || (o.pkg ? o.pkg.split(' (')[0] : ''))) { document.getElementById('editPkg').selectedIndex = i; foundPkg = true; break; }
+           if (id) {
+               o = ordersDb.find(x => x.id === id);
+               document.getElementById('modalTitle').innerText = `Chỉnh sửa Đơn Hàng`;
+               document.getElementById('editId').value = o.id;
+           } else {
+               o = { id: generateRandomId(), email: '', pkg: packageOptions[0].txt, status: 'pending', info: '', reason: '', expDate: '' };
+               document.getElementById('modalTitle').innerText = `Tạo Đơn Thủ Công`;
+               document.getElementById('editId').value = o.id;
            }
-           if(!foundPkg) document.getElementById('editPkg').selectedIndex = 0;
+           document.getElementById('editEmail').value = o.email || '';
+           document.getElementById('editExpDate').value = o.expDate || '';
+           let foundPkg = false;
+           for (let i = 0; i < document.getElementById('editPkg').options.length; i++) {
+               if (document.getElementById('editPkg').options[i].text.includes(o.pkgName || (o.pkg ? o.pkg.split(' (')[0] : ''))) {
+                   document.getElementById('editPkg').selectedIndex = i;
+                   foundPkg = true;
+                   break;
+               }
+           }
+           if (!foundPkg) document.getElementById('editPkg').selectedIndex = 0;
+           document.getElementById('editStatus').value = o.status;
+           document.getElementById('editLink').value = o.info || '';
+           document.getElementById('editReason').value = o.reason || '';
+           toggleStatusFields();
+           document.getElementById('modalEdit').classList.remove('hidden');
+       }
 
-           document.getElementById('editStatus').value = o.status; document.getElementById('editLink').value = o.info || ''; document.getElementById('editReason').value = o.reason || '';
-           toggleStatusFields(); document.getElementById('modalEdit').classList.remove('hidden');
-        }
        function toggleStatusFields() {
            const s = document.getElementById('editStatus').value;
            document.getElementById('fieldSuccess').classList.toggle('hidden', s !== 'success');
            document.getElementById('fieldFailed').classList.toggle('hidden', s !== 'failed');
-        }
+       }
 
        async function saveOrderToCloud() {
            const originalId = document.getElementById('editId').value.trim();
-           if(!originalId) return showToast("Mã đơn không được rỗng!", "error");
+           if (!originalId) return showToast("Mã đơn không được rỗng!", "error");
            let o = ordersDb.find(x => x.id === originalId);
-           if(!o) { o = { id: originalId, needSupport: false, method: "Manual", date: new Date().toLocaleString() }; ordersDb.unshift(o); }
-
-           o.id = originalId; o.email = document.getElementById('editEmail').value.trim(); 
+           if (!o) {
+               o = { id: originalId, needSupport: false, method: "Manual", date: new Date().toLocaleString() };
+               ordersDb.unshift(o);
+           }
+           o.id      = originalId;
+           o.email   = document.getElementById('editEmail').value.trim();
            const selectedPkg = packageOptions[document.getElementById('editPkg').value];
-           o.pkg = selectedPkg.txt; o.expDate = document.getElementById('editExpDate').value.trim();
-           o.status = document.getElementById('editStatus').value; o.info = document.getElementById('editLink').value; o.reason = document.getElementById('editReason').value;
+           o.pkg     = selectedPkg.txt;
+           o.expDate = document.getElementById('editExpDate').value.trim();
+           o.status  = document.getElementById('editStatus').value;
+           o.info    = document.getElementById('editLink').value;
+           o.reason  = document.getElementById('editReason').value;
            o.pkgName = o.pkg.split(' - ')[0];
 
-           const btn = event.target; const oldTxt = btn.innerText; btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
+           const btn = event.target;
+           const oldTxt = btn.innerText;
+           btn.innerText = "ĐANG LƯU...";
+           btn.disabled = true;
 
            await apiPost("/api/orders", ordersDb);
-           showToast("Đã đồng bộ đơn hàng!", "success");
+           showToast("Đã đồng bộ đơn hàng!");
 
-           btn.innerText = oldTxt; btn.disabled = false; renderOrders(); document.getElementById('modalEdit').classList.add('hidden');
-        }
+           btn.innerText = oldTxt;
+           btn.disabled = false;
+           renderOrders();
+           document.getElementById('modalEdit').classList.add('hidden');
+       }
+
        async function deleteOrder(id) {
-           if(confirm('Xóa vĩnh viễn đơn ' + id + '?')) { ordersDb = ordersDb.filter(x => x.id !== id); await apiPost("/api/orders", ordersDb); renderOrders(); showToast("Đã xóa vĩnh viễn!", "info"); }
-        }
-       function copyText(txt) { navigator.clipboard.writeText(txt); showToast("Đã Copy!", "success"); }
+           if (confirm('Xóa vĩnh viễn đơn ' + id + '?')) {
+               ordersDb = ordersDb.filter(x => x.id !== id);
+               await apiPost("/api/orders", ordersDb);
+               renderOrders();
+               showToast("Đã xóa vĩnh viễn!");
+           }
+       }
+
+       function copyText(txt) {
+           navigator.clipboard.writeText(txt);
+           showToast("Đã Copy!");
+       }
    </script>
 </body>
 </html>
