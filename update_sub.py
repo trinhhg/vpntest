@@ -20,61 +20,61 @@ GROUP_RENAMES = [
 
 INFO_KEYWORDS = ['剩余流量', '距离下次重置', '套餐到期']
 
-# Bảng dịch Trung → Anh, ĐÃ TEST với tên node thực tế
+# Bảng dịch Trung → Anh (đã test với tên node thực tế)
 CN_TO_EN = [
-    # Cờ + tên quốc gia (dài trước)
+    # Cờ + tên nước (phải xử lý trước tên nước đơn)
     ("🇨🇳台湾","🇹🇼 Taiwan"), ("🇹🇼台湾","🇹🇼 Taiwan"),
     ("🇭🇰香港","🇭🇰 HK"), ("🇸🇬新加坡","🇸🇬 SG"),
     ("🇯🇵日本","🇯🇵 JP"), ("🇺🇸美国","🇺🇸 USA"),
     ("🇰🇷韩国","🇰🇷 KR"), ("🇩🇪德国","🇩🇪 DE"),
-    ("🇬🇧英国","🇬🇧 UK"), ("🇫🇷法国","🇫🇷 FR"),
-    ("🇧🇷巴西","🇧🇷 BR"), ("🇦🇺澳大利亚","🇦🇺 AU"),
+    ("🇬🇧英国","🇬🇧 UK"), ("🇧🇷巴西","🇧🇷 BR"),
     ("🇨🇦加拿大","🇨🇦 CA"), ("🇮🇳印度","🇮🇳 IN"),
-    ("🇿🇦非洲","🇿🇦 Africa"), ("🇲🇽墨西哥","🇲🇽 MX"),
+    ("🇿🇦非洲","🇿🇦 ZA"), ("🇲🇽墨西哥","🇲🇽 MX"),
     ("🇸🇪瑞典","🇸🇪 SE"), ("🇦🇪迪拜","🇦🇪 Dubai"),
-    # Tên không có cờ
+    # Tên nước đơn
     ("台湾","TW"), ("香港","HK"), ("新加坡","SG"),
     ("日本","JP"), ("美国","USA"), ("韩国","KR"),
-    ("德国","DE"), ("英国","UK"), ("法国","FR"),
-    ("巴西","BR"), ("加拿大","CA"), ("印度","IN"),
-    ("非洲","Africa"), ("墨西哥","MX"), ("瑞典","SE"), ("迪拜","Dubai"),
+    ("德国","DE"), ("英国","UK"), ("巴西","BR"),
+    ("加拿大","CA"), ("印度","IN"), ("非洲","ZA"),
+    ("墨西哥","MX"), ("瑞典","SE"), ("迪拜","Dubai"),
     # Thành phố
     ("洛杉矶","LA"), ("凤凰城","Phoenix"), ("法兰克福","Frankfurt"),
-    ("伦敦","London"), ("圣保罗","SaoPaulo"), ("约翰内斯堡","JHB"),
+    ("伦敦","London"), ("圣保罗","Sao Paulo"), ("约翰内斯堡","JHB"),
     ("多伦多","Toronto"), ("斯德哥尔摩","Stockholm"), ("克雷塔罗","Queretaro"),
     ("孟买","Mumbai"), ("海得拉巴","Hyderabad"),
     # Tính năng (dài trước)
-    ("三网高速","TriNet-HS"), ("高速","HS"), ("专线","Direct"),
+    ("三网高速","TriNet HS"), ("高速","HS"), ("专线","Direct"),
     ("流媒体","Stream"), ("三网","TriNet"),
     # Bội số (dài trước)
     ("1.5倍率","1.5x"), ("1.2倍率","1.2x"), ("1.8倍率","1.8x"),
     ("3.5倍率","3.5x"), ("2倍率","2x"), ("0.1倍","0.1x"), ("1倍","1x"),
     ("倍率","x"), ("倍","x"),
-    # Số thứ tự
+    # Số thứ tự (dài trước)
     ("1号","1"), ("2号","2"), ("3号","3"), ("4号","4"),
     ("5号","5"), ("6号","6"), ("7号","7"), ("号",""),
-    # Ký tự đặc biệt
-    ("—","-"), ("–","-"),
+    # Ký tự đặc biệt → space
+    ("—"," "), ("–"," "), ("|"," "),
     # Xóa tên nhà cung cấp
     ("顶级机场",""), ("良心云",""), ("自动选择",""), ("故障转移",""),
 ]
 
 
-def is_info_node(n: str) -> bool:
-    return any(k in n for k in INFO_KEYWORDS)
+def is_info_node(name: str) -> bool:
+    return any(k in name for k in INFO_KEYWORDS)
 
 
 def clean_node_name(raw: str) -> str:
-    """Dịch tên node Trung → Anh, trả về chuỗi sạch."""
+    """Dịch tên node Trung → Anh."""
     text = urllib.parse.unquote(raw)
-    text = text.replace("|", " ")  # pipe separator → space
     for cn, en in CN_TO_EN:
         text = text.replace(cn, en)
     text = re.sub(r'\bBGP\b', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf]+', '', text)  # xóa Hán còn sót
-    text = re.sub(r'[-\s]+', ' ', text).strip()
-    text = re.sub(r'\s*-\s*', ' - ', text)
-    return text.strip(' -').strip()
+    # Xóa Hán còn sót
+    text = re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf]+', '', text)
+    # Chuẩn hóa spaces
+    text = re.sub(r'[ \t]+', ' ', text).strip()
+    text = text.strip(' -').strip()
+    return text
 
 
 def build_final_name(raw: str) -> str:
@@ -82,9 +82,9 @@ def build_final_name(raw: str) -> str:
     return f"{c} - {NODE_SUFFIX}" if c else NODE_SUFFIX
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 # XỬ LÝ BASE64
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 def process_base64(content: str, rename_map: dict) -> str:
     padded = content + '=' * ((-len(content)) % 4)
     try:
@@ -115,48 +115,94 @@ def process_base64(content: str, rename_map: dict) -> str:
     return base64.b64encode(result_str.encode('utf-8')).decode('ascii')
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# XÓA INFO NODES KHỎI INLINE LIST
-# ─────────────────────────────────────────────────────────────────────────────
-def remove_info_from_lists(text: str, info_keywords: list) -> str:
-    """Xóa entries chứa info keywords khỏi inline YAML list [a, b, c]"""
-    for kw in info_keywords:
-        # Giữa list, có nháy đơn: , 'kw...', 
+# ──────────────────────────────────────────────────────────────────────────────
+# XÓA INFO ENTRIES KHỎI INLINE LIST
+# ──────────────────────────────────────────────────────────────────────────────
+def remove_info_from_lists(text: str) -> str:
+    for kw in INFO_KEYWORDS:
+        # Có nháy đơn ở giữa: , 'kw...',
         text = re.sub(r",\s*'[^']*" + re.escape(kw) + r"[^']*'", '', text)
-        # Giữa list, có nháy kép: , "kw...", 
+        # Có nháy kép ở giữa
         text = re.sub(r',\s*"[^"]*' + re.escape(kw) + r'[^"]*"', '', text)
-        # Đầu list, có nháy đơn: ['kw...', 
+        # Đầu list nháy đơn: ['kw...',
         text = re.sub(r"(?<=\[)'[^']*" + re.escape(kw) + r"[^']*',?\s*", '', text)
-        # Đầu list, có nháy kép
+        # Đầu list nháy kép
         text = re.sub(r'(?<=\[)"[^"]*' + re.escape(kw) + r'[^"]*",?\s*', '', text)
-        # Giữa/cuối, không nháy: , kw..., hoặc , kw...]
+        # Không nháy ở giữa/cuối: , kw..., hoặc , kw...]
         text = re.sub(r',\s*' + re.escape(kw) + r'[^,\[\]\'"{}]*(?=[,\]])', '', text)
-        # Đầu list, không nháy: [kw...,
+        # Không nháy ở đầu: [kw...,
         text = re.sub(r'(?<=\[)' + re.escape(kw) + r'[^,\[\]\'"{}]*,?\s*', '', text)
-    # Dọn dấu phẩy thừa
     text = re.sub(r'\[\s*,\s*', '[', text)
     text = re.sub(r',\s*,+', ',', text)
     text = re.sub(r',\s*\]', ']', text)
     return text
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# XỬ LÝ YAML — KHÔNG dùng yaml.dump
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
+# ĐẢM BẢO TẤT CẢ TÊN TRONG PROXY-GROUPS LIST ĐỀU CÓ NHÁY ĐƠN
+# ──────────────────────────────────────────────────────────────────────────────
+def ensure_quoted_in_groups(yaml_text: str) -> str:
+    """
+    Quét proxy-groups section, đảm bảo mọi entry trong proxies: [...]
+    đều được bọc trong nháy đơn. Điều này quan trọng cho Clash Go YAML parser.
+    """
+    in_proxy_groups = False
+    lines = yaml_text.splitlines()
+    result_lines = []
+
+    for line in lines:
+        stripped = line.strip()
+        # Detect section
+        if re.match(r'^proxy-groups\s*:', stripped):
+            in_proxy_groups = True
+        elif stripped and not line[0].isspace() and not stripped.startswith('-'):
+            if not re.match(r'^proxy-groups\s*:', stripped):
+                in_proxy_groups = False
+
+        if in_proxy_groups and 'proxies:' in line and '[' in line:
+            def quote_entries(m):
+                content = m.group(1)
+                entries = re.split(r',\s*', content)
+                quoted = []
+                for entry in entries:
+                    entry = entry.strip()
+                    if not entry:
+                        continue
+                    # Đã có nháy → giữ nguyên
+                    if (entry.startswith("'") and entry.endswith("'")) or \
+                       (entry.startswith('"') and entry.endswith('"')):
+                        # Đổi nháy kép thành nháy đơn
+                        if entry.startswith('"'):
+                            entry = "'" + entry[1:-1] + "'"
+                        quoted.append(entry)
+                    else:
+                        # Chưa có nháy → thêm nháy đơn
+                        quoted.append(f"'{entry}'")
+                return 'proxies: [' + ', '.join(quoted) + ']'
+
+            line = re.sub(r'proxies:\s*\[([^\]]*)\]', quote_entries, line)
+
+        result_lines.append(line)
+
+    return '\n'.join(result_lines)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# XỬ LÝ YAML HOÀN CHỈNH
+# ──────────────────────────────────────────────────────────────────────────────
 def process_yaml_raw(yaml_text: str, rename_map: dict) -> str:
     """
-    Xử lý YAML trực tiếp trên chuỗi.
-    Thứ tự:
-    1. Xóa node rác trong proxies: section (theo tên trong name: field)
-    2. Xóa info keywords khỏi proxy-groups proxies list
-    3. Rename group names (tên ngắn, xuất hiện khắp nơi)
+    Thứ tự xử lý:
+    1. Xóa node rác trong proxies: section
+    2. Xóa info entries khỏi proxy-groups proxies list
+    3. Rename group names TRƯỚC (vì chúng xuất hiện trong list của group khác)
     4. Rename proxy names theo rename_map
+    5. Đảm bảo tất cả entries trong proxy-groups list đều có nháy đơn
     """
     lines = yaml_text.splitlines()
     filtered = []
     i = 0
     in_proxies = False
-    in_proxy_groups = False
 
     while i < len(lines):
         line = lines[i]
@@ -164,20 +210,17 @@ def process_yaml_raw(yaml_text: str, rename_map: dict) -> str:
 
         # Detect section
         if re.match(r'^proxies\s*:', stripped):
-            in_proxies = True; in_proxy_groups = False
+            in_proxies = True
         elif re.match(r'^proxy-groups\s*:', stripped):
-            in_proxies = False; in_proxy_groups = True
-        elif re.match(r'^rules\s*:', stripped):
-            in_proxies = False; in_proxy_groups = False
+            in_proxies = False
         elif stripped and not line[0].isspace() and not stripped.startswith('-'):
-            in_proxies = False; in_proxy_groups = False
+            in_proxies = False
 
-        # Trong proxies section: xóa node rác
+        # Xóa node rác trong proxies: section
         if in_proxies and re.match(r'^\s*-\s', line):
-            name_match = re.search(r"name:\s*['\"]?([^'\"{}]+?)['\"]?\s*[,}]", line)
-            if name_match and is_info_node(name_match.group(1).strip()):
+            nm = re.search(r"name:\s*['\"]?([^'\"{}]+?)['\"]?\s*[,}]", line)
+            if nm and is_info_node(nm.group(1).strip()):
                 i += 1
-                # Skip block proxy attributes
                 while i < len(lines) and lines[i].startswith('    ') and not re.match(r'^\s*-\s', lines[i]):
                     i += 1
                 continue
@@ -188,9 +231,9 @@ def process_yaml_raw(yaml_text: str, rename_map: dict) -> str:
     result = '\n'.join(filtered)
 
     # Bước 2: Xóa info entries khỏi proxy-groups lists
-    result = remove_info_from_lists(result, INFO_KEYWORDS)
+    result = remove_info_from_lists(result)
 
-    # Bước 3: Rename group names - replace toàn bộ (xuất hiện ở proxies list, rules, name field)
+    # Bước 3: Rename group names TRƯỚC (toàn bộ văn bản)
     for old_g, new_g in GROUP_RENAMES:
         result = result.replace(old_g, new_g)
 
@@ -199,27 +242,31 @@ def process_yaml_raw(yaml_text: str, rename_map: dict) -> str:
     for old_name, new_name in sorted_items:
         if not old_name or old_name == new_name:
             continue
-        # name: 'old' hoặc name: "old"
+        # name: 'old' / name: "old"
         result = result.replace(f"name: '{old_name}'", f"name: '{new_name}'")
         result = result.replace(f'name: "{old_name}"', f'name: "{new_name}"')
         # name: old, (inline block)
         result = re.sub(r'(name:\s)' + re.escape(old_name) + r'(\s*[,}])',
                         r'\g<1>' + new_name + r'\g<2>', result)
-        # Trong list: 'old' hoặc "old"
+        # Trong list: 'old' / "old"
         result = result.replace(f"'{old_name}'", f"'{new_name}'")
         result = result.replace(f'"{old_name}"', f'"{new_name}"')
-        # Trong list không nháy: , old, hoặc [old,
+        # Trong list không nháy
         result = result.replace(f", {old_name},", f", {new_name},")
         result = result.replace(f"[{old_name},", f"[{new_name},")
         result = result.replace(f", {old_name}]", f", {new_name}]")
         result = result.replace(f"[{old_name}]", f"[{new_name}]")
 
+    # Bước 5: Đảm bảo tất cả entries trong proxy-groups list đều có nháy đơn
+    # → Tránh Clash Go YAML parser đọc sai tên chứa dấu '-'
+    result = ensure_quoted_in_groups(result)
+
     return result
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 # BUILD RENAME MAP
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 def build_rename_map(decoded_b64: str, yaml_text: str) -> dict:
     rename_map = {}
 
@@ -244,28 +291,27 @@ def build_rename_map(decoded_b64: str, yaml_text: str) -> dict:
     return rename_map
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 # HÀM CHÍNH
-# ─────────────────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 def update_all_subs():
     try:
         res = requests.get(API_LINKS, timeout=15)
         res.raise_for_status()
         links_db = res.json()
-        print(f"Tổng link trong DB: {len(links_db)}")
+        print(f"Tổng link DB: {len(links_db)}")
     except Exception as e:
         print(f"[!] Không lấy được links DB: {e}")
         return
 
-    # Chỉ fetch link GỐC (token gốc, không phải token ẩn)
+    # Chỉ fetch token GỐC
     unique_origins = {}
     for item in links_db:
         orig_url = item.get("orig")
         if not orig_url:
             continue
         try:
-            parsed = urllib.parse.urlparse(orig_url)
-            qs = urllib.parse.parse_qs(parsed.query)
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(orig_url).query)
             tl = qs.get("OwO") or qs.get("token")
             if tl:
                 unique_origins[tl[0]] = orig_url
@@ -277,7 +323,7 @@ def update_all_subs():
     for token, orig_url in unique_origins.items():
         print(f"\n→ Token: {token[:10]}...")
         try:
-            b64_res = requests.get(orig_url, headers={"User-Agent": "v2rayN/6.23"}, timeout=20)
+            b64_res  = requests.get(orig_url, headers={"User-Agent": "v2rayN/6.23"}, timeout=20)
             yaml_res = requests.get(orig_url, headers={"User-Agent": "ClashForWindows/0.20.39"}, timeout=20)
 
             if b64_res.status_code != 200:
@@ -286,7 +332,7 @@ def update_all_subs():
 
             print(f"  b64  CT: {b64_res.headers.get('Content-Type','?')[:50]}")
             print(f"  yaml CT: {yaml_res.headers.get('Content-Type','?')[:50]}")
-            print(f"  yaml preview: {yaml_res.text[:100].strip()}")
+            print(f"  yaml[0]: {yaml_res.text.split(chr(10))[0].strip()[:80]}")
 
             b64_raw   = b64_res.text.strip()
             yaml_raw  = yaml_res.text.strip()
@@ -295,7 +341,7 @@ def update_all_subs():
             # Traffic
             traffic = {"used":"0.00","total":"0.00","percent":0,"expire":"Vĩnh viễn"}
             if user_info:
-                def gi(p): m=re.search(p,user_info); return int(m.group(1)) if m else 0
+                def gi(p): m=re.search(p, user_info); return int(m.group(1)) if m else 0
                 up=gi(r'upload=(\d+)'); dn=gi(r'download=(\d+)')
                 tot=gi(r'total=(\d+)'); exp=gi(r'expire=(\d+)')
                 used_gb=(up+dn)/1_073_741_824; total_gb=tot/1_073_741_824
@@ -315,10 +361,9 @@ def update_all_subs():
 
             # Xử lý base64
             final_b64 = process_base64(b64_raw, rename_map)
-            # Verify
             try:
                 base64.b64decode(final_b64 + '=' * ((-len(final_b64)) % 4))
-                print(f"  [OK] b64 verify ({len(final_b64)} chars)")
+                print(f"  [OK] b64 verified ({len(final_b64)} chars)")
             except Exception as e:
                 print(f"  [WARN] b64 verify failed: {e} → dùng raw")
                 final_b64 = b64_raw
@@ -328,16 +373,33 @@ def update_all_subs():
             first_line = yaml_raw.split('\n')[0].strip() if yaml_raw else ""
             yaml_valid = any(first_line.startswith(k) for k in
                              ['proxies','mixed-port','port:','allow-lan','mode:','log-level'])
+
             if yaml_valid:
                 final_yaml = process_yaml_raw(yaml_raw, rename_map)
-                print(f"  [OK] YAML processed: {len(final_yaml)} chars")
+                # Verify YAML có thể parse được
+                try:
+                    y_check = yaml.safe_load(final_yaml)
+                    group_names = {g['name'] for g in y_check.get('proxy-groups',[])}
+                    proxy_names = {p['name'] for p in y_check.get('proxies',[])}
+                    all_names = proxy_names | group_names
+                    errors = []
+                    for g in y_check.get('proxy-groups',[]):
+                        for p in g.get('proxies',[]):
+                            if p not in all_names:
+                                errors.append(f"'{p}' in '{g['name']}'")
+                    if errors:
+                        print(f"  [WARN] Group proxy not found: {errors[:3]}")
+                    else:
+                        print(f"  [OK] YAML verify: {len(proxy_names)} proxies, {len(group_names)} groups ✅")
+                except Exception as e:
+                    print(f"  [WARN] YAML verify lỗi: {e}")
+
                 cn_left = list(set(re.findall(r'[\u4e00-\u9fff]+', final_yaml)))
                 if cn_left:
-                    print(f"  [WARN] Còn Hán: {cn_left[:8]}")
-                else:
-                    print(f"  [OK] YAML sạch Hán tự ✅")
+                    print(f"  [WARN] Còn Hán: {cn_left[:5]}")
+                print(f"  [OK] YAML: {len(final_yaml)} chars")
             else:
-                print(f"  [!] Không phải YAML Clash. First line: '{first_line[:50]}'")
+                print(f"  [!] Không phải YAML Clash. First: '{first_line[:60]}'")
 
             payload = {
                 "key": token, "body_b64": final_b64,
