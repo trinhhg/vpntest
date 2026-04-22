@@ -1,12 +1,11 @@
 """
 update_sub.py — VPN Trinh Hg subscription updater
 
-Fix lần này:
-- Node thông tin có tiếng Việt đầy đủ dấu (encode UTF-8 đúng)
-- 4 info nodes (thêm Zalo)
-- Tên sub = "VPN Trinh Hg" (không phải VPN_Trinh_Hg.yaml)
-- Thêm UA fetch cho Mihomo/Clash Meta
-- YAML verify sau khi xử lý
+APPROACH MỚI (fix lỗi proxy group not found):
+- Fetch b64 (UA: v2rayN) → decode → parse từng proxy URI
+- Convert sang Clash proxy dict (tự parse, không dựa vào YAML từ server)
+- Build YAML đầy đủ từ scratch → 100% đảm bảo proxy name == group refs
+- Không còn vấn đề UA filtering hay sync lệch tên
 """
 
 import requests
@@ -20,7 +19,7 @@ WORKER_DOMAIN = "https://vpntest-ad4.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
 API_PUSH  = f"{WORKER_DOMAIN}/api/push_data"
 
-# ─── 4 Node thông tin tự build (đặt ở đầu) ──────────────────────────────────
+# ─── 4 Node thông tin ────────────────────────────────────────────────────────
 INFO_NODES_NEW = [
     "🇻🇳 Truy cập web bên dưới",
     "🇻🇳 Để xem thêm gói khác",
@@ -28,10 +27,8 @@ INFO_NODES_NEW = [
     "📞 Zalo: 0917678211",
 ]
 
-# ─── Keyword info nodes từ link gốc (sẽ bị xóa) ─────────────────────────────
 INFO_KEYWORDS = ['剩余流量', '距离下次重置', '套餐到期']
 
-# ─── Rename group ─────────────────────────────────────────────────────────────
 GROUP_RENAMES = {
     '顶级机场': 'VPN Trinh Hg',
     '良心云':   'VPN Trinh Hg',
@@ -39,9 +36,8 @@ GROUP_RENAMES = {
     '故障转移': 'Fallback',
 }
 
-# ─── Bảng rename cố định ──────────────────────────────────────────────────────
+# ─── Bảng rename node cố định ────────────────────────────────────────────────
 FIXED_RENAME = {
-    # ── DJJC ──
     '🇺🇸美国洛杉矶1号':        '🇺🇸 US Los Angeles 01 - VPN Trinh Hg',
     '🇺🇸美国洛杉矶2号':        '🇺🇸 US Los Angeles 02 - VPN Trinh Hg',
     '🇺🇸美国洛杉矶3号':        '🇺🇸 US Los Angeles 03 - VPN Trinh Hg',
@@ -77,7 +73,6 @@ FIXED_RENAME = {
     '🇬🇧英国伦敦-1倍':         '🇬🇧 UK London 1.0x - VPN Trinh Hg',
     '🇹🇼台湾—TK专线':          '🇹🇼 TW Taiwan TK Dedicated - VPN Trinh Hg',
     '🇮🇳印度孟买':             '🇮🇳 IN Mumbai - VPN Trinh Hg',
-    # ── Liangxin ──
     '🇭🇰香港高速01|BGP|流媒体': '🇭🇰 HK Hong Kong High Speed 01 Streaming - VPN Trinh Hg',
     '🇭🇰香港高速02|BGP|流媒体': '🇭🇰 HK Hong Kong High Speed 02 Streaming - VPN Trinh Hg',
     '🇭🇰香港高速03|BGP|流媒体': '🇭🇰 HK Hong Kong High Speed 03 Streaming - VPN Trinh Hg',
@@ -112,59 +107,159 @@ FIXED_RENAME = {
     '🇺🇸美国02|流媒体':         '🇺🇸 US America 02 Streaming - VPN Trinh Hg',
 }
 
-
 def is_info_node(name: str) -> bool:
     return any(k in name for k in INFO_KEYWORDS)
 
-
-def get_new_name(old: str) -> str:
+def rename(old: str) -> str:
     return FIXED_RENAME.get(old, old)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# BASE64
+# PARSE PROXY URI → Clash proxy dict
 # ─────────────────────────────────────────────────────────────────────────────
-def process_base64(content: str) -> str:
-    padded = content + '=' * ((-len(content)) % 4)
+def parse_hysteria2(uri: str) -> dict:
+    base = uri.split('#')[0]
     try:
-        decoded = base64.b64decode(padded).decode('utf-8', errors='ignore')
+        u = urllib.parse.urlparse(base)
+        params = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
+        proxy = {
+            'type': 'hysteria2',
+            'server': u.hostname,
+            'port': u.port or 443,
+            'password': urllib.parse.unquote(u.username or ''),
+            'udp': True,
+            'skip-cert-verify': params.get('insecure', '0') == '1',
+        }
+        if params.get('sni'):   proxy['sni'] = params['sni']
+        if params.get('mport'): proxy['mport'] = params['mport']
+        if params.get('ports'): proxy['ports'] = params['ports']
+        return proxy
     except Exception as e:
-        print(f"  [!] b64 decode lỗi: {e}")
-        return content
+        return None
 
-    # 4 info nodes UTF-8 đúng (có dấu tiếng Việt)
-    new_lines = []
-    for info_name in INFO_NODES_NEW:
-        # Encode đúng UTF-8 để # fragment không bị vỡ
-        new_lines.append(
-            f"vless://00000000-0000-0000-0000-000000000000@127.0.0.1:1?type=tcp"
-            f"#{urllib.parse.quote(info_name, safe='')}"
-        )
 
-    for line in decoded.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        if "://" in line:
-            if "#" in line:
-                idx = line.index("#")
-                proto = line[:idx]
-                old_name = urllib.parse.unquote(line[idx+1:].strip())
-                if is_info_node(old_name):
-                    continue
-                new_name = get_new_name(old_name)
-                new_lines.append(f"{proto}#{urllib.parse.quote(new_name, safe='')}")
-            else:
-                new_lines.append(line)
-        else:
-            new_lines.append(line)
+def parse_vless(uri: str) -> dict:
+    base = uri.split('#')[0]
+    try:
+        u = urllib.parse.urlparse(base)
+        params = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
+        security = params.get('security', 'none')
+        network = params.get('type', 'tcp')
+        proxy = {
+            'type': 'vless',
+            'server': u.hostname,
+            'port': u.port or 443,
+            'uuid': u.username or '',
+            'udp': True,
+            'tls': security in ('tls', 'reality'),
+            'skip-cert-verify': params.get('insecure', '0') == '1',
+        }
+        flow = params.get('flow', '')
+        if flow: proxy['flow'] = flow
+        fp = params.get('fp', '')
+        if fp: proxy['client-fingerprint'] = fp
+        sni = params.get('sni', '')
+        if sni: proxy['servername'] = sni
+        if security == 'reality':
+            ro = {}
+            if params.get('pbk'): ro['public-key'] = params['pbk']
+            if params.get('sid'): ro['short-id'] = params['sid']
+            if ro: proxy['reality-opts'] = ro
+        if network == 'ws':
+            proxy['network'] = 'ws'
+            path = urllib.parse.unquote(params.get('path', '/'))
+            host = params.get('host', u.hostname)
+            proxy['ws-opts'] = {'path': path, 'headers': {'Host': host}}
+        elif network == 'grpc':
+            proxy['network'] = 'grpc'
+            proxy['grpc-opts'] = {'grpc-service-name': params.get('serviceName', '')}
+        return proxy
+    except Exception:
+        return None
 
-    result_str = "\n".join(new_lines)
-    return base64.b64encode(result_str.encode('utf-8')).decode('ascii')
+
+def parse_trojan(uri: str) -> dict:
+    base = uri.split('#')[0]
+    try:
+        u = urllib.parse.urlparse(base)
+        params = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
+        proxy = {
+            'type': 'trojan',
+            'server': u.hostname,
+            'port': u.port or 443,
+            'password': urllib.parse.unquote(u.username or ''),
+            'udp': True,
+            'skip-cert-verify': params.get('allowInsecure', '0') == '1',
+        }
+        sni = params.get('sni', params.get('peer', ''))
+        if sni: proxy['sni'] = sni
+        return proxy
+    except Exception:
+        return None
+
+
+def parse_ss(uri: str) -> dict:
+    """Shadowsocks: ss://BASE64(method:password)@server:port#name"""
+    base = uri.split('#')[0]
+    try:
+        u = urllib.parse.urlparse(base)
+        userinfo = u.username or ''
+        try:
+            pad = userinfo + '=' * ((-len(userinfo)) % 4)
+            decoded = base64.b64decode(pad).decode()
+            method, password = decoded.split(':', 1)
+        except Exception:
+            method = urllib.parse.unquote(userinfo)
+            password = u.password or ''
+        return {
+            'type': 'ss',
+            'server': u.hostname,
+            'port': u.port or 443,
+            'cipher': method,
+            'password': password,
+            'udp': True,
+        }
+    except Exception:
+        return None
+
+
+def uri_to_proxy(line: str):
+    """Convert một proxy URI string thành Clash proxy dict với name"""
+    line = line.strip()
+    if not line or '://' not in line:
+        return None
+    
+    # Lấy name từ fragment
+    if '#' in line:
+        name_encoded = line.split('#', 1)[1]
+        name = urllib.parse.unquote(name_encoded)
+    else:
+        name = None
+    
+    # Parse theo protocol
+    proto = line.split('://')[0].lower()
+    proxy = None
+    
+    if proto == 'hysteria2' or proto == 'hy2':
+        proxy = parse_hysteria2(line)
+    elif proto == 'vless':
+        proxy = parse_vless(line)
+    elif proto == 'trojan':
+        proxy = parse_trojan(line)
+    elif proto in ('ss', 'shadowsocks'):
+        proxy = parse_ss(line)
+    elif proto == 'vmess':
+        # vmess thường là base64 JSON - bỏ qua vì phức tạp
+        return None
+    
+    if proxy and name:
+        proxy['name'] = name
+    
+    return proxy
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# YAML DUMP helpers
+# YAML DUMP helpers (tương tự bản cũ)
 # ─────────────────────────────────────────────────────────────────────────────
 def _needs_quote(s: str) -> bool:
     if not isinstance(s, str) or not s:
@@ -176,16 +271,11 @@ def _needs_quote(s: str) -> bool:
             bool(re.search(r'[\u4e00-\u9fff\u3400-\u4dbf\U0001f300-\U0001faff]', s)) or
             s.lower() in ('true','false','null','yes','no','on','off'))
 
-
 def _q(v) -> str:
-    if isinstance(v, bool):
-        return str(v).lower()
-    if not isinstance(v, str):
-        return str(v)
-    if _needs_quote(v):
-        return "'" + v.replace("'", "''") + "'"
+    if isinstance(v, bool): return str(v).lower()
+    if not isinstance(v, str): return str(v)
+    if _needs_quote(v): return "'" + v.replace("'", "''") + "'"
     return v
-
 
 def _proxy_to_inline(p: dict) -> str:
     parts = []
@@ -205,7 +295,6 @@ def _proxy_to_inline(p: dict) -> str:
             parts.append(f"{k}: {_q(v)}")
     return "    - { " + ", ".join(parts) + " }"
 
-
 def _group_to_inline(g: dict) -> str:
     name  = _q(g['name'])
     gtype = g['type']
@@ -218,110 +307,238 @@ def _group_to_inline(g: dict) -> str:
     return line
 
 
-def dump_yaml_clash(y_obj: dict, original_yaml: str) -> str:
-    """Giữ header gốc, rebuild proxies/proxy-groups/rules."""
-    # Tách header: mọi thứ trước 'proxies:'
-    header_match = re.split(r'^proxies\s*:', original_yaml, maxsplit=1, flags=re.MULTILINE)
-    header = header_match[0].rstrip() if len(header_match) > 1 else ""
+# ─────────────────────────────────────────────────────────────────────────────
+# BUILD YAML ĐẦY ĐỦ TỪ DANH SÁCH PROXY
+# ─────────────────────────────────────────────────────────────────────────────
 
-    lines = [header, "proxies:"]
-    for p in y_obj.get('proxies', []):
+# Header chuẩn Clash Meta / Mihomo
+CLASH_HEADER = """mixed-port: 7890
+allow-lan: false
+bind-address: '*'
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+unified-delay: true
+tcp-concurrent: true
+dns:
+    enable: true
+    ipv6: false
+    default-nameserver: [223.5.5.5, 119.29.29.29]
+    enhanced-mode: fake-ip
+    fake-ip-range: 198.18.0.1/16
+    use-hosts: true
+    nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
+    fallback: ['https://doh.dns.sb/dns-query', 'https://dns.cloudflare.com/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
+    fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }"""
+
+# Rules chuẩn
+CLASH_RULES = [
+    "DOMAIN-SUFFIX,services.googleapis.cn,VPN Trinh Hg",
+    "DOMAIN,safebrowsing.urlsec.qq.com,DIRECT",
+    "DOMAIN,safebrowsing.googleapis.com,DIRECT",
+    "DOMAIN-KEYWORD,google,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,gmail,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,youtube,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,facebook,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,fb.me,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,twitter,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,instagram,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,telegram,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,telegram.org,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,telegra.ph,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,tiktok.com,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,github.com,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,githubusercontent.com,VPN Trinh Hg",
+    "DOMAIN-KEYWORD,dropbox,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,spotify.com,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,netflix.com,VPN Trinh Hg",
+    "DOMAIN-SUFFIX,126.com,DIRECT",
+    "DOMAIN-SUFFIX,163.com,DIRECT",
+    "DOMAIN-SUFFIX,bilibili.com,DIRECT",
+    "DOMAIN-SUFFIX,qq.com,DIRECT",
+    "DOMAIN-SUFFIX,weibo.com,DIRECT",
+    "DOMAIN-SUFFIX,zhihu.com,DIRECT",
+    "DOMAIN-SUFFIX,baidu.com,DIRECT",
+    "DOMAIN-KEYWORD,adservice,REJECT",
+    "DOMAIN-SUFFIX,doubleclick.net,REJECT",
+    "DOMAIN-SUFFIX,appsflyer.com,REJECT",
+    "DOMAIN,injections.adguard.org,DIRECT",
+    "DOMAIN-SUFFIX,local,DIRECT",
+    "IP-CIDR,127.0.0.0/8,DIRECT",
+    "IP-CIDR,172.16.0.0/12,DIRECT",
+    "IP-CIDR,192.168.0.0/16,DIRECT",
+    "IP-CIDR,10.0.0.0/8,DIRECT",
+    "GEOIP,CN,DIRECT",
+    "MATCH,VPN Trinh Hg",
+]
+
+# Info node vless fake để đặt ở đầu
+INFO_VLESS = {
+    'type': 'vless',
+    'server': '127.0.0.1',
+    'port': 1,
+    'uuid': '00000000-0000-0000-0000-000000000000',
+    'udp': False,
+    'tls': False,
+    'skip-cert-verify': True,
+}
+
+
+def build_yaml_from_proxies(proxy_list: list) -> str:
+    """
+    Build YAML đầy đủ từ danh sách proxy dict.
+    proxy_list đã qua rename, đã bỏ info nodes gốc.
+    """
+    # Tạo 4 info nodes đặt đầu
+    final_proxies = []
+    for info_name in INFO_NODES_NEW:
+        p = dict(INFO_VLESS)
+        p['name'] = info_name
+        final_proxies.append(p)
+    
+    # Thêm proxy thực
+    real_proxy_names = []
+    for p in proxy_list:
+        final_proxies.append(p)
+        real_proxy_names.append(p['name'])
+    
+    # Tất cả tên proxy (để đưa vào group)
+    all_proxy_names = INFO_NODES_NEW + real_proxy_names
+    
+    # Build groups
+    groups = [
+        {
+            'name': 'VPN Trinh Hg',
+            'type': 'select',
+            'proxies': ['Auto Select', 'Fallback'] + all_proxy_names,
+        },
+        {
+            'name': 'Auto Select',
+            'type': 'url-test',
+            'proxies': real_proxy_names,
+            'url': 'http://www.gstatic.com/generate_204',
+            'interval': 86400,
+            'tolerance': 50,
+        },
+        {
+            'name': 'Fallback',
+            'type': 'fallback',
+            'proxies': real_proxy_names,
+            'url': 'http://www.gstatic.com/generate_204',
+            'interval': 7200,
+        },
+    ]
+    
+    # Dump
+    lines = [CLASH_HEADER, "proxies:"]
+    for p in final_proxies:
         lines.append(_proxy_to_inline(p))
     lines.append("proxy-groups:")
-    for g in y_obj.get('proxy-groups', []):
+    for g in groups:
         lines.append(_group_to_inline(g))
     lines.append("rules:")
-    for r in y_obj.get('rules', []):
+    for r in CLASH_RULES:
         lines.append(f"    - {_q(r)}")
-    return "\n".join(lines)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# YAML PROCESS
-# ─────────────────────────────────────────────────────────────────────────────
-def process_yaml(yaml_text: str) -> str:
-    try:
-        y = yaml.safe_load(yaml_text)
-    except Exception as e:
-        print(f"  [!] YAML parse lỗi: {e}")
-        return yaml_text
-    if not y or not isinstance(y, dict):
-        return yaml_text
-
-    removed_names = {p['name'] for p in (y.get('proxies') or [])
-                     if is_info_node(p.get('name', ''))}
-
-    # ── Proxies mới ──
-    new_proxies = []
-    for info in INFO_NODES_NEW:
-        new_proxies.append({
-            'name': info, 'type': 'vless',
-            'server': '127.0.0.1', 'port': 1,
-            'uuid': '00000000-0000-0000-0000-000000000000', 'udp': False,
-        })
-    for p in (y.get('proxies') or []):
-        n = p.get('name', '')
-        if n in removed_names:
-            continue
-        p = dict(p)
-        p['name'] = get_new_name(n)
-        new_proxies.append(p)
-
-    # Map tên cũ → mới
-    name_map = {p.get('name',''): get_new_name(p.get('name',''))
-                for p in (y.get('proxies') or []) if p.get('name','') not in removed_names}
-
-    # ── Groups mới ──
-    new_groups = []
-    for g in (y.get('proxy-groups') or []):
-        new_g = dict(g)
-        new_g['name'] = GROUP_RENAMES.get(g['name'], g['name'])
-        is_main = (new_g['name'] == 'VPN Trinh Hg')
-        new_list = []
-        if is_main:
-            new_list.extend(INFO_NODES_NEW)
-        for p_ref in g.get('proxies', []):
-            if is_info_node(p_ref):
-                continue
-            r = GROUP_RENAMES.get(p_ref, p_ref)
-            r = name_map.get(r, r)
-            if is_main and r in INFO_NODES_NEW:
-                continue
-            new_list.append(r)
-        new_g['proxies'] = new_list
-        new_groups.append(new_g)
-
-    # ── Rules mới ──
-    new_rules = []
-    for r in (y.get('rules') or []):
-        for og, ng in GROUP_RENAMES.items():
-            r = r.replace(og, ng)
-        new_rules.append(r)
-
-    y['proxies']      = new_proxies
-    y['proxy-groups'] = new_groups
-    y['rules']        = new_rules
-
-    result = dump_yaml_clash(y, yaml_text)
-
+    
+    result = "\n".join(lines)
+    
     # Verify
     try:
         y2 = yaml.safe_load(result)
         pnames = {p['name'] for p in y2.get('proxies', [])}
         gnames = {g['name'] for g in y2.get('proxy-groups', [])}
-        all_n  = pnames | gnames
-        errors = [f"'{p}' in '{g['name']}'"
-                  for g in y2.get('proxy-groups', [])
-                  for p in g.get('proxies', [])
-                  if p not in all_n]
+        all_n = pnames | gnames
+        errors = []
+        for g in y2.get('proxy-groups', []):
+            for ref in g.get('proxies', []):
+                if ref not in all_n:
+                    errors.append(f"'{ref}' in '{g['name']}'")
         if errors:
-            print(f"  [WARN] Proxy not found: {errors[:3]}")
+            print(f"  [WARN] YAML verify errors: {errors[:3]}")
         else:
             print(f"  [OK] YAML ✅ ({len(pnames)} proxies, {len(gnames)} groups)")
     except Exception as e:
-        print(f"  [WARN] YAML re-parse lỗi: {e}")
-
+        print(f"  [WARN] YAML verify fail: {e}")
+    
     return result
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROCESS B64
+# ─────────────────────────────────────────────────────────────────────────────
+def process_b64_to_b64_and_yaml(raw_b64: str):
+    """
+    Từ b64 raw:
+    1. Decode → list URIs
+    2. Parse từng URI
+    3. Rename, bỏ info nodes gốc, thêm info nodes mới
+    4. Return (new_b64, yaml_full)
+    """
+    pad = raw_b64 + '=' * ((-len(raw_b64)) % 4)
+    try:
+        decoded = base64.b64decode(pad).decode('utf-8', errors='ignore')
+    except Exception as e:
+        print(f"  [!] b64 decode lỗi: {e}")
+        return raw_b64, ""
+    
+    lines = [l.strip() for l in decoded.splitlines() if l.strip()]
+    
+    # ── Build new b64 ──
+    new_b64_lines = []
+    # Info nodes đầu tiên
+    for info_name in INFO_NODES_NEW:
+        new_b64_lines.append(
+            f"vless://00000000-0000-0000-0000-000000000000@127.0.0.1:1?type=tcp"
+            f"#{urllib.parse.quote(info_name, safe='')}"
+        )
+    
+    # ── Build proxy list cho YAML ──
+    proxy_list = []
+    
+    for line in lines:
+        if '://' not in line:
+            continue
+        
+        # Lấy tên gốc
+        old_name = None
+        if '#' in line:
+            old_name = urllib.parse.unquote(line.split('#', 1)[-1])
+        
+        # Bỏ info nodes gốc
+        if old_name and is_info_node(old_name):
+            continue
+        
+        # Rename
+        new_name = rename(old_name) if old_name else old_name
+        
+        # B64: thêm vào new lines với tên mới
+        if old_name and new_name:
+            new_line = line.split('#')[0] + '#' + urllib.parse.quote(new_name, safe='')
+        else:
+            new_line = line
+        new_b64_lines.append(new_line)
+        
+        # YAML: parse proxy
+        if new_name:
+            # Tạo URI với tên mới để parse
+            uri_with_new_name = line.split('#')[0] + '#' + urllib.parse.quote(new_name, safe='')
+            proxy = uri_to_proxy(uri_with_new_name)
+            if proxy and proxy.get('name') and proxy.get('server'):
+                proxy_list.append(proxy)
+    
+    # Build new b64
+    new_b64_str = "\n".join(new_b64_lines)
+    new_b64 = base64.b64encode(new_b64_str.encode('utf-8')).decode('ascii')
+    
+    # Build YAML
+    yaml_str = ""
+    if proxy_list:
+        print(f"  [OK] Parsed {len(proxy_list)} proxies from b64")
+        yaml_str = build_yaml_from_proxies(proxy_list)
+    else:
+        print(f"  [!] Không parse được proxy nào từ b64!")
+    
+    return new_b64, yaml_str
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -336,7 +553,8 @@ def update_all_subs():
     except Exception as e:
         print(f"[!] Không lấy được links DB: {e}")
         return
-
+    
+    # Chỉ fetch token GỐC duy nhất
     unique_origins = {}
     for item in links_db:
         orig_url = item.get("orig")
@@ -349,72 +567,70 @@ def update_all_subs():
                 unique_origins[tl[0]] = orig_url
         except Exception:
             continue
-
+    
     print(f"Link gốc cần fetch: {len(unique_origins)}")
-
+    
     for token, orig_url in unique_origins.items():
-        print(f"\n→ Token: {token[:10]}...")
+        print(f"\n→ Token: {token[:12]}...")
         try:
-            # Fetch b64
-            b64_res = requests.get(orig_url,
-                headers={"User-Agent": "v2rayN/6.23"}, timeout=20)
-            # Fetch YAML – thử ClashMeta trước, fallback sang ClashForWindows
-            yaml_res = requests.get(orig_url,
-                headers={"User-Agent": "Mihomo/1.18.6"}, timeout=20)
-            if not yaml_res.text.strip().startswith(('proxies','mixed-port','port:','allow-lan','mode:','log-level')):
-                yaml_res = requests.get(orig_url,
-                    headers={"User-Agent": "ClashForWindows/0.20.39"}, timeout=20)
-
+            # Chỉ cần fetch b64 (luôn work)
+            b64_res = requests.get(
+                orig_url,
+                headers={"User-Agent": "v2rayN/6.23"},
+                timeout=25
+            )
+            
             if b64_res.status_code != 200:
-                print(f"  [!] Base64 HTTP {b64_res.status_code}")
+                print(f"  [!] HTTP {b64_res.status_code}")
                 continue
-
+            
             b64_raw   = b64_res.text.strip()
-            yaml_raw  = yaml_res.text.strip()
             user_info = b64_res.headers.get("subscription-userinfo", "")
-
-            print(f"  yaml first: {yaml_raw[:60]}")
-
-            # Traffic
+            
+            print(f"  b64 len: {len(b64_raw)} chars")
+            
+            # Parse traffic
             traffic = {"used":"0.00","total":"0.00","percent":0,"expire":"Vĩnh viễn"}
             if user_info:
-                def gi(p): m=re.search(p, user_info); return int(m.group(1)) if m else 0
-                up=gi(r'upload=(\d+)'); dn=gi(r'download=(\d+)')
-                tot=gi(r'total=(\d+)'); exp=gi(r'expire=(\d+)')
-                used_gb=(up+dn)/1_073_741_824; total_gb=tot/1_073_741_824
-                pct=round((used_gb/total_gb)*100) if total_gb>0 else 0
-                exp_str=(datetime.datetime.fromtimestamp(exp).strftime('%d/%m/%Y')
-                         if exp>0 else "Vĩnh viễn")
-                traffic={"used":f"{used_gb:.2f}","total":f"{total_gb:.2f}",
-                         "percent":pct,"expire":exp_str}
-
-            # Process b64
-            final_b64 = process_base64(b64_raw)
+                def gi(p):
+                    m = re.search(p, user_info)
+                    return int(m.group(1)) if m else 0
+                up = gi(r'upload=(\d+)'); dn = gi(r'download=(\d+)')
+                tot = gi(r'total=(\d+)'); exp = gi(r'expire=(\d+)')
+                used_gb  = (up + dn) / 1_073_741_824
+                total_gb = tot / 1_073_741_824
+                pct = round((used_gb / total_gb) * 100) if total_gb > 0 else 0
+                exp_str = (datetime.datetime.fromtimestamp(exp).strftime('%d/%m/%Y')
+                           if exp > 0 else "Vĩnh viễn")
+                traffic = {"used": f"{used_gb:.2f}", "total": f"{total_gb:.2f}",
+                           "percent": pct, "expire": exp_str}
+            
+            # Process b64 → b64 mới + YAML đầy đủ
+            final_b64, final_yaml = process_b64_to_b64_and_yaml(b64_raw)
+            
+            # Verify b64
             try:
-                base64.b64decode(final_b64 + '='*((-len(final_b64))%4))
+                base64.b64decode(final_b64 + '=' * ((-len(final_b64)) % 4))
                 print(f"  [OK] b64 ({len(final_b64)} chars)")
             except Exception as e:
                 print(f"  [WARN] b64 verify: {e}")
                 final_b64 = b64_raw
-
-            # Process YAML
-            final_yaml = ""
-            yaml_valid = any(yaml_raw.startswith(k) for k in
-                             ['proxies','mixed-port','port:','allow-lan','mode:','log-level'])
-            if yaml_valid:
-                final_yaml = process_yaml(yaml_raw)
-                print(f"  [OK] YAML ({len(final_yaml)} chars)")
-            else:
-                print(f"  [!] Không phải YAML Clash: '{yaml_raw[:50]}'")
-
-            payload = {"key":token,"body_b64":final_b64,
-                       "body_yaml":final_yaml,"info":user_info,"traffic":traffic}
+            
+            # Push lên KV
+            payload = {
+                "key":       token,
+                "body_b64":  final_b64,
+                "body_yaml": final_yaml,
+                "info":      user_info,
+                "traffic":   traffic,
+            }
             push_res = requests.post(API_PUSH, json=payload, timeout=15)
-            print(f"  [OK] Push → {push_res.status_code}")
-
+            print(f"  [OK] Push → HTTP {push_res.status_code}")
+            
         except Exception as e:
             print(f"  [!] Lỗi: {e}")
-            import traceback; traceback.print_exc()
+            import traceback
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
