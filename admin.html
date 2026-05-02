@@ -26,7 +26,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
 <body>
 <div id="toastBox" class="toast"></div>
 
-<!-- ── Login ── -->
 <div id="loginWrap" class="fixed inset-0 bg-slate-100 z-50 flex items-center justify-center p-4">
   <div class="card p-8 w-full max-w-xs text-center">
     <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -43,7 +42,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
   </div>
 </div>
 
-<!-- ── Header ── -->
 <header id="hdr" class="hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between shadow-sm">
   <span class="font-extrabold text-indigo-600 text-base">VPN Trinh Hg</span>
   <div class="flex gap-2">
@@ -56,10 +54,8 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
   </div>
 </header>
 
-<!-- ── Main FULL WIDTH ── -->
 <main id="main" class="hidden w-full px-3 py-4 md:px-5">
 
-  <!-- Tabs -->
   <div class="flex gap-1.5 mb-4 overflow-x-auto pb-1">
     <button onclick="go('t-ord')"  id="btn-t-ord"  class="tab-btn flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200">
       <i class="fas fa-box mr-1"></i>Đơn hàng
@@ -84,7 +80,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </button>
   </div>
 
-  <!-- ═══ TAB ĐƠN HÀNG ═══ -->
   <div id="t-ord">
     <div class="flex items-center justify-between mb-3">
       <h2 class="font-extrabold text-slate-800">Đơn hàng</h2>
@@ -110,7 +105,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </div>
   </div>
 
-  <!-- ═══ TAB HẾT HẠN ═══ -->
   <div id="t-exp" class="hidden card p-5">
     <h2 class="font-extrabold text-slate-800 mb-1">Sắp hết hạn</h2>
     <p class="text-xs text-slate-400 mb-4">Màu đỏ = còn ≤ 3 ngày</p>
@@ -131,9 +125,7 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </div>
   </div>
 
-  <!-- ═══ TAB LINK SUB ═══ -->
   <div id="t-lnk" class="hidden space-y-4">
-    <!-- Form tạo link -->
     <div class="card p-4">
       <div class="flex items-start justify-between mb-3 gap-3 flex-wrap">
         <div>
@@ -145,7 +137,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
           <i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP
         </button>
       </div>
-      <!-- 4 ô: link gốc, email, ngày hết hạn, số máy -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         <div class="md:col-span-2">
           <label class="block text-xs font-bold text-slate-600 mb-1">Link gốc</label>
@@ -173,11 +164,9 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
         <i class="fas fa-wand-magic-sparkles mr-2"></i>TẠO LINK ẨN
       </button>
     </div>
-    <!-- Tree view -->
     <div id="linksTree" class="space-y-3"></div>
   </div>
 
-  <!-- ═══ TAB ĐÃ XÓA ═══ -->
   <div id="t-dead" class="hidden card p-5">
     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
       <div>
@@ -205,7 +194,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </div>
   </div>
 
-  <!-- ═══ TAB HƯỚNG DẪN ═══ -->
   <div id="t-cms" class="hidden card p-5">
     <h2 class="font-extrabold text-slate-800 mb-3">Hướng dẫn (CMS)</h2>
     <div class="flex gap-2 flex-wrap mb-3">
@@ -228,7 +216,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </button>
   </div>
 
-  <!-- ═══ TAB THIẾT BỊ ═══ -->
   <div id="t-dev" class="hidden card p-5">
     <h2 class="font-extrabold text-slate-800 mb-4">Thiết bị được phép</h2>
     <div class="overflow-x-auto">
@@ -241,7 +228,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     </div>
   </div>
 
-  <!-- ═══ TAB TÀI KHOẢN — TREE VIEW ═══ -->
   <div id="t-acc" class="hidden">
     <div class="flex items-center justify-between mb-3">
       <div>
@@ -257,7 +243,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
 
 </main>
 
-<!-- ══ MODAL ĐƠN HÀNG ══ -->
 <div id="mOrd" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="card p-5 w-full max-w-xl max-h-[95vh] overflow-y-auto">
     <h3 id="mOrdTtl" class="font-extrabold text-lg mb-4">Đơn hàng</h3>
@@ -308,7 +293,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
   </div>
 </div>
 
-<!-- ══ MODAL SỬA LINK ══ -->
 <div id="mLnk" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="card p-5 w-full max-w-md">
     <h3 class="font-extrabold text-lg mb-4">Sửa Link</h3>
@@ -336,7 +320,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
   </div>
 </div>
 
-<!-- ══ MODAL TÀI KHOẢN ══ -->
 <div id="mAcc" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="card p-5 w-full max-w-sm">
     <h3 id="mAccTtl" class="font-extrabold text-lg mb-4">Tài khoản</h3>
@@ -362,7 +345,6 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
   </div>
 </div>
 
-<!-- ══ MODAL EMAIL KHÁCH (tab Tài khoản) ══ -->
 <div id="mCust" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="card p-5 w-full max-w-sm">
     <h3 class="font-extrabold text-lg mb-1">Thêm email khách</h3>
@@ -418,10 +400,10 @@ const tglPw = (inp,ico) => {
 };
 const getT = (masked) => { try{ const u=new URL(masked); return u.searchParams.get("OwO")||u.searchParams.get("token")||""; }catch{ return ""; } };
 
-// ── API ───────────────────────────────────────────────────────────────────────
+// ── API (Bật chống Cache F5) ──────────────────────────────────────────────────
 async function apG(p, def){
   try{
-    const r=await fetch(API+p+"?_="+Date.now());
+    const r=await fetch(API+p+"?_t="+Date.now());
     if(!r.ok) throw new Error(r.status);
     const d=await r.json();
     localStorage.setItem("a"+p, JSON.stringify(d));
@@ -432,7 +414,12 @@ async function apG(p, def){
 }
 async function apP(p, data){
   localStorage.setItem("a"+p, JSON.stringify(data));
-  try{ await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); }catch{}
+  try{ 
+    const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    if(!r.ok) toast("Lỗi lưu lên DB: HTTP " + r.status, "err");
+  }catch(e){
+    toast("Mất kết nối với Cloudflare: " + e.message, "err");
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -465,7 +452,6 @@ function loginOK(st=true){
   if(st) toast("Đăng nhập thành công!");
   fetchAll();
   go("t-ord");
-  // Fetch lock status từ KV để persist sau F5
   setInterval(async()=>{
     if(!document.getElementById("mOrd").classList.contains("hidden")) return;
     const fresh=await apG("/api/orders",[]);
@@ -499,22 +485,25 @@ async function fetchAll(msg=false){
   if(!Array.isArray(devicesDb)) devicesDb=[];
   if(!Array.isArray(accountsDb)) accountsDb=[];
   if(typeof cmsDb!=="object"||Array.isArray(cmsDb)) cmsDb={};
-  // Fetch lock status từ KV cho tất cả link (fix F5 mất trạng thái khóa)
+  
   await syncLockCache();
   renderOrd(); renderLinks(); renderDev(); renderAcc();
   document.getElementById("cmsTA").value=cmsDb[curCms]||"";
   if(msg) toast("Đã làm mới!");
 }
 
+// Gọi API quét toàn bộ KV lấy trạng thái Khóa chuẩn xác 100%
 async function syncLockCache(){
-  // Fetch lock status từ /api/lock?token=xxx cho từng link
-  const tokens = linksDb.map(l => getT(l.masked)).filter(Boolean);
-  await Promise.all(tokens.map(async tok => {
-    try {
-      const r = await fetch(API+"/api/lock?token="+tok);
-      if(r.ok){ const d=await r.json(); lockCache[tok]=!!d.locked; }
-    } catch{}
-  }));
+  try {
+    const r = await fetch(API+"/api/lock?_t="+Date.now());
+    if(r.ok){ 
+      const d = await r.json(); 
+      lockCache = {};
+      if(d.locked && Array.isArray(d.locked)) {
+        d.locked.forEach(t => lockCache[t] = true);
+      }
+    }
+  } catch{}
 }
 
 // ── Đơn hàng ─────────────────────────────────────────────────────────────────
@@ -639,9 +628,7 @@ function renderLinks(){
     const isLx=g.orig.includes("liangxin");
     const isDj=g.orig.includes("djjc");
     const badge=isLx?`<span class="badge-lx">Liangxin</span>`:isDj?`<span class="badge-dj">DJJC</span>`:`<span class="badge-ot">Other</span>`;
-    const prov=isLx?"Liangxin":isDj?"DJJC":"Other";
 
-    // Sắp xếp theo số máy (linkIndex) từ nhỏ đến lớn
     const sorted=[...g.children].sort((a,b)=>{
       const ai=parseInt(a.linkIndex)||1, bi=parseInt(b.linkIndex)||1;
       return ai-bi;
@@ -652,13 +639,11 @@ function renderLinks(){
       const isLocked=!!lockCache[maskTok];
       const idx=parseInt(l.linkIndex)||1;
       return `<div class="py-2.5 border-b border-slate-100 last:border-0">
-        <!-- Dòng: #N  email  [KHÓA] -->
         <div class="flex items-center gap-2 mb-0.5">
           <span class="text-slate-400 font-mono text-xs w-6 text-right shrink-0">#${idx}</span>
           <span class="font-bold text-xs text-slate-700">${l.email||"—"}</span>
           ${isLocked?`<span class="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded font-bold">🔒 KHÓA</span>`:""}
           <div class="flex-1"></div>
-          <!-- Nút action thẳng hàng phải -->
           <div class="flex items-center gap-1 shrink-0">
             <button onclick="rebuildOneMAP('${l.id}')" title="Rebuild MAP" class="text-emerald-500 hover:text-emerald-700 text-xs px-1.5 py-1 bg-emerald-50 rounded hover:bg-emerald-100">
               <i class="fas fa-rotate text-[10px]"></i>
@@ -674,9 +659,7 @@ function renderLinks(){
             </button>
           </div>
         </div>
-        <!-- Dòng ngày hết hạn nhỏ -->
         ${l.expDate?`<div class="text-[10px] text-slate-400 ml-8 mb-1"><i class="fas fa-calendar-xmark mr-1"></i>Hết hạn: <span class="font-bold">${l.expDate}</span></div>`:""}
-        <!-- Dòng link ẩn: click = copy -->
         <div class="ml-8 mono-link" onclick="cp('${l.masked}')" title="Click để copy">${l.masked}</div>
       </div>`;
     }).join("");
@@ -684,7 +667,6 @@ function renderLinks(){
     return `<div class="card overflow-hidden">
       <div class="bg-slate-50 px-4 py-2.5 flex items-center gap-2 border-b">
         ${badge}
-        <!-- Link gốc đầy đủ, click = copy -->
         <span class="mono-link flex-1 min-w-0" onclick="cp('${g.orig}')" title="Click để copy link gốc">${g.orig}</span>
         <span class="text-[10px] text-slate-400 shrink-0">${g.children.length} link</span>
       </div>
@@ -709,7 +691,6 @@ function createLink(){
       if(orig.includes("liangxin")){ queryStr=`?OwO=${newTok}`; }
       else { queryStr=`?token=${newTok}`; }
     }
-    // Detect domain: liangxin → /v1, djjc (bất kỳ subdomain) → /v2
     if(orig.includes("liangxin")) masked=PD+"/v1"+queryStr+"#VPNTrinhHg";
     else if(orig.includes("djjc.cfd")) masked=PD+"/v2"+queryStr+"#VPNTrinhHg";
     else return toast("Domain không hỗ trợ!","err");
@@ -717,7 +698,7 @@ function createLink(){
   const nl={id:"LNK-"+Date.now(),orig,masked,email,expDate,linkIndex:idx,date:new Date().toLocaleString("vi")};
   linksDb.unshift(nl);
   renderLinks();
-  toast("✅ Đã tạo link ẩn!");
+  toast("✅ Đã tạo link ẩn! Nhớ chạy lại GitHub Action.");
   document.getElementById("lkOrig").value="";
   document.getElementById("lkEmail").value="";
   document.getElementById("lkExp").value="";
@@ -734,6 +715,7 @@ function openLnkModal(id){
   document.getElementById("mLIdx").value=l.linkIndex||"";
   document.getElementById("mLnk").classList.remove("hidden");
 }
+
 function saveLnkEdit(){
   const id=document.getElementById("mLId").value;
   const l=linksDb.find(x=>x.id===id); if(!l) return;
@@ -743,7 +725,18 @@ function saveLnkEdit(){
   l.expDate=document.getElementById("mLExp").value.trim();
   l.linkIndex=document.getElementById("mLIdx").value.trim();
   l.orig=newOrig;
-  renderLinks(); cm("mLnk"); toast("Đã cập nhật! Nhớ Rebuild MAP.");
+
+  try {
+    const mu = new URL(l.masked);
+    const maskT = getP(mu, "OwO", "token");
+    if(maskT){
+      lockCache[maskT] = false;
+      fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:maskT,action:"unlock"})}).catch(()=>{});
+    }
+  }catch{}
+
+  renderLinks(); cm("mLnk"); 
+  toast("Đã cập nhật! Phải REBUILD MAP và chạy GITHUB ACTION để có mạng!");
   apP("/api/links",linksDb);
 }
 
@@ -774,9 +767,9 @@ async function rebuildAllMAP(){
   btn.disabled=true;
   try{
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
-    if(r.ok) toast("✅ Rebuild MAP xong! Import lại link để kiểm tra.");
+    if(r.ok) toast("✅ Rebuild MAP xong! Chờ Github Action chạy.");
     else toast("Lỗi HTTP "+r.status,"err");
-  }catch(e){toast("Failed to fetch: "+e.message,"err");}
+  }catch(e){toast("Lỗi mạng: "+e.message,"err");}
   finally{btn.innerHTML=`<i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP`;btn.disabled=false;}
 }
 
@@ -788,7 +781,7 @@ async function rebuildOneMAP(id){
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
     if(r.ok) toast("✅ Rebuild MAP link xong!");
     else toast("Lỗi HTTP "+r.status,"err");
-  }catch(e){toast("Lỗi: "+e.message,"err");}
+  }catch(e){toast("Lỗi mạng: "+e.message,"err");}
 }
 
 // ── Dead links ────────────────────────────────────────────────────────────────
@@ -796,7 +789,6 @@ function renderDead(){
   const tb=document.getElementById("deadBody");
   if(!deadLinksDb.length){tb.innerHTML=`<tr><td colspan="6" class="p-5 text-center text-slate-400">Không có</td></tr>`;return;}
   tb.innerHTML=deadLinksDb.map((l,i)=>{
-    // Hiển thị thời gian còn lại trước khi tự xóa
     let remaining="";
     if(l.deadDate){
       const d=new Date(l.deadDate).getTime();
@@ -872,8 +864,7 @@ function delDev(id){
   if(id===myDev) doLogout();
 }
 
-// ── Accounts — TREE VIEW ─────────────────────────────────────────────────────
-// accountsDb structure: [{email, username, password, note, customers:[{email, note}]}]
+// ── Accounts ─────────────────────────────────────────────────────────────────
 function renderAcc(){
   const c=document.getElementById("accTree");
   if(!accountsDb.length){c.innerHTML=`<div class="card p-5 text-center text-slate-400">Chưa có tài khoản nào</div>`;return;}
@@ -897,7 +888,6 @@ function renderAcc(){
       </div>`).join("");
 
     return `<div class="card overflow-hidden">
-      <!-- Dòng tài khoản chính -->
       <div class="px-4 py-3 bg-slate-50 border-b flex items-start gap-2">
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
@@ -929,7 +919,6 @@ function renderAcc(){
           </button>
         </div>
       </div>
-      <!-- Email khách (tree indent) -->
       ${custs.length?`<div class="px-4 tree-indent my-2">${custRows}</div>`:`<div class="px-8 py-2 text-xs text-slate-400 italic">Chưa có email khách — nhấn <i class="fas fa-plus"></i> để thêm</div>`}
     </div>`;
   }).join("");
