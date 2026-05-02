@@ -43,13 +43,11 @@ details>summary::-webkit-details-marker{display:none;}
 <body class="min-h-screen flex flex-col w-full overflow-x-hidden">
 <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
-<!-- Floating socials -->
 <div id="floatingSocials" class="fixed bottom-24 md:bottom-6 right-4 md:right-6 flex flex-col gap-3 z-40 transition-all duration-300">
   <a href="https://www.facebook.com/trinh.hg.57" target="_blank" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:scale-110 transition animate-bounce" style="animation-delay:.1s"><i class="fab fa-facebook-messenger"></i></a>
   <a href="https://zalo.me/0917678211" target="_blank" class="w-12 h-12 bg-[#0068ff] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition animate-bounce"><span class="font-bold text-[14px]">Zalo</span></a>
 </div>
 
-<!-- Nav -->
 <nav id="mainNav" class="glass-ui fixed top-0 w-full z-[70] border-b border-slate-200 py-3">
   <div class="max-w-7xl mx-auto px-4 w-full flex flex-col md:flex-row gap-3 md:items-center justify-between">
     <div class="flex justify-between items-center w-full md:w-auto shrink-0">
@@ -87,7 +85,6 @@ details>summary::-webkit-details-marker{display:none;}
 </nav>
 <div class="h-[110px] md:h-[80px]"></div>
 
-<!-- Mobile bottom nav -->
 <div id="mobileNavWrapper" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60]">
   <div class="md:hidden bg-white/95 backdrop-blur-md shadow-lg rounded-full px-3 py-1.5 flex gap-2 border border-slate-200">
     <button onclick="switchPortalTab('p-home')"  class="btn-nav-p-home  mobile-tab-btn active flex items-center justify-center text-slate-500 w-10 h-10 rounded-full transition"><i class="fas fa-tv text-lg"></i></button>
@@ -98,7 +95,6 @@ details>summary::-webkit-details-marker{display:none;}
 
 <main class="flex-grow z-10 px-2 md:px-4 py-4 md:py-6 max-w-7xl mx-auto w-full overflow-x-hidden">
 
-  <!-- Portal -->
   <div id="view-portal" class="view-section mb-20 w-full">
     <div id="p-home" class="portal-tab-content active w-full">
       <div class="bg-white p-4 md:p-8 rounded-3xl mb-8 shadow-sm border border-slate-200 w-full overflow-hidden">
@@ -109,7 +105,6 @@ details>summary::-webkit-details-marker{display:none;}
           <a href="https://zalo.me/0917678211" target="_blank" class="mt-4 bg-[#0068ff] text-white font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 text-sm"><i class="fas fa-comment-dots"></i>Nhắn Zalo Admin</a>
         </div>
         <div id="portalContentSuccess" class="hidden w-full">
-          <!-- Info row -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 w-full">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-4 w-full text-left items-center overflow-hidden">
               <div class="truncate"><p class="text-[10px] text-slate-500 uppercase font-black mb-1" data-i18n="order_id_label">Mã Đơn</p><p id="portalOrderId" class="text-indigo-600 font-mono font-black text-xs uppercase truncate cursor-pointer" onclick="copyText(this.innerText)"></p></div>
@@ -117,11 +112,9 @@ details>summary::-webkit-details-marker{display:none;}
               <div class="truncate"><p class="text-[10px] text-slate-500 uppercase font-black mb-1" data-i18n="exp_date_label">Ngày Hết Hạn</p><p id="portalExpDate" class="text-slate-800 font-extrabold text-xs truncate"></p></div>
               <div class="truncate"><p class="text-[10px] text-slate-500 uppercase font-black mb-1" data-i18n="time_left_label">Còn Lại</p><p id="portalDaysLeft" class="text-aura-fixed text-sm truncate"></p></div>
             </div>
-            <!-- ECG widget -->
             <div id="ecgWidget" class="w-full xl:w-64 shrink-0"></div>
             <button onclick="switchPortalTab('p-store')" class="w-full xl:w-auto bg-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white font-bold py-2.5 px-6 rounded-xl text-sm flex items-center justify-center shrink-0 transition"><i class="fas fa-redo-alt mr-2"></i><span data-i18n="btn_renew">Gia hạn</span></button>
           </div>
-          <!-- Link Sub -->
           <div class="bg-green-50 border-2 border-dashed border-green-500 p-4 md:p-6 rounded-2xl w-full">
             <h3 class="text-green-700 font-extrabold mb-3 text-xs md:text-sm"><i class="fas fa-link mr-1"></i>Link Subscription URL:</h3>
             <div class="flex flex-col sm:flex-row gap-2 sm:gap-0 w-full">
@@ -174,7 +167,6 @@ details>summary::-webkit-details-marker{display:none;}
     </div>
   </div>
 
-  <!-- Store (default) -->
   <div id="view-store" class="view-section active mb-20 w-full">
     <div class="text-center mb-8 mt-2 md:mt-4 px-2 w-full">
       <h1 class="text-3xl md:text-5xl font-extrabold mb-3 text-slate-800 leading-tight" data-i18n="hero_title">Vượt rào cản. <span class="text-indigo-600">Kết nối thế giới.</span></h1>
@@ -262,8 +254,8 @@ details>summary::-webkit-details-marker{display:none;}
 </footer>
 
 <script>
-// ── Config — API qua Pages proxy, KHÔNG gọi thẳng Worker ──
-const API_URL = "";  // Rỗng = dùng relative path qua _worker.js proxy
+// ── Gán cứng API_URL để không bị lỗi HTTP khi host ở local hoặc domain phụ ──
+const API_URL = "https://vpntest-ad4.pages.dev";  
 const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
 const SESSION_KEY = 'vpn_portal_session_24h';
 const DB_KEY = 'vpn_orders_db';
@@ -390,14 +382,18 @@ async function apiGet(path){
     const r=await fetch(API_URL+path+'?_t='+Date.now());
     if(!r.ok)throw new Error("HTTP "+r.status);
     const d=await r.json();
-    localStorage.setItem(path===='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(d));
+    // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
+    localStorage.setItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(d));
     return d;
   }catch(e){
-    return JSON.parse(localStorage.getItem(path===='/api/orders'?DB_KEY:path.replace(/\//g,'_')))||(path==='/api/orders'?[]:{});
+    // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
+    return JSON.parse(localStorage.getItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_')))||(path==='/api/orders'?[]:{});
   }
 }
+
 async function apiPost(path,data){
-  localStorage.setItem(path===='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(data));
+  // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
+  localStorage.setItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(data));
   try{await fetch(API_URL+path,{method:'POST',body:JSON.stringify(data)});}catch{}
 }
 
