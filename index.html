@@ -254,8 +254,8 @@ details>summary::-webkit-details-marker{display:none;}
 </footer>
 
 <script>
-// ── Gán cứng API_URL để không bị lỗi HTTP khi host ở local hoặc domain phụ ──
-const API_URL = "https://vpntest-ad4.pages.dev";  
+// ── Gán API_URL tự động theo tên miền hiện tại ──
+const API_URL = window.location.origin;  
 const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
 const SESSION_KEY = 'vpn_portal_session_24h';
 const DB_KEY = 'vpn_orders_db';
@@ -382,17 +382,14 @@ async function apiGet(path){
     const r=await fetch(API_URL+path+'?_t='+Date.now());
     if(!r.ok)throw new Error("HTTP "+r.status);
     const d=await r.json();
-    // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
     localStorage.setItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(d));
     return d;
   }catch(e){
-    // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
     return JSON.parse(localStorage.getItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_')))||(path==='/api/orders'?[]:{});
   }
 }
 
 async function apiPost(path,data){
-  // Lỗi chí mạng ==== nằm ở đây, đã sửa thành ===
   localStorage.setItem(path==='/api/orders'?DB_KEY:path.replace(/\//g,'_'),JSON.stringify(data));
   try{await fetch(API_URL+path,{method:'POST',body:JSON.stringify(data)});}catch{}
 }
@@ -538,10 +535,13 @@ function renderPaymentBox(){
       </div></div>`;
   }else{
     const isAli=m==='alipay';
-    const imgSrc=isAli?'https://scontent-nrt6-1.xx.fbcdn.net/v/t1.15752-9/653857590_1758745008618735_4375237426148577611_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=110&ccb=1-7&_nc_sid=0024fc&_nc_ohc=_SgoipZLgUkQ7kNvwGTIzYm&_nc_oc=AdrO2lWMUl61E44q7BVfIH40A2fqKLTNdcUAdoWhzfwuF4McoyFJ70VzU_UPmIDtXtGyHkyqvgbynydVWSE5yl7r&_nc_zt=23&_nc_ht=scontent-nrt6-1.xx&_nc_ss=7a30f&oh=03_Q7cD4wE32bYIr4NC7uRoxNa04HxQqRSAhpXXhdbM7YBist-IxQ&oe=69E5BE9F':'https://scontent-nrt1-2.xx.fbcdn.net/v/t1.15752-9/652721068_899535699618771_165366187059067125_n.png?_nc_cat=102&ccb=1-7&_nc_sid=9f807c&_nc_ohc=tqY_EL9rmrsQ7kNvwHryZQy&_nc_oc=AdrasTGaeXx7U24IMsuc9vhdQVwi_wXbxBYjA562u4NvuQobh3nrSC0oI33-DMuX-i04YqDuRxnThnfh0mJaRgJT&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_ss=7a30f&oh=03_Q7cD4wEuP3DCf5T9KwYNCILX_DPsbf1gpzV5RcYnlMjy_NoCyg&oe=69E59E0D';
+    const imgSrc=isAli?'https://i.pinimg.com/736x/44/57/9d/44579dfb5241614ddc897a21ce34e233.jpg':'https://i.pinimg.com/736x/28/b2/95/28b29577c6229ec943e8e13afe241db3.jpg';
     col.innerHTML=`<div class="text-center w-full"><h4 class="font-extrabold text-lg mb-4 ${isAli?'text-blue-600':'text-green-600'}">${isAli?'Alipay':'WeChat Pay'}</h4>
-      <img src="${imgSrc}" class="w-48 h-48 mx-auto rounded-xl border border-slate-100 shadow-sm mb-4 object-contain">
-      <div class="flex justify-between bg-white p-3 rounded-xl border mb-4"><span class="text-slate-500 text-xs">${i18n[lang].copy_amount}</span><strong class="text-red-500 font-black text-lg">¥${currentTotalCny}</strong></div>
+      <img src="${imgSrc}" class="w-48 max-w-full h-auto mx-auto rounded-xl border border-slate-100 shadow-sm mb-4 object-contain">
+      <div class="text-left text-xs space-y-2 mb-6 w-full">
+         <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">Chủ TK:</span><strong>TRINH THI XUAN HUONG</strong></div>
+         <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">${i18n[lang].copy_amount}</span><strong class="text-red-500 font-black text-base">¥${currentTotalCny}</strong></div>
+      </div>
       <div class="highlight-copy py-4 px-3 rounded-xl text-center cursor-pointer" onclick="copyText('${currentOrderId}')">
         <span class="block text-[11px] font-black mb-2 uppercase">${i18n[lang].copy_memo}</span>
         <strong class="block bg-white font-mono text-2xl py-3 rounded-xl shadow-inner border-2 border-yellow-400">${currentOrderId} <i class="far fa-copy ml-2 opacity-50"></i></strong>
