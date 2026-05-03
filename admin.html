@@ -133,7 +133,7 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
           <p class="text-xs text-slate-400 mt-0.5">Link ẩn tự động thêm <code class="bg-slate-100 px-1 rounded">#VPNTrinhHg</code></p>
         </div>
         <div class="flex gap-2">
-          <button onclick="runGC()" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-xs transition flex-shrink-0">
+          <button id="btnRunGC" onclick="runGC()" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-xs transition flex-shrink-0">
             <i class="fas fa-broom mr-1"></i>Dọn rác
           </button>
           <button onclick="rebuildAllMAP()" id="btnRebuildAll"
@@ -176,10 +176,10 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
       <div>
         <h2 class="font-extrabold text-slate-800">Link đã ngắt mạng</h2>
-        <p class="text-xs text-slate-400 mt-0.5">Lưu lịch sử các link đã xóa. Nhấn Khôi phục hoặc Dọn rác ở tab Quản lý.</p>
+        <p class="text-xs text-slate-400 mt-0.5">Lưu lịch sử các link đã xóa. Muốn dọn sạch KV thì ấn Dọn rác ở tab Quản lý.</p>
       </div>
-      <button onclick="clearDeadLinks()" class="bg-red-50 text-red-500 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-xs">
-        <i class="fas fa-trash mr-1"></i>Xóa sạch mảng
+      <button onclick="clearDeadLinks()" class="bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold px-4 py-2 rounded-xl text-xs">
+        <i class="fas fa-eraser mr-1"></i>Xóa lịch sử UI
       </button>
     </div>
     <div class="overflow-x-auto">
@@ -394,7 +394,7 @@ function toast(msg, type="ok"){
   el.className="toast-item "+(type==="err"?"bg-red-500":type==="warn"?"bg-amber-500":"bg-emerald-500");
   el.textContent=msg; box.appendChild(el);
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add("show")));
-  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),250);},2500);
+  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),250);},3000);
 }
 const cp = (t) => { navigator.clipboard.writeText(t).catch(()=>{}); toast("✅ Đã copy!"); };
 const cm = (id) => document.getElementById(id).classList.add("hidden");
@@ -408,7 +408,6 @@ const getT = (masked) => { try{ const u=new URL(masked); return u.searchParams.g
 // ── API (Bảo vệ đồng bộ Eventual Consistency chống F5 đè JSON rác) ──────────────
 async function apG(p, def){
   try{
-    // Nếu vừa mới lưu lên (tính bằng ms), KHÔNG lấy từ mạng về vì cache KV chưa kịp đổi
     const lastPush = parseInt(localStorage.getItem("t"+p) || "0");
     if(Date.now() - lastPush < 15000) {
       return JSON.parse(localStorage.getItem("a"+p)) || def;
@@ -761,33 +760,45 @@ function delLink(id){
   apP("/api/links",linksDb);
 }
 
-// ── Dọn rác (GC) Xóa triệt để key khỏi Worker ────────────────────────────────
+// ── Dọn rác (GC) Mark-and-Sweep quét toàn bộ KV ────────────────────────────────
 async function runGC(){
-  if(!confirm("Hành động này sẽ xóa DATA RÁC từ các link ĐÃ XÓA khỏi Cloudflare KV. Chắc chắn dọn?")) return;
-  toast("🧹 Đang dọn rác hệ thống...", "warn");
+  if(!confirm("Hành động này sẽ QUÉT TOÀN BỘ Cloudflare KV và XÓA SẠCH mọi key rác (link đã chết, link ẩn bị lỗi) KHÔNG nằm trong tab 'Link Sub' hiện tại. Chắc chắn dọn?")) return;
   
-  const tokensToDelete = [];
-  for(const l of deadLinksDb) {
+  const btn = document.getElementById("btnRunGC");
+  if (btn) { btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i>Đang quét KV...`; btn.disabled = true; }
+  
+  toast("🧹 Đang quét toàn bộ KV. Vui lòng không đóng trang...", "warn");
+  
+  // Thu thập danh sách Token "Sống" từ linksDb
+  const validTokens = new Set();
+  linksDb.forEach(l => {
     const origTok = getT(l.orig);
     const maskTok = getT(l.masked);
-    if(origTok) tokensToDelete.push(origTok);
-    if(maskTok && maskTok !== origTok) tokensToDelete.push(maskTok);
-  }
+    if(origTok) validTokens.add(origTok);
+    if(maskTok) validTokens.add(maskTok);
+  });
   
-  if(tokensToDelete.length > 0) {
-    await fetch(API+"/api/gc", {
+  try {
+    const r = await fetch(API+"/api/gc", {
       method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ tokens: tokensToDelete })
-    }).catch(()=>{});
+      body: JSON.stringify({ validTokens: Array.from(validTokens) })
+    });
+    
+    if (r.ok) {
+      const res = await r.json();
+      deadLinksDb = []; // Clear UI array
+      apP("/api/deadlinks", deadLinksDb);
+      renderDead();
+      await rebuildAllMAP();
+      toast(`✅ Dọn rác thành công! Đã xóa vĩnh viễn ${res.deleted} key rác khỏi KV.`);
+    } else {
+      toast("Lỗi GC: HTTP " + r.status, "err");
+    }
+  } catch(e) {
+    toast("Lỗi mạng khi dọn rác: " + e.message, "err");
+  } finally {
+    if (btn) { btn.innerHTML = `<i class="fas fa-broom mr-1"></i>Dọn rác`; btn.disabled = false; }
   }
-  
-  const cleared = deadLinksDb.length;
-  deadLinksDb = [];
-  apP("/api/deadlinks", deadLinksDb);
-  renderDead();
-  
-  await rebuildAllMAP();
-  toast(`✅ Dọn rác thành công! Đã xóa sạch ${cleared} link rác khỏi DB.`);
 }
 
 async function rebuildAllMAP(){
@@ -797,7 +808,6 @@ async function rebuildAllMAP(){
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
     if(r.ok) {
       toast("✅ Rebuild MAP xong! Khôi phục trạng thái Khóa...");
-      // Re-apply Lock sau khi Rebuild MAP xóa key LOCK
       const lockedToks = new Set();
       linksDb.forEach(l => { if(l.isLocked) lockedToks.add(getT(l.masked)); });
       for(const tok of lockedToks) {
@@ -857,8 +867,8 @@ function restoreLink(i){
   apP("/api/links",linksDb); apP("/api/deadlinks",deadLinksDb);
 }
 function clearDeadLinks(){
-  if(!confirm("Xóa hết lịch sử dead links trong KV?")) return;
-  deadLinksDb=[]; renderDead(); toast("Đã xóa!");
+  if(!confirm("Chỉ xóa trên giao diện này thôi nhé? (Muốn xóa thật sự trên Server thì qua tab Link Sub -> Ấn Dọn rác)")) return;
+  deadLinksDb=[]; renderDead(); toast("Đã xóa lịch sử!");
   try{ fetch(API+"/api/deadlinks",{method:"DELETE"}); }catch{}
 }
 
