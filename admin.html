@@ -132,10 +132,15 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
           <h2 class="font-extrabold text-slate-800">Quản lý Link Sub</h2>
           <p class="text-xs text-slate-400 mt-0.5">Link ẩn tự động thêm <code class="bg-slate-100 px-1 rounded">#VPNTrinhHg</code></p>
         </div>
-        <button onclick="rebuildAllMAP()" id="btnRebuildAll"
-          class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-4 py-2 rounded-xl text-xs transition flex-shrink-0">
-          <i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP
-        </button>
+        <div class="flex gap-2">
+          <button onclick="runGC()" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-xs transition flex-shrink-0">
+            <i class="fas fa-broom mr-1"></i>Dọn rác
+          </button>
+          <button onclick="rebuildAllMAP()" id="btnRebuildAll"
+            class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-4 py-2 rounded-xl text-xs transition flex-shrink-0">
+            <i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP
+          </button>
+        </div>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         <div class="md:col-span-2">
@@ -171,10 +176,10 @@ html,body{height:100%;margin:0;font-family:system-ui,-apple-system,sans-serif;ba
     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
       <div>
         <h2 class="font-extrabold text-slate-800">Link đã ngắt mạng</h2>
-        <p class="text-xs text-slate-400 mt-0.5">Tự xóa sau 24h. Có thể khôi phục trước đó.</p>
+        <p class="text-xs text-slate-400 mt-0.5">Lưu lịch sử các link đã xóa. Nhấn Khôi phục hoặc Dọn rác ở tab Quản lý.</p>
       </div>
       <button onclick="clearDeadLinks()" class="bg-red-50 text-red-500 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-xs">
-        <i class="fas fa-trash mr-1"></i>Xóa hết lịch sử
+        <i class="fas fa-trash mr-1"></i>Xóa sạch mảng
       </button>
     </div>
     <div class="overflow-x-auto">
@@ -380,7 +385,7 @@ const PKGS = [
 ];
 
 let ordersDb=[], linksDb=[], deadLinksDb=[], cmsDb={}, devicesDb=[], accountsDb=[];
-let myDev="", curCms="android", lockCache={};
+let myDev="", curCms="android";
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg, type="ok"){
@@ -400,9 +405,15 @@ const tglPw = (inp,ico) => {
 };
 const getT = (masked) => { try{ const u=new URL(masked); return u.searchParams.get("OwO")||u.searchParams.get("token")||""; }catch{ return ""; } };
 
-// ── API (Bật chống Cache F5) ──────────────────────────────────────────────────
+// ── API (Bảo vệ đồng bộ Eventual Consistency chống F5 đè JSON rác) ──────────────
 async function apG(p, def){
   try{
+    // Nếu vừa mới lưu lên (tính bằng ms), KHÔNG lấy từ mạng về vì cache KV chưa kịp đổi
+    const lastPush = parseInt(localStorage.getItem("t"+p) || "0");
+    if(Date.now() - lastPush < 15000) {
+      return JSON.parse(localStorage.getItem("a"+p)) || def;
+    }
+
     const r=await fetch(API+p+"?_t="+Date.now());
     if(!r.ok) throw new Error(r.status);
     const d=await r.json();
@@ -414,6 +425,7 @@ async function apG(p, def){
 }
 async function apP(p, data){
   localStorage.setItem("a"+p, JSON.stringify(data));
+  localStorage.setItem("t"+p, Date.now()); 
   try{ 
     const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
     if(!r.ok) toast("Lỗi lưu lên DB: HTTP " + r.status, "err");
@@ -486,24 +498,9 @@ async function fetchAll(msg=false){
   if(!Array.isArray(accountsDb)) accountsDb=[];
   if(typeof cmsDb!=="object"||Array.isArray(cmsDb)) cmsDb={};
   
-  await syncLockCache();
   renderOrd(); renderLinks(); renderDev(); renderAcc();
   document.getElementById("cmsTA").value=cmsDb[curCms]||"";
   if(msg) toast("Đã làm mới!");
-}
-
-// Gọi API quét toàn bộ KV lấy trạng thái Khóa chuẩn xác 100%
-async function syncLockCache(){
-  try {
-    const r = await fetch(API+"/api/lock?_t="+Date.now());
-    if(r.ok){ 
-      const d = await r.json(); 
-      lockCache = {};
-      if(d.locked && Array.isArray(d.locked)) {
-        d.locked.forEach(t => lockCache[t] = true);
-      }
-    }
-  } catch{}
 }
 
 // ── Đơn hàng ─────────────────────────────────────────────────────────────────
@@ -636,7 +633,7 @@ function renderLinks(){
 
     const rows=sorted.map(l=>{
       const maskTok=getT(l.masked);
-      const isLocked=!!lockCache[maskTok];
+      const isLocked=!!l.isLocked;
       const idx=parseInt(l.linkIndex)||1;
       return `<div class="py-2.5 border-b border-slate-100 last:border-0">
         <div class="flex items-center gap-2 mb-0.5">
@@ -695,7 +692,7 @@ function createLink(){
     else if(orig.includes("djjc.cfd")) masked=PD+"/v2"+queryStr+"#VPNTrinhHg";
     else return toast("Domain không hỗ trợ!","err");
   }catch{return toast("Link không hợp lệ!","err");}
-  const nl={id:"LNK-"+Date.now(),orig,masked,email,expDate,linkIndex:idx,date:new Date().toLocaleString("vi")};
+  const nl={id:"LNK-"+Date.now(),orig,masked,email,expDate,linkIndex:idx,isLocked:false,date:new Date().toLocaleString("vi")};
   linksDb.unshift(nl);
   renderLinks();
   toast("✅ Đã tạo link ẩn! Nhớ chạy lại GitHub Action.");
@@ -724,14 +721,13 @@ function saveLnkEdit(){
   l.email=document.getElementById("mLEmail").value.trim();
   l.expDate=document.getElementById("mLExp").value.trim();
   l.linkIndex=document.getElementById("mLIdx").value.trim();
-  l.orig=newOrig;
+  l.orig=newOrig; 
 
   try {
     const mu = new URL(l.masked);
-    const maskT = getP(mu, "OwO", "token");
-    if(maskT){
-      lockCache[maskT] = false;
-      fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:maskT,action:"unlock"})}).catch(()=>{});
+    const maskT = getT(l.masked);
+    if(maskT && l.isLocked){
+      fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:maskT,action:"lock"})}).catch(()=>{});
     }
   }catch{}
 
@@ -742,7 +738,12 @@ function saveLnkEdit(){
 
 async function toggleLock(tok,isLocked){
   if(!tok) return;
-  lockCache[tok]=!isLocked;
+  let changed = false;
+  linksDb.forEach(l => {
+    if(getT(l.masked) === tok) { l.isLocked = !isLocked; changed = true; }
+  });
+  if(changed) apP("/api/links", linksDb);
+  
   renderLinks();
   toast(isLocked?"🔓 Đã mở khóa!":"🔒 Đã khóa!","warn");
   try{await fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:tok,action:isLocked?"unlock":"lock"})});}catch{}
@@ -760,26 +761,64 @@ function delLink(id){
   apP("/api/links",linksDb);
 }
 
-// Rebuild toàn bộ MAP
-async function rebuildAllMAP(){
-  const btn=document.getElementById("btnRebuildAll");
-  btn.innerHTML=`<i class="fas fa-spinner fa-spin mr-1"></i>Đang rebuild...`;
-  btn.disabled=true;
-  try{
-    const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
-    if(r.ok) toast("✅ Rebuild MAP xong! Chờ Github Action chạy.");
-    else toast("Lỗi HTTP "+r.status,"err");
-  }catch(e){toast("Lỗi mạng: "+e.message,"err");}
-  finally{btn.innerHTML=`<i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP`;btn.disabled=false;}
+// ── Dọn rác (GC) Xóa triệt để key khỏi Worker ────────────────────────────────
+async function runGC(){
+  if(!confirm("Hành động này sẽ xóa DATA RÁC từ các link ĐÃ XÓA khỏi Cloudflare KV. Chắc chắn dọn?")) return;
+  toast("🧹 Đang dọn rác hệ thống...", "warn");
+  
+  const tokensToDelete = [];
+  for(const l of deadLinksDb) {
+    const origTok = getT(l.orig);
+    const maskTok = getT(l.masked);
+    if(origTok) tokensToDelete.push(origTok);
+    if(maskTok && maskTok !== origTok) tokensToDelete.push(maskTok);
+  }
+  
+  if(tokensToDelete.length > 0) {
+    await fetch(API+"/api/gc", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ tokens: tokensToDelete })
+    }).catch(()=>{});
+  }
+  
+  const cleared = deadLinksDb.length;
+  deadLinksDb = [];
+  apP("/api/deadlinks", deadLinksDb);
+  renderDead();
+  
+  await rebuildAllMAP();
+  toast(`✅ Dọn rác thành công! Đã xóa sạch ${cleared} link rác khỏi DB.`);
 }
 
-// Rebuild MAP từng link
+async function rebuildAllMAP(){
+  const btn=document.getElementById("btnRebuildAll");
+  if(btn) { btn.innerHTML=`<i class="fas fa-spinner fa-spin mr-1"></i>Đang rebuild...`; btn.disabled=true; }
+  try{
+    const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
+    if(r.ok) {
+      toast("✅ Rebuild MAP xong! Khôi phục trạng thái Khóa...");
+      // Re-apply Lock sau khi Rebuild MAP xóa key LOCK
+      const lockedToks = new Set();
+      linksDb.forEach(l => { if(l.isLocked) lockedToks.add(getT(l.masked)); });
+      for(const tok of lockedToks) {
+        if(tok) await fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:tok,action:"lock"})}).catch(()=>{});
+      }
+      toast("✅ Đã khôi phục Khóa! Chờ Github Action chạy.");
+    }
+    else toast("Lỗi HTTP "+r.status,"err");
+  }catch(e){toast("Lỗi mạng: "+e.message,"err");}
+  finally{ if(btn) { btn.innerHTML=`<i class="fas fa-rotate mr-1"></i>Rebuild tất cả MAP`; btn.disabled=false; } }
+}
+
 async function rebuildOneMAP(id){
   const l=linksDb.find(x=>x.id===id); if(!l) return;
   toast("Đang rebuild link này...");
   try{
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
-    if(r.ok) toast("✅ Rebuild MAP link xong!");
+    if(r.ok) {
+      if(l.isLocked) await fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:getT(l.masked),action:"lock"})}).catch(()=>{});
+      toast("✅ Rebuild MAP link xong!");
+    }
     else toast("Lỗi HTTP "+r.status,"err");
   }catch(e){toast("Lỗi mạng: "+e.message,"err");}
 }
