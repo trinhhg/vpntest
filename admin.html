@@ -1,3 +1,4 @@
+<!-- v1.9 - Ultimate UI/UX Mobile, Flat Design, Await Fix, Click-to-Copy - 2026-05-04 -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -10,7 +11,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; }
 .glass-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); border-radius: 1.25rem; }
-.tab-btn { transition: all .15s; }
+.tab-btn { transition: all .15s cubic-bezier(0.4, 0, 0.2, 1); }
 .tab-btn.active { background: #4f46e5; color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,.35); border-color: #4f46e5; }
 .toast { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: .5rem; pointer-events: none; }
 .toast-item { padding: .75rem 1.25rem; border-radius: .75rem; font-weight: 700; font-size: .85rem; color: #fff; transform: translateX(120%); transition: transform .2s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -18,10 +19,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 .badge-lx { background: #dcfce7; color: #15803d; font-size: .65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
 .badge-dj { background: #dbeafe; color: #1d4ed8; font-size: .65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
 .badge-ot { background: #f3f4f6; color: #475569; font-size: .65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
-.cp { cursor: pointer; transition: color 0.15s ease; }
+/* Click-to-copy mượt mà không viền */
+.cp { cursor: pointer; transition: color 0.15s ease; position: relative; }
 .cp:hover { color: #4f46e5; }
 .tree-indent { border-left: 2px solid #e0e7ff; margin-left: 1.25rem; padding-left: .75rem; }
 .dev-btn.active { border-color: #4f46e5; background-color: #e0e7ff; color: #4338ca; }
+/* Chấm trạng thái hiện đại */
 .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 4px currentColor; }
 </style>
 </head>
@@ -53,20 +56,22 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 
 <main id="main" class="hidden max-w-7xl mx-auto p-3 md:p-6 w-full">
 
-  <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 mb-6">
-    <button onclick="go('t-ord')"  id="btn-t-ord"  class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-box mr-1.5"></i>Đơn hàng</button>
-    <button onclick="go('t-lnk')"  id="btn-t-lnk"  class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-link mr-1.5"></i>Link Sub</button>
-    <button onclick="go('t-acc')"  id="btn-t-acc"  class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-key mr-1.5"></i>Tài khoản</button>
-    <button onclick="go('t-exp')"  id="btn-t-exp"  class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-clock mr-1.5"></i>Hết hạn</button>
-    <button onclick="go('t-dead')" id="btn-t-dead" class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-ban mr-1.5"></i>Đã xóa</button>
-    <button onclick="go('t-cms')"  id="btn-t-cms"  class="tab-btn px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-book mr-1.5"></i>Hướng dẫn</button>
-    <button onclick="go('t-dev')"  id="btn-t-dev"  class="tab-btn col-span-2 md:col-span-1 px-3 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-laptop mr-1.5"></i>Thiết bị</button>
+  <!-- Mobile-optimized Tabs: Dạng Grid siêu gọn trên mobile, bẻ ngang trên Desktop -->
+  <div class="grid grid-cols-3 md:flex md:flex-wrap gap-2 mb-6">
+    <button onclick="go('t-ord')"  id="btn-t-ord"  class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-box md:mr-1.5"></i><span class="hidden md:inline">Đơn hàng</span></button>
+    <button onclick="go('t-lnk')"  id="btn-t-lnk"  class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-link md:mr-1.5"></i><span class="hidden md:inline">Link Sub</span></button>
+    <button onclick="go('t-acc')"  id="btn-t-acc"  class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-key md:mr-1.5"></i><span class="hidden md:inline">Tài khoản</span></button>
+    <button onclick="go('t-exp')"  id="btn-t-exp"  class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-clock md:mr-1.5"></i><span class="hidden md:inline">Hết hạn</span></button>
+    <button onclick="go('t-dead')" id="btn-t-dead" class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-ban md:mr-1.5"></i><span class="hidden md:inline">Đã xóa</span></button>
+    <button onclick="go('t-cms')"  id="btn-t-cms"  class="tab-btn px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-book md:mr-1.5"></i><span class="hidden md:inline">Hướng dẫn</span></button>
+    <button onclick="go('t-dev')"  id="btn-t-dev"  class="tab-btn col-span-3 md:col-span-1 px-2 py-2.5 md:px-5 md:py-3 rounded-xl font-bold text-[11px] md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center"><i class="fas fa-laptop mr-1.5"></i>Thiết bị</button>
   </div>
 
+  <!-- TAB QUẢN LÝ ĐƠN HÀNG -->
   <div id="t-ord">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg md:text-xl font-bold text-slate-800">Quản lý Đơn hàng</h2>
-      <button onclick="openOrdModal(null)" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm shadow-sm transition">
+      <button onclick="openOrdModal(null)" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 font-bold px-4 py-2 rounded-xl text-xs md:text-sm shadow-sm transition">
         <i class="fas fa-plus mr-1"></i>Tạo thủ công
       </button>
     </div>
@@ -80,9 +85,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
   </div>
 
+  <!-- TAB HẾT HẠN -->
   <div id="t-exp" class="hidden glass-card p-4 md:p-8 border border-slate-200">
     <h2 class="text-lg md:text-xl font-bold text-slate-800 mb-2">Đơn hàng sắp hết hạn</h2>
-    <p class="text-xs text-slate-500 mb-5">Màu đỏ = còn ≤ 3 ngày. Sắp xếp theo ưu tiên gần hết hạn nhất.</p>
+    <p class="text-xs text-slate-500 mb-5">Màu đỏ = còn ≤ 3 ngày.</p>
     <div class="overflow-x-auto border border-slate-200 rounded-xl">
       <table class="w-full text-left text-xs md:text-sm whitespace-nowrap min-w-[700px]">
         <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase text-[10px] md:text-xs">
@@ -93,22 +99,24 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
   </div>
 
+  <!-- TAB LINK SUB -->
   <div id="t-lnk" class="hidden space-y-5">
     
+    <!-- KHỐI QUY TRÌNH CHUẨN (SOP) -->
     <div class="bg-indigo-50 border border-indigo-100 p-4 md:p-5 rounded-2xl w-full">
       <h3 class="font-extrabold text-indigo-800 text-xs md:text-sm mb-3 flex items-center"><i class="fas fa-clipboard-check mr-2 text-indigo-600"></i>📌 QUY TRÌNH VẬN HÀNH CHUẨN</h3>
       <div class="grid md:grid-cols-3 gap-3">
         <div class="bg-white p-3 rounded-xl border border-indigo-50/50 shadow-sm">
           <p class="text-[11px] md:text-xs text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">1</span>TẠO LINK MỚI</p>
-          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Bấm <b class="text-slate-700">Tạo Link Ẩn</b> $\rightarrow$ Bắt buộc bấm <span class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">Đồng bộ GITHUB</span> để máy chủ ghi nhận.</p>
+          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Tạo Link Ẩn $\rightarrow$ Bắt buộc bấm <span class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">Đồng bộ GITHUB</span>.</p>
         </div>
         <div class="bg-white p-3 rounded-xl border border-indigo-50/50 shadow-sm">
           <p class="text-[11px] md:text-xs text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">2</span>KHÓA / MỞ KHÓA</p>
-          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Bấm icon 🔒 đổi trạng thái $\rightarrow$ Bắt buộc bấm <span class="bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">Rebuild MAP</span> để áp dụng ngay.</p>
+          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Đổi trạng thái $\rightarrow$ Bắt buộc bấm <span class="bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">Rebuild MAP</span>.</p>
         </div>
         <div class="bg-white p-3 rounded-xl border border-indigo-50/50 shadow-sm">
           <p class="text-[11px] md:text-xs text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">3</span>SỬA / XÓA LINK</p>
-          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Sửa/Xóa xong $\rightarrow$ Bấm <span class="bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">Rebuild MAP</span> $\rightarrow$ Bấm <span class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">Đồng bộ GITHUB</span>.</p>
+          <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">Sửa/Xóa $\rightarrow$ Bấm <span class="bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">Rebuild MAP</span> $\rightarrow$ <span class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">Đồng bộ GH</span>.</p>
         </div>
       </div>
     </div>
@@ -117,12 +125,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
       <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6 gap-4">
         <div>
           <h2 class="text-lg md:text-xl font-bold text-slate-800">Quản lý Link Sub Ẩn</h2>
-          <p class="text-xs text-slate-500 mt-1">Gán <code class="bg-slate-100 px-1 rounded text-pink-600 font-bold">#VPNTrinhHg</code> vào cuối đuôi mọi link sinh ra.</p>
+          <p class="text-xs text-slate-500 mt-1">Đuôi tự động gán <code class="bg-slate-100 px-1 rounded text-pink-600 font-bold">#VPNTrinhHg</code></p>
         </div>
         <div class="grid grid-cols-2 md:flex gap-2 w-full lg:w-auto">
-          <button id="btnRunGC" onclick="runGC()" class="col-span-2 md:col-span-1 bg-red-50 text-red-600 hover:bg-red-100 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-sm border border-red-100 text-center"><i class="fas fa-broom mr-1"></i>Dọn rác KV</button>
-          <button onclick="rebuildAllMAP()" id="btnRebuildAll" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-sm border border-emerald-100 text-center"><i class="fas fa-rotate mr-1"></i>Rebuild MAP</button>
-          <button onclick="triggerGitHub()" id="btnTriggerGH" class="bg-blue-600 text-white hover:bg-blue-700 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-md text-center"><i class="fab fa-github mr-1"></i>Đồng bộ GITHUB</button>
+          <button id="btnRunGC" onclick="runGC()" class="col-span-2 md:col-span-1 bg-red-50 text-red-600 hover:bg-red-100 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-sm border border-red-100"><i class="fas fa-broom mr-1"></i>Dọn rác KV</button>
+          <button onclick="rebuildAllMAP()" id="btnRebuildAll" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-sm border border-emerald-100"><i class="fas fa-rotate mr-1"></i>Rebuild MAP</button>
+          <button onclick="triggerGitHub()" id="btnTriggerGH" class="bg-blue-600 text-white hover:bg-blue-700 font-bold px-3 py-2.5 rounded-xl text-xs md:text-sm transition shadow-md"><i class="fab fa-github mr-1"></i>Đồng bộ GITHUB</button>
         </div>
       </div>
       
@@ -134,15 +142,15 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
           <div>
             <label class="block font-bold text-xs text-slate-700 mb-1">Email khách (Tùy chọn)</label>
-            <input id="lkEmail" type="text" placeholder="khach@email.com" class="w-full p-2.5 md:p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm">
+            <input id="lkEmail" type="text" placeholder="khach@email.com" class="w-full p-2.5 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm">
           </div>
           <div>
             <label class="block font-bold text-xs text-slate-700 mb-1">Hết hạn (DD/MM/YYYY)</label>
-            <input id="lkExp" type="text" placeholder="DD/MM/YYYY" class="w-full p-2.5 md:p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm text-center">
+            <input id="lkExp" type="text" placeholder="DD/MM/YYYY" class="w-full p-2.5 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm text-center">
           </div>
           <div>
             <label class="block font-bold text-xs text-slate-700 mb-1">Index Máy</label>
-            <input id="lkIdx" type="number" min="1" placeholder="1, 2..." class="w-full p-2.5 md:p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm text-center">
+            <input id="lkIdx" type="number" min="1" placeholder="1, 2..." class="w-full p-2.5 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs md:text-sm text-center">
           </div>
         </div>
         <button onclick="createLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition w-full text-sm">
@@ -154,6 +162,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
   </div>
 
+  <!-- TAB ĐÃ XÓA -->
   <div id="t-dead" class="hidden glass-card p-4 md:p-8 border border-slate-200">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
       <div>
@@ -174,6 +183,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
   </div>
 
+  <!-- TAB HƯỚNG DẪN CMS (Block Builder UI) -->
   <div id="t-cms" class="hidden glass-card p-4 md:p-8 border border-slate-200">
     <h2 class="text-lg md:text-xl font-bold mb-4 text-slate-800">Cấu hình Hướng dẫn (CMS)</h2>
     <div class="flex flex-wrap gap-2 mb-5">
@@ -183,7 +193,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
       <button onclick="setCms('ios')"     id="cms-btn-ios"     class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-xs md:text-sm flex items-center transition shadow-sm"><i class="fab fa-app-store-ios text-blue-400 mr-1.5"></i> iOS</button>
     </div>
     
-    <div class="bg-slate-50 p-3 md:p-4 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
+    <div class="bg-slate-50 p-3 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
       <button onclick="ins('h')" class="bg-white border border-slate-200 shadow-sm px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold text-purple-600 hover:bg-purple-50 transition"><i class="fas fa-layer-group mr-1"></i> Header</button>
       <button onclick="ins('t')" class="bg-white border border-slate-200 shadow-sm px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-heading mr-1"></i> Sub-Title</button>
       <button onclick="ins('s')" class="bg-white border border-slate-200 shadow-sm px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-list-ol mr-1"></i> Bước</button>
@@ -191,21 +201,23 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
       <button onclick="ins('b')" class="bg-white border border-slate-200 shadow-sm px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition"><i class="fas fa-download mr-1"></i> Nút Tải</button>
       <button onclick="ins('i')" class="bg-white border border-slate-200 shadow-sm px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold text-pink-600 hover:bg-pink-50 transition"><i class="fas fa-image mr-1"></i> Ảnh</button>
     </div>
-    <textarea id="cmsTA" rows="18" class="w-full p-4 md:p-5 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-[11px] md:text-sm leading-relaxed resize-y overflow-x-hidden whitespace-pre-wrap shadow-inner"></textarea>
-    <button onclick="saveCms()" class="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow-md w-full md:w-auto transition text-sm"><i class="fas fa-save mr-2"></i> LƯU LÊN CLOUD</button>
+    <textarea id="cmsTA" rows="14" class="w-full p-4 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-[11px] md:text-sm leading-relaxed resize-y overflow-x-hidden whitespace-pre-wrap shadow-inner"></textarea>
+    <button onclick="saveCms()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md w-full md:w-auto transition text-sm"><i class="fas fa-save mr-2"></i> LƯU LÊN CLOUD</button>
   </div>
 
+  <!-- TAB TÀI KHOẢN (Đã dọn dẹp tối giản) -->
   <div id="t-acc" class="hidden glass-card p-4 md:p-8 border border-slate-200">
     <div class="flex items-center justify-between mb-5">
       <div>
         <h2 class="text-lg md:text-xl font-bold text-slate-800">Tài khoản VPN gốc</h2>
-        <p class="text-[11px] md:text-xs text-slate-500 mt-1">Từ Liangxin / DJJC...</p>
+        <p class="text-[11px] md:text-xs text-slate-500 mt-1">Quản lý kho Liangxin / DJJC...</p>
       </div>
       <button onclick="openAccModal(null)" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 font-bold px-4 py-2 rounded-xl text-xs md:text-sm transition shadow-sm"><i class="fas fa-plus mr-1"></i>Thêm</button>
     </div>
-    <div id="accTree" class="space-y-4"></div>
+    <div id="accTree" class="space-y-3"></div>
   </div>
 
+  <!-- TAB THIẾT BỊ -->
   <div id="t-dev" class="hidden glass-card p-4 md:p-8 border border-slate-200">
     <h2 class="text-lg md:text-xl font-bold mb-4 text-slate-800">Thiết bị quản trị</h2>
     <div class="overflow-x-auto border border-slate-200 rounded-xl">
@@ -220,6 +232,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 
 </main>
 
+<!-- Modals -->
 <div id="mOrd" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
   <div class="glass-card p-5 md:p-8 w-full max-w-2xl max-h-[95vh] overflow-y-auto">
     <h3 id="mOrdTtl" class="text-lg md:text-2xl font-bold mb-4">Đơn hàng</h3>
@@ -275,7 +288,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <h3 class="font-extrabold text-xl mb-5">Sửa Link Sub</h3>
     <input type="hidden" id="mLId">
     <div class="mb-4">
-      <label class="block text-xs font-bold text-slate-600 mb-1">Link gốc (Đổi link gốc, giữ nguyên link ẩn)</label>
+      <label class="block text-xs font-bold text-slate-600 mb-1">Link gốc</label>
       <input id="mLOrig" type="text" class="w-full p-2.5 text-sm border border-slate-300 rounded-xl font-mono outline-none focus:border-indigo-500">
     </div>
     <div class="mb-4">
@@ -359,7 +372,7 @@ const PKGS = [
 let ordersDb=[], linksDb=[], deadLinksDb=[], cmsDb={}, devicesDb=[], accountsDb=[];
 let myDev="", curCms="android";
 
-// Helper hàm Copy vạn năng
+// Helper hàm Copy Click-to-copy
 const cp = (t) => { 
   if(!t) return;
   navigator.clipboard.writeText(t).catch(()=>{}); 
@@ -383,7 +396,7 @@ const tglPw = (inp,ico) => {
 };
 const getT = (masked) => { try{ const u=new URL(masked); return u.searchParams.get("OwO")||u.searchParams.get("token")||""; }catch{ return ""; } };
 
-// ── API Core ──────────────────────────────────────────────────────────────────
+// ── API Core (Đã fix full AWAIT) ─────────────────────────────────────────────
 async function apG(p, def){
   try{
     const lastPush = parseInt(localStorage.getItem("t"+p) || "0");
@@ -422,7 +435,7 @@ async function doLogin(){
     if(!Array.isArray(devicesDb)) devicesDb=[];
     if(!devicesDb.find(x=>x.id===myDev)){
       devicesDb.push({id:myDev,ua:navigator.userAgent.slice(0,60),date:new Date().toLocaleString("vi")});
-      apP("/api/devices",devicesDb);
+      await apP("/api/devices",devicesDb);
     }
     loginOK(true);
   }else toast("Sai mật khẩu!","err");
@@ -874,7 +887,7 @@ async function delDev(id){
   else toast("✅ Đã xóa!");
 }
 
-// ── Accounts (Tài Khoản Gốc) ──────────────────────────────────────────────────
+// ── Accounts (Tài Khoản Gốc: Cực kỳ tối giản) ─────────────────────────────────
 function renderAcc(){
   const c=document.getElementById("accTree");
   if(!accountsDb.length){c.innerHTML=`<div class="border border-dashed border-slate-300 p-8 rounded-2xl text-center text-slate-400 font-bold">Chưa có tài khoản nào</div>`;return;}
@@ -884,7 +897,7 @@ function renderAcc(){
       <div class="flex items-center gap-2 py-2 border-b border-slate-100 last:border-0 pl-0 hover:bg-slate-50 transition">
         <span class="text-slate-400 font-mono text-[10px] w-5 text-right shrink-0 font-bold cp" onclick="cp('${ci+1}')">#${ci+1}</span>
         <div class="flex-1 min-w-0 flex items-center gap-2">
-          <span class="font-bold text-[11px] text-slate-800 cp" onclick="cp('${cu.email||''}')">${cu.email||"—"}</span>
+          <span class="font-bold text-[11px] text-slate-800 cp truncate" onclick="cp('${cu.email||''}')">${cu.email||"—"}</span>
           ${cu.note?`<span class="text-[9px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded cp" onclick="cp('${cu.note}')">${cu.note}</span>`:""}
         </div>
         <div class="flex gap-1 shrink-0">
