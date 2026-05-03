@@ -254,7 +254,7 @@ details>summary::-webkit-details-marker{display:none;}
 </footer>
 
 <script>
-// ── Gán API_URL tự động theo tên miền hiện tại ──
+// Tự nhận diện Domain
 const API_URL = window.location.origin;  
 const GOOGLE_MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
 const SESSION_KEY = 'vpn_portal_session_24h';
@@ -520,9 +520,10 @@ function renderPaymentBox(){
     col.innerHTML=`<div><h4 class="font-extrabold text-base mb-2 text-indigo-700 border-b pb-2"><i class="fas fa-info-circle mr-2"></i>${i18n[lang].guide_title}</h4><p class="text-sm text-slate-600">${i18n[lang].guide_desc}</p></div>`;return;
   }
   btn.innerHTML=`<i class="fas fa-check-circle mr-2"></i>${i18n[lang].btn_paid}`;btn.className='w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 md:py-4 rounded-xl text-sm uppercase transition btn-heartbeat';
+  
   if(m==='bank'){
     col.innerHTML=`<div class="text-center w-full"><div class="bg-indigo-50 p-2 rounded-xl inline-block mb-4"><img src="https://img.vietqr.io/image/mbbank-0917678211-compact.png?amount=${currentTotalVnd}&addInfo=${currentOrderId}&accountName=TRINH THI XUAN HUONG" class="w-40 h-40 md:w-56 md:h-56 rounded-xl mix-blend-multiply mx-auto"></div>
-      <div class="text-left text-xs space-y-2 mb-6">
+      <div class="text-left text-xs space-y-2 mb-6 w-full">
         <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">Chủ TK:</span><strong>TRINH THI XUAN HUONG</strong></div>
         <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">Ngân hàng:</span><strong>MB BANK</strong></div>
         <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">Số TK:</span><strong class="text-indigo-600 cursor-pointer" onclick="copyText('0917678211')">0917678211 <i class="far fa-copy ml-1"></i></strong></div>
@@ -537,7 +538,9 @@ function renderPaymentBox(){
     const isAli=m==='alipay';
     const imgSrc=isAli?'https://i.pinimg.com/736x/44/57/9d/44579dfb5241614ddc897a21ce34e233.jpg':'https://i.pinimg.com/736x/28/b2/95/28b29577c6229ec943e8e13afe241db3.jpg';
     col.innerHTML=`<div class="text-center w-full"><h4 class="font-extrabold text-lg mb-4 ${isAli?'text-blue-600':'text-green-600'}">${isAli?'Alipay':'WeChat Pay'}</h4>
-      <img src="${imgSrc}" class="w-48 max-w-full h-auto mx-auto rounded-xl border border-slate-100 shadow-sm mb-4 object-contain">
+      <div class="bg-slate-50 p-2 rounded-xl inline-block mb-4 border border-slate-100 shadow-sm">
+        <img src="${imgSrc}" class="w-48 max-w-full h-auto mx-auto rounded-lg object-contain mix-blend-multiply">
+      </div>
       <div class="text-left text-xs space-y-2 mb-6 w-full">
          <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">Chủ TK:</span><strong>TRINH THI XUAN HUONG</strong></div>
          <div class="flex justify-between bg-white p-2.5 rounded-xl border"><span class="text-slate-500">${i18n[lang].copy_amount}</span><strong class="text-red-500 font-black text-base">¥${currentTotalCny}</strong></div>
