@@ -112,25 +112,23 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
         </div>
       </div>
       
-      <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div class="lg:col-span-2">
-            <label class="block font-bold text-xs text-slate-700 mb-1">Link Gốc (Liangxin / Djjc)</label>
-            <input id="lkOrig" type="text" placeholder="https://liangxin... hoặc djjc..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm">
-          </div>
+      <div class="bg-slate-50 p-5 md:p-6 rounded-2xl border border-slate-200 mb-6">
+        <div class="mb-4">
+          <label class="block font-bold text-xs text-slate-700 mb-1">Link Gốc (Liangxin / Djjc)</label>
+          <input id="lkOrig" type="text" placeholder="https://liangxin..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
           <div>
             <label class="block font-bold text-xs text-slate-700 mb-1">Email khách (Tùy chọn)</label>
             <input id="lkEmail" type="text" placeholder="khach@email.com" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm">
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block font-bold text-xs text-slate-700 mb-1">Hết hạn</label>
-              <input id="lkExp" type="text" placeholder="DD/MM/YYYY" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm">
-            </div>
-            <div>
-              <label class="block font-bold text-xs text-slate-700 mb-1">Index Máy</label>
-              <input id="lkIdx" type="number" min="1" placeholder="1, 2..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm">
-            </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Hết hạn (DD/MM/YYYY)</label>
+            <input id="lkExp" type="text" placeholder="DD/MM/YYYY" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm">
+          </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Index Máy</label>
+            <input id="lkIdx" type="number" min="1" placeholder="1, 2..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm">
           </div>
         </div>
         <button onclick="createLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition w-full md:w-auto">
@@ -164,14 +162,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 
   <div id="t-cms" class="hidden glass-card p-5 md:p-8">
     <h2 class="text-xl font-bold mb-4 text-slate-800">Soạn thảo Hướng dẫn (CMS Editor)</h2>
-    <div class="flex flex-wrap gap-2 mb-4">
-      <button onclick="setCms('android')" id="cms-btn-android" class="dev-btn active border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-android text-green-500 mr-2"></i> Android</button>
-      <button onclick="setCms('windows')" id="cms-btn-windows" class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-windows text-blue-500 mr-2"></i> Windows</button>
-      <button onclick="setCms('macos')"   id="cms-btn-macos"   class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-apple text-slate-800 mr-2"></i> MacOS</button>
-      <button onclick="setCms('ios')"     id="cms-btn-ios"     class="dev-btn border-2 border-slate-200 px-4 py-2 rounded-xl font-bold text-slate-600 text-sm flex items-center transition"><i class="fab fa-app-store-ios text-blue-400 mr-2"></i> iOS</button>
+    <div class="flex flex-wrap gap-2 mb-5">
+      <button onclick="setCms('android')" id="cms-btn-android" class="dev-btn active border-2 border-slate-200 px-5 py-2.5 rounded-xl font-bold text-slate-600 text-sm flex items-center transition shadow-sm"><i class="fab fa-android text-green-500 mr-2"></i> Android</button>
+      <button onclick="setCms('windows')" id="cms-btn-windows" class="dev-btn border-2 border-slate-200 px-5 py-2.5 rounded-xl font-bold text-slate-600 text-sm flex items-center transition shadow-sm"><i class="fab fa-windows text-blue-500 mr-2"></i> Windows</button>
+      <button onclick="setCms('macos')"   id="cms-btn-macos"   class="dev-btn border-2 border-slate-200 px-5 py-2.5 rounded-xl font-bold text-slate-600 text-sm flex items-center transition shadow-sm"><i class="fab fa-apple text-slate-800 mr-2"></i> MacOS</button>
+      <button onclick="setCms('ios')"     id="cms-btn-ios"     class="dev-btn border-2 border-slate-200 px-5 py-2.5 rounded-xl font-bold text-slate-600 text-sm flex items-center transition shadow-sm"><i class="fab fa-app-store-ios text-blue-400 mr-2"></i> iOS</button>
     </div>
     
-    <div class="bg-slate-50 p-3 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
+    <div class="bg-slate-50 p-4 rounded-t-xl border border-slate-200 border-b-0 flex gap-2 flex-wrap">
       <button onclick="ins('h')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-purple-600 hover:bg-purple-50 transition"><i class="fas fa-layer-group mr-1"></i> Header Tổng</button>
       <button onclick="ins('t')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-heading mr-1"></i> Mục Nhỏ (Tip)</button>
       <button onclick="ins('s')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-list-ol mr-1"></i> Bước Cài</button>
@@ -179,8 +177,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
       <button onclick="ins('b')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition"><i class="fas fa-download mr-1"></i> Nút Tải</button>
       <button onclick="ins('i')" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-xs font-bold text-pink-600 hover:bg-pink-50 transition"><i class="fas fa-image mr-1"></i> Ảnh</button>
     </div>
-    <textarea id="cmsTA" rows="16" class="w-full p-4 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-sm leading-relaxed resize-y overflow-x-hidden whitespace-pre-wrap"></textarea>
-    <button onclick="saveCms()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-md w-full md:w-auto transition"><i class="fas fa-save mr-2"></i> LƯU LÊN MÁY CHỦ</button>
+    <textarea id="cmsTA" rows="18" class="w-full p-5 border border-slate-200 rounded-b-xl focus:outline-none focus:border-indigo-400 text-slate-800 bg-white font-mono text-sm leading-relaxed resize-y overflow-x-hidden whitespace-pre-wrap shadow-inner"></textarea>
+    <button onclick="saveCms()" class="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-md w-full md:w-auto transition"><i class="fas fa-save mr-2"></i> LƯU LÊN MÁY CHỦ</button>
   </div>
 
   <div id="t-acc" class="hidden glass-card p-5 md:p-8">
@@ -328,9 +326,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
-// Tự động nhận URL gốc của tên miền hiện tại để deploy ở đâu cũng ăn.
+// Tự động nhận URL gốc và Tự động trỏ kho GitHub tương ứng
 const API = window.location.origin;
 const PD  = window.location.origin;
+const GH_REPO = window.location.hostname.includes("vpntrinhhg") ? "trinhhg/vpntrinhhg" : "trinhhg/vpntest";
+
 const MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
 
 const PKGS = [
@@ -643,7 +643,7 @@ function createLink(){
       if(orig.includes("liangxin")){ queryStr=`?OwO=${newTok}`; }
       else { queryStr=`?token=${newTok}`; }
     }
-    // Sử dụng domain hiện hành động + Thêm /VPNTrinhHg vào path
+    // Sử dụng domain tự động + Thêm /VPNTrinhHg vào path
     if(orig.includes("liangxin")) masked=PD+"/v1/VPNTrinhHg"+queryStr+"#VPNTrinhHg";
     else if(orig.includes("djjc.cfd")) masked=PD+"/v2/VPNTrinhHg"+queryStr+"#VPNTrinhHg";
     else return toast("Domain không hỗ trợ!","err");
@@ -719,7 +719,7 @@ async function triggerGitHub() {
   try {
     const r = await fetch(API + "/api/trigger_github", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ repo: "trinhhg/vibecod", workflow: "update_sub.yml" })
+      body: JSON.stringify({ repo: GH_REPO, workflow: "update.yml" })
     });
     if(r.ok) toast("✅ Lệnh đồng bộ đã gửi sang GitHub thành công!");
     else toast("Lỗi gọi GH: " + await r.text(), "err");
