@@ -571,10 +571,24 @@ async function submitOrder(e){
       totalVnd:currentTotalVnd,needSupport:document.getElementById('needSupport').checked,
       status:'pending',date:new Date().toLocaleString(),expDate:'',daysLeft:'',info:''});
     await apiPost('/api/orders',db);
-    try{await fetch(GOOGLE_MAIL_API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      to:'lucastanora@gmail.com',subject:`[ĐƠN MỚI] ${currentOrderId}`,
-      html:`<h2>Khách báo đã CK!</h2><p>Mã: <b>${currentOrderId}</b></p><p>Email: ${document.getElementById('cusEmail').value}</p>`
-    })});}catch{}
+    try {
+        const cusZaloVal = document.getElementById('cusZalo').value || 'Không nhập';
+        await fetch(GOOGLE_MAIL_API, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+            to: "lucastanora@gmail.com", 
+            subject: `[CÓ ĐƠN MỚI] ${currentOrderId} - Khách báo Đã CK`, 
+            html: `<div style="font-family:sans-serif; max-width:500px; margin:auto; border:1px solid #e2e8f0; border-radius:10px; padding:20px;">
+                <h2 style="color:#2563eb; margin-top:0;">💰 Khách vừa báo ĐÃ THANH TOÁN!</h2>
+                <ul style="list-style-type:none; padding:0; font-size:15px; line-height:1.8;">
+                    <li style="border-bottom:1px solid #f1f5f9; padding-bottom:8px;">📌 <b>Mã Đơn:</b> <span style="color:#ef4444; font-weight:bold;">${currentOrderId}</span></li>
+                    <li style="border-bottom:1px solid #f1f5f9; padding:8px 0;">📦 <b>Gói VPN:</b> ${currentPackage.vi.name} (${cy2})</li>
+                    <li style="border-bottom:1px solid #f1f5f9; padding:8px 0;">💵 <b>Số tiền:</b> <b style="color:#16a34a;">${fp}</b></li>
+                    <li style="border-bottom:1px solid #f1f5f9; padding:8px 0;">📧 <b>Email:</b> ${document.getElementById('cusEmail').value}</li>
+                    <li style="padding-top:8px;">💬 <b>Zalo/Tele:</b> <span style="background:#fef08a; padding:2px 6px; border-radius:4px; font-weight:bold; color:#854d0e;">${cusZaloVal}</span></li>
+                </ul>
+                <p style="background:#eff6ff; padding:10px; border-radius:6px; font-size:13px; color:#1e40af; text-align:center; margin-bottom:0;">Vui lòng mở trang Admin để kiểm tra tiền và duyệt đơn!</p>
+            </div>`
+        }) });
+    } catch(err) {}
     showToast(lang==='vi'?'Thành công!':'Success!','success');
     document.getElementById('checkoutSection').classList.add('hidden');
     document.getElementById('orderForm').reset();
