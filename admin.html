@@ -1,3 +1,4 @@
+// v1.5 - Tích hợp Template Email Mới (Thành công, Thất bại, Nhắc Zalo) vào core admin rút gọn - 2026-05-04
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -227,7 +228,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 </div>
 
 <script>
-// ── CHÚ Ý: MẢNG TABS ĐÃ FIX ĐẦY ĐỦ ──
 const TABS=["t-ord","t-lnk","t-acc","t-exp","t-dead","t-cms","t-dev"];
 
 const API = window.location.origin;
@@ -242,7 +242,6 @@ const PKGS = [
 let ordersDb=[], linksDb=[], deadLinksDb=[], cmsDb={}, devicesDb=[], accountsDb=[];
 let myDev="", curCms="android";
 
-// Copy Tool & Toasts (Ko emoji rác)
 const cp = (t) => { if(!t) return; navigator.clipboard.writeText(t).catch(()=>{}); toast("Đã copy: " + (t.length > 20 ? t.substring(0,20)+"..." : t)); };
 function toast(msg, type="ok"){
   const box=document.getElementById("toastBox"); const el=document.createElement("div");
@@ -257,7 +256,6 @@ const genId = () => "DH-"+Math.random().toString(36).slice(2,11).toUpperCase();
 const tglPw = (inp,ico) => { const el=document.getElementById(inp); el.type=el.type==="password"?"text":"password"; document.getElementById(ico).className=`fas ${el.type==="password"?"fa-eye":"fa-eye-slash"} text-sm`; };
 const getT = (masked) => { try{ const u=new URL(masked); return u.searchParams.get("OwO")||u.searchParams.get("token")||""; }catch{ return ""; } };
 
-// API Tools
 async function apG(p, def){
   try{
     const lastPush = parseInt(localStorage.getItem("t"+p) || "0");
@@ -316,7 +314,6 @@ async function fetchAll(msg=false){
   if(!Array.isArray(ordersDb)) ordersDb=[]; if(!Array.isArray(linksDb)) linksDb=[]; if(!Array.isArray(deadLinksDb)) deadLinksDb=[]; if(!Array.isArray(devicesDb)) devicesDb=[]; if(!Array.isArray(accountsDb)) accountsDb=[];
   if(typeof cmsDb!=="object"||Array.isArray(cmsDb)) cmsDb={};
   
-  // Dịch ngược HTML cũ sang Shortcode (nếu có)
   for(let k in cmsDb){ cmsDb[k] = reverseShortcodes(cmsDb[k]); }
 
   renderOrd(); renderLinks(); renderDev(); renderAcc(); 
@@ -326,7 +323,7 @@ async function fetchAll(msg=false){
 
 function pd(s){const p=s?.split("/");return p?.length===3?new Date(`${p[2]}-${p[1]}-${p[0]}T23:59:59`):null;}
 
-// ── RENDER THẺ CARDS THAY CHO BẢNG ──
+// === RENDER THẺ CARDS ĐƠN HÀNG (CÓ NÚT NHẮC ZALO) ===
 function renderOrd(){
   const tb=document.getElementById("ordBody");
   if(!ordersDb.length){tb.innerHTML=`<div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200 shadow-sm font-bold">Chưa có đơn</div>`;return;}
@@ -339,6 +336,7 @@ function renderOrd(){
         <div class="text-xs text-slate-500 mt-1 font-medium truncate">${o.pkgName||"—"} • HSD: <span class="font-bold text-slate-700">${o.expDate||"—"}</span></div>
       </div>
       <div class="flex gap-2 shrink-0 border-t border-slate-100 md:border-0 pt-2 md:pt-0 mt-1 md:mt-0">
+        <button onclick="sendZaloMail('${o.id}')" title="Nhắc Zalo khách hàng" class="text-blue-500 font-bold px-3 py-2 bg-blue-50 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition"><i class="fas fa-comment-dots"></i></button>
         <button onclick="openOrdModal('${o.id}')" class="flex-1 md:flex-none text-indigo-600 font-bold px-4 py-2 bg-indigo-50 rounded-lg text-xs hover:bg-indigo-600 hover:text-white transition"><i class="fas fa-pen mr-1.5"></i>Sửa</button>
         <button onclick="delOrd('${o.id}')" class="text-red-500 font-bold px-3 py-2 bg-red-50 rounded-lg text-xs hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash"></i></button>
       </div>
@@ -353,20 +351,65 @@ function openOrdModal(id){
   togSF(); document.getElementById("mOrd").classList.remove("hidden");
 }
 function togSF(){ const s=document.getElementById("mOStatus").value; document.getElementById("fSuc").classList.toggle("hidden",s!=="success"); document.getElementById("fFail").classList.toggle("hidden",s!=="failed"); }
+
+// === LOGIC LƯU ĐƠN VÀ BẮN MAIL TEMPLATE THÀNH CÔNG/THẤT BẠI ===
 async function saveOrd(){
   const id=document.getElementById("mOId").value.trim(); if(!id) return toast("Mã đơn rỗng!","err");
-  let o=ordersDb.find(x=>x.id===id); if(!o){o={id,needSupport:false,method:"Manual",date:new Date().toLocaleString("vi")};ordersDb.unshift(o);}
+  let o=ordersDb.find(x=>x.id===id); if(!o){o={id,method:"Manual",date:new Date().toLocaleString("vi")};ordersDb.unshift(o);}
   const pkgTxt=PKGS[document.getElementById("mOPkg").value], status=document.getElementById("mOStatus").value;
   Object.assign(o,{ email:document.getElementById("mOEmail").value.trim(), pkg:pkgTxt, pkgName:pkgTxt.split(" - ")[0], expDate:document.getElementById("mOExp").value.trim(), status, info:document.getElementById("mOLink").value.trim(), reason:document.getElementById("mOReason").value.trim() });
   renderOrd(); cm("mOrd"); toast("Đang lưu..."); await apP("/api/orders",ordersDb); toast("Đã lưu!");
-  if(document.getElementById("mOSendMail").checked&&o.email&&(status==="success"||status==="failed")){
-    const subj=status==="success"?"VPN Trinh Hg - Kích hoạt thành công":"VPN Trinh Hg - Đơn bị từ chối";
-    const html=status==="success"?`<h2>Kích hoạt thành công!</h2><p>Gói: ${o.pkgName}</p><p>Vào <a href="${PD}">${PD}</a> để nhận link VPN.</p>`:`<h2>Đơn bị từ chối</h2><p>Lý do: ${o.reason}</p><p>Liên hệ Zalo: 0917678211</p>`;
+  
+  if(document.getElementById("mOSendMail").checked && o.email && (status==="success"||status==="failed")) {
+    const subj = status==="success"?"VPN Trinh Hg - Kích hoạt thành công":"VPN Trinh Hg - Đơn bị từ chối";
+    let html = "";
+    
+    // Nút Zalo/Mess dùng chung
+    const contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
+      <p style="margin:0 0 12px 0; color:#475569; font-size:13px; line-height:1.5;">Cần hỗ trợ? Đội ngũ của chúng tôi sẵn sàng 24/7</p>
+      <div style="display:block; width:100%;">
+        <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0068ff; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px;">Chat Zalo</a>
+        <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#0668E1; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px;">Messenger</a>
+      </div>
+    </div>`;
+
+    if(status==="success"){
+      html = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+        <div style="background:linear-gradient(135deg, #4f46e5, #8b5cf6); padding:20px; text-align:center;">
+          <h2 style="color:white; margin:0; font-size:22px; text-transform:uppercase;">KÍCH HOẠT THÀNH CÔNG</h2>
+        </div>
+        <div style="padding:20px; box-sizing:border-box;">
+          <p style="font-size:15px; line-height:1.5; margin-top:0;">Xin chào, Gói VPN <b style="color:#4f46e5;">${o.pkgName}</b> của bạn đã sẵn sàng.</p>
+          <div style="background:#f1f5f9; border-left:4px solid #4f46e5; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
+            <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold; text-transform:uppercase;">MÃ ĐƠN HÀNG CỦA BẠN</p>
+            <p style="margin:8px 0 0 0; font-size:24px; font-weight:900; color:#4f46e5; letter-spacing:2px;">${o.id}</p>
+          </div>
+          <div style="text-align:center; margin:25px 0;">
+            <a href="${PD}" style="background:#1e293b; color:white; padding:14px 24px; border-radius:10px; text-decoration:none; font-weight:900; display:block; font-size:15px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">TRUY CẬP CỔNG KHÁCH HÀNG</a>
+            <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Dùng <b>Mã Đơn Hàng</b> để đăng nhập và lấy Link VPN.</i></p>
+          </div>
+          ${contactBlock}
+        </div></div>`;
+    } else {
+      html = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #fecaca; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+        <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); padding:20px; text-align:center;">
+          <h2 style="color:white; margin:0; font-size:22px; text-transform:uppercase;">GIAO DỊCH THẤT BẠI</h2>
+        </div>
+        <div style="padding:20px; box-sizing:border-box;">
+          <p style="font-size:15px; line-height:1.5; margin-top:0;">Xin chào, Đơn hàng <b style="color:#ef4444;">${o.id}</b> của bạn không thể kích hoạt.</p>
+          <div style="background:#fef2f2; border:1px dashed #fca5a5; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
+            <p style="margin:0; font-size:12px; color:#991b1b; font-weight:bold; text-transform:uppercase;">LÝ DO TỪ CHỐI</p>
+            <p style="margin:8px 0 0 0; font-size:15px; font-weight:bold; color:#b91c1c;">${o.reason}</p>
+          </div>
+          ${contactBlock}
+        </div></div>`;
+    }
     fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:subj,html})});
   }
 }
 async function delOrd(id){ if(!confirm("Xóa đơn "+id+"?")) return; ordersDb=ordersDb.filter(x=>x.id!==id); renderOrd(); await apP("/api/orders",ordersDb); toast("Đã xóa!"); }
 
+// === TEMPLATE BÁO HẾT HẠN GÓI (TỪ TAB HẾT HẠN) ===
 function renderExp(){
   const tb=document.getElementById("expBody"), now=new Date();
   const valid=ordersDb.filter(o=>o.status==="success"&&o.expDate).map(o=>({...o,_d:pd(o.expDate)})).filter(o=>o._d).sort((a,b)=>a._d-b._d);
@@ -384,8 +427,38 @@ function renderExp(){
   }).join("");
 }
 function sendExpMail(id){
-  const o=ordersDb.find(x=>x.id===id); if(!o?.email) return; if(!confirm(`Gửi nhắc tới ${o.email}?`)) return;
-  fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:"VPN Trinh Hg - Sắp hết hạn",html:`<p>Gói của bạn hết hạn vào ${o.expDate}.</p><p>Gia hạn tại: <a href="${PD}">${PD}</a></p>`})}); toast("Đã gửi email nhắc!");
+  const o=ordersDb.find(x=>x.id===id); if(!o?.email) return; if(!confirm(`Gửi mail nhắc hết hạn tới ${o.email}?`)) return;
+  const html = `<div style="font-family:sans-serif; width:100%; max-width:450px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+    <div style="background:linear-gradient(135deg, #f59e0b, #d97706); padding:20px; text-align:center;">
+        <h2 style="color:white; margin:0; font-size:20px; text-transform:uppercase;">GÓI VPN SẮP HẾT HẠN</h2>
+    </div>
+    <div style="padding:25px 20px; box-sizing:border-box; text-align:center;">
+        <p style="font-size:15px; line-height:1.6; margin:0 0 15px 0; color:#334155;">Gói <b>${o.pkgName}</b> của đơn hàng <b style="color:#ea580c;">${o.id}</b> sắp hết hạn sử dụng (${o.expDate}). Vui lòng gia hạn ngay để không bị gián đoạn.</p>
+        <div style="text-align:center; margin:25px 0;">
+            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:14px;">GIA HẠN TẠI CỔNG</a>
+        </div>
+    </div></div>`;
+  fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:"VPN Trinh Hg - Sắp hết hạn",html})}); toast("Đã gửi email nhắc hết hạn!");
+}
+
+// === TEMPLATE BÁO NHẮC LIÊN HỆ ZALO MỚI (TỪ NÚT TAB ĐƠN HÀNG) ===
+function sendZaloMail(id) {
+  const o=ordersDb.find(x=>x.id===id); if(!o?.email) return toast("Đơn này chưa có email khách!","err"); 
+  if(!confirm(`Bắn mail Nhắc Zalo cho ${o.email}?`)) return;
+  
+  const contactBlock = `<div style="text-align:center; margin-top:20px;"><div style="display:block; width:100%;"><a href="https://zalo.me/0917678211" style="display:inline-block; background:#0068ff; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px;">Chat Zalo</a><a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#0668E1; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px;">Messenger</a></div></div>`;
+  const html = `<div style="font-family:sans-serif; width:100%; max-width:450px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+    <div style="padding:25px 20px; box-sizing:border-box; text-align:center;">
+        <p style="font-size:15px; line-height:1.6; margin:0 0 15px 0; color:#334155;">Chào bạn, vui lòng liên hệ Admin qua Zalo để được hỗ trợ về gói VPN <b style="color:#2563eb;">${o.id}</b> ngay nhé!</p>
+        <div style="background:#fefce8; border:2px dashed #facc15; padding:20px; border-radius:12px; margin:20px 0;">
+            <p style="margin:0; font-size:13px; color:#a16207; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">HOTLINE / ZALO ADMIN</p>
+            <p style="margin:10px 0 0 0; font-size:32px; font-weight:900; color:#ca8a04; letter-spacing:2px;">0917678211</p>
+        </div>
+        ${contactBlock}
+    </div></div>`;
+  
+  fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:"VPN Trinh Hg - Thông báo từ Admin",html})}); 
+  toast("Đã gửi mail Nhắc Zalo!");
 }
 
 function genHex(len){let r="";const c="0123456789abcdef";for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*16)];return r;}
@@ -541,7 +614,6 @@ function setCms(dev){
 }
 function insShort(t){ const ta=document.getElementById("cmsRaw"),s=ta.selectionStart; ta.value=ta.value.slice(0,s)+t+"\n"+ta.value.slice(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+t.length; ta.focus(); updatePreview(); }
 
-// Dịch Shortcode -> HTML để Preview và Lưu
 function parseShortcodes(text) {
   if (!text) return "";
   const lines = text.split("\n");
@@ -563,7 +635,6 @@ function parseShortcodes(text) {
   return html;
 }
 
-// Dịch ngược HTML -> Shortcode để edit (Giữ form cũ)
 function reverseShortcodes(html) {
   if(!html) return "";
   let text = html;
@@ -580,7 +651,7 @@ function reverseShortcodes(html) {
 function updatePreview() { document.getElementById("cmsPreview").innerHTML = parseShortcodes(document.getElementById("cmsRaw").value); }
 
 async function saveCms(){ 
-  cmsDb[curCms] = document.getElementById("cmsRaw").value; // Lưu text shortcode vào DB, lúc ra index.html tự dịch
+  cmsDb[curCms] = document.getElementById("cmsRaw").value;
   toast("Đang lưu CMS..."); await apP("/api/cms",cmsDb); toast("Đã lưu Hướng dẫn lên hệ thống!"); 
 }
 
