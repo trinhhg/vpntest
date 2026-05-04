@@ -365,25 +365,25 @@ async function saveOrd(){
     
     const contactBlock = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:20px; text-align:center;">
       <p style="margin:0 0 12px 0; color:#475569; font-size:13px; line-height:1.5;">Cần hỗ trợ? Đội ngũ của chúng tôi sẵn sàng 24/24</p>
-      <div style="display:block; width:100%;">
-        <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0068ff; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Chat Zalo</a>
-        <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#0668E1; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Messenger</a>
+      <div style="display:block; width:100%; text-align:center;">
+        <a href="https://zalo.me/0917678211" style="display:inline-block; width:46%; background:#0068ff; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; box-sizing:border-box;">Chat Zalo</a>
+        <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; width:46%; background:#0668E1; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin-left:4%; box-sizing:border-box;">Messenger</a>
       </div>
     </div>`;
 
     if(status==="success"){
       html = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
         <div style="background:linear-gradient(135deg, #4f46e5, #8b5cf6); padding:20px; text-align:center;">
-          <h2 style="color:white; margin:0; font-size:22px; text-transform:uppercase; white-space:nowrap;">KÍCH HOẠT THÀNH CÔNG</h2>
+          <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">KÍCH HOẠT THÀNH CÔNG</h2>
         </div>
         <div style="padding:20px; box-sizing:border-box;">
           <p style="font-size:15px; line-height:1.5; margin-top:0;">Xin chào, Gói VPN <b style="color:#4f46e5;">${o.pkgName}</b> của bạn đã sẵn sàng.</p>
           <div style="background:#f1f5f9; border-left:4px solid #4f46e5; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
             <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold; text-transform:uppercase;">MÃ ĐƠN HÀNG CỦA BẠN</p>
-            <p style="margin:8px 0 0 0; font-size:24px; font-weight:900; color:#4f46e5; letter-spacing:2px; white-space:nowrap;">${o.id}</p>
+            <p style="margin:8px 0 0 0; font-size:22px; font-weight:900; color:#4f46e5; letter-spacing:1px; word-break:break-word;">${o.id}</p>
           </div>
           <div style="text-align:center; margin:25px 0;">
-            <a href="${PD}" style="background:#1e293b; color:white; padding:14px 24px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:15px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); white-space:nowrap;">TRUY CẬP CỔNG KHÁCH HÀNG</a>
+            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 15px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; width:100%; box-sizing:border-box; font-size:14px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">TRUY CẬP CỔNG KHÁCH HÀNG</a>
             <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Dùng <b>Mã Đơn Hàng</b> hoặc <b>Email</b> để tra cứu và lấy link VPN.</i></p>
           </div>
           ${contactBlock}
@@ -391,17 +391,17 @@ async function saveOrd(){
     } else {
       html = `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #fecaca; border-radius:12px; overflow:hidden; box-sizing:border-box;">
         <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); padding:20px; text-align:center;">
-          <h2 style="color:white; margin:0; font-size:22px; text-transform:uppercase; white-space:nowrap;">KÍCH HOẠT THẤT BẠI</h2>
+          <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">KÍCH HOẠT THẤT BẠI</h2>
         </div>
         <div style="padding:20px; box-sizing:border-box;">
           <p style="font-size:15px; line-height:1.5; margin-top:0;">Xin chào, Gói VPN <b style="color:#ef4444;">${o.pkgName}</b> của bạn không thể kích hoạt.</p>
           <div style="background:#f1f5f9; border-left:4px solid #4f46e5; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
             <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold; text-transform:uppercase;">MÃ ĐƠN HÀNG CỦA BẠN</p>
-            <p style="margin:8px 0 0 0; font-size:24px; font-weight:900; color:#4f46e5; letter-spacing:2px; white-space:nowrap;">${o.id}</p>
+            <p style="margin:8px 0 0 0; font-size:22px; font-weight:900; color:#4f46e5; letter-spacing:1px; word-break:break-word;">${o.id}</p>
           </div>
           <div style="background:#fef2f2; border:1px dashed #fca5a5; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
             <p style="margin:0; font-size:12px; color:#991b1b; font-weight:bold; text-transform:uppercase;">LÝ DO TỪ CHỐI</p>
-            <p style="margin:8px 0 0 0; font-size:15px; font-weight:bold; color:#b91c1c;">${o.reason}</p>
+            <p style="margin:8px 0 0 0; font-size:14px; font-weight:bold; color:#b91c1c; word-break:break-word;">${o.reason}</p>
           </div>
           <div style="text-align:center; margin:25px 0;">
             <p style="font-size:12px; color:#64748b; margin-top:12px; line-height:1.5;">👉 <i>Dùng <b>Mã Đơn Hàng</b> hoặc <b>Email</b> để tra cứu và lấy link VPN.</i></p>
@@ -435,23 +435,23 @@ function sendExpMail(id){
   const o=ordersDb.find(x=>x.id===id); if(!o?.email) return; if(!confirm(`Gửi mail nhắc hết hạn tới ${o.email}?`)) return;
   const html = `<div style="font-family:sans-serif; width:100%; max-width:450px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
     <div style="background:linear-gradient(135deg, #f59e0b, #d97706); padding:20px; text-align:center;">
-        <h2 style="color:white; margin:0; font-size:20px; text-transform:uppercase; white-space:nowrap;">GÓI VPN SẮP HẾT HẠN</h2>
+        <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">GÓI VPN SẮP HẾT HẠN</h2>
     </div>
     <div style="padding:25px 20px; box-sizing:border-box; text-align:center;">
         <p style="font-size:15px; line-height:1.6; margin:0 0 15px 0; color:#334155;">Xin chào, Gói VPN <b>${o.pkgName}</b> của bạn sắp hết hạn.</p>
         <div style="background:#f1f5f9; border-left:4px solid #f59e0b; padding:15px; border-radius:8px; margin:20px 0; text-align:center;">
             <p style="margin:0; font-size:11px; color:#64748b; font-weight:bold; text-transform:uppercase;">MÃ ĐƠN HÀNG HIỆN TẠI</p>
-            <p style="margin:8px 0 0 0; font-size:24px; font-weight:900; color:#d97706; letter-spacing:2px; white-space:nowrap;">${o.id}</p>
+            <p style="margin:8px 0 0 0; font-size:22px; font-weight:900; color:#d97706; letter-spacing:1px; word-break:break-word;">${o.id}</p>
         </div>
         <div style="text-align:center; margin:25px 0;">
-            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:14px; white-space:nowrap;">GIA HẠN NGAY TẠI CỔNG KHÁCH HÀNG</a>
+            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 15px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:13px; width:100%; box-sizing:border-box;">GIA HẠN NGAY TẠI CỔNG KHÁCH HÀNG</a>
         </div>
         <p style="font-size:13px; color:#475569; margin-top:12px; line-height:1.5;">Gia hạn ngay tại website để tránh gián đoạn dịch vụ.</p>
         <div style="text-align:center; margin-top:20px;">
             <p style="font-size:13px; color:#475569; margin-bottom:12px;">Cần hỗ trợ gia hạn? Đội ngũ của chúng tôi sẵn sàng 24/24</p>
-            <div style="display:block; width:100%;">
-                <a href="https://zalo.me/0917678211" style="display:inline-block; background:#0068ff; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Chat Zalo</a>
-                <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#0668E1; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Messenger</a>
+            <div style="display:block; width:100%; text-align:center;">
+                <a href="https://zalo.me/0917678211" style="display:inline-block; width:46%; background:#0068ff; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; box-sizing:border-box;">Chat Zalo</a>
+                <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; width:46%; background:#0668E1; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin-left:4%; box-sizing:border-box;">Messenger</a>
             </div>
         </div>
     </div></div>`;
@@ -463,19 +463,20 @@ function sendZaloMail(id) {
   const o=ordersDb.find(x=>x.id===id); if(!o?.email) return toast("Đơn này chưa có email khách!","err"); 
   if(!confirm(`Bắn mail Nhắc Zalo cho ${o.email}?`)) return;
   
-  const contactBlock = `<div style="text-align:center; margin-top:20px;"><div style="display:block; width:100%;"><a href="https://zalo.me/0917678211" style="display:inline-block; background:#0068ff; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Chat Zalo</a><a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; background:#0668E1; color:white; padding:8px 16px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin:0 4px; white-space:nowrap;">Messenger</a></div></div>`;
+  const contactBlock = `<div style="text-align:center; margin-top:20px;"><div style="display:block; width:100%; text-align:center;"><a href="https://zalo.me/0917678211" style="display:inline-block; width:46%; background:#0068ff; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; box-sizing:border-box;">Chat Zalo</a><a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; width:46%; background:#0668E1; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin-left:4%; box-sizing:border-box;">Messenger</a></div></div>`;
+  
   const html = `<div style="font-family:sans-serif; width:100%; max-width:450px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
     <div style="background:linear-gradient(135deg, #2563eb, #1d4ed8); padding:20px; text-align:center;">
-        <h2 style="color:white; margin:0; font-size:20px; text-transform:uppercase; white-space:nowrap;">HỖ TRỢ CÀI ĐẶT</h2>
+        <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">HỖ TRỢ CÀI ĐẶT</h2>
     </div>
     <div style="padding:25px 20px; box-sizing:border-box; text-align:center;">
-        <p style="font-size:15px; line-height:1.6; margin:0 0 15px 0; color:#334155;">Chào bạn, vui lòng liên hệ Admin qua Zalo bên dưới để được hỗ trợ về gói VPN có mã đơn hàng là <b style="color:#2563eb; white-space:nowrap;">${o.id}</b> ngay nhé!</p>
+        <p style="font-size:15px; line-height:1.6; margin:0 0 15px 0; color:#334155;">Chào bạn, vui lòng liên hệ Admin qua Zalo bên dưới để được hỗ trợ về gói VPN có mã đơn hàng là <b style="color:#2563eb; word-break:break-word;">${o.id}</b> ngay nhé!</p>
         <div style="background:#fefce8; border:2px dashed #facc15; padding:20px; border-radius:12px; margin:20px 0;">
             <p style="margin:0; font-size:13px; color:#a16207; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">ZALO ADMIN</p>
-            <p style="margin:10px 0 0 0; font-size:32px; font-weight:900; color:#ca8a04; letter-spacing:2px; white-space:nowrap;">0917678211</p>
+            <p style="margin:10px 0 0 0; font-size:28px; font-weight:900; color:#ca8a04; letter-spacing:1px;">0917678211</p>
         </div>
         <div style="text-align:center; margin:25px 0;">
-            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:14px; white-space:nowrap;">TRUY CẬP CỔNG KHÁCH HÀNG</a>
+            <a href="${PD}" style="background:#1e293b; color:white; padding:12px 15px; border-radius:10px; text-decoration:none; font-weight:900; display:inline-block; font-size:14px; width:100%; box-sizing:border-box;">TRUY CẬP CỔNG KHÁCH HÀNG</a>
         </div>
         ${contactBlock}
     </div></div>`;
