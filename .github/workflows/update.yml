@@ -1,9 +1,8 @@
 name: Update VPN Subs Automatically
 
 on:
-  schedule:
-    - cron: '*/60 * * * *'
-  workflow_dispatch:
+  # Xóa sổ phần schedule (cron) để tắt chạy tự động
+  workflow_dispatch: # Giữ lại cái này để mày có thể bấm nút trên GitHub hoặc trang Admin
 
 jobs:
   update-subs:
