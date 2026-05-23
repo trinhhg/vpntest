@@ -1,8 +1,10 @@
 name: Update VPN Subs Automatically
 
 on:
-  # Xóa sổ phần schedule (cron) để tắt chạy tự động
-  workflow_dispatch: # Giữ lại cái này để mày có thể bấm nút trên GitHub hoặc trang Admin
+  schedule:
+    # Chạy đúng 1 lần/ngày vào lúc 00:00 UTC (7h sáng VN - lúc Cloudflare vừa reset quota)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   update-subs:
