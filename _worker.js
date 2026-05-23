@@ -5,7 +5,7 @@ export default {
     // Nếu là Link Sub hoặc API -> Bẻ lái ngầm sang con Worker Test (Nơi chứa Database)
     if (url.pathname.startsWith("/v1") || url.pathname.startsWith("/v2") || url.pathname.startsWith("/api")) {
       const workerUrl = new URL(request.url);
-      workerUrl.hostname = "vpn-worker-test.doicucden.workers.dev";
+      workerUrl.hostname = "vpn-api.doicucden.workers.dev";
       const newRequest = new Request(workerUrl.toString(), request);
       return fetch(newRequest);
     }
