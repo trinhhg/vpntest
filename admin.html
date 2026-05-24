@@ -26,6 +26,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 .dot-green { width: 12px; height: 12px; border-radius: 50%; background-color: #22c55e; flex-shrink: 0; }
 .dot-yellow { width: 12px; height: 12px; border-radius: 50%; background-color: #eab308; flex-shrink: 0; }
 .dot-red { width: 12px; height: 12px; border-radius: 50%; background-color: #ef4444; flex-shrink: 0; }
+
+/* Radio Buttons cho Bảng màu Promo */
+.color-radio { display: none; }
+.color-label { display: inline-block; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; }
+.color-radio:checked + .color-label { transform: scale(1.2); border-color: #1e293b; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 </style>
 </head>
 <body class="min-h-screen pb-20 overflow-x-hidden bg-slate-50">
@@ -55,6 +60,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <button onclick="go('t-lnk')" id="btn-t-lnk" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-link"></i>Link Sub</button>
     <button onclick="go('t-acc')" id="btn-t-acc" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-key"></i>Tài khoản</button>
     <button onclick="go('t-exp')" id="btn-t-exp" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-clock"></i>Hết hạn</button>
+    <button onclick="go('t-promo')" id="btn-t-promo" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-envelope-open-text text-pink-500"></i>Mail Promo</button>
     <button onclick="go('t-dead')" id="btn-t-dead" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-ban"></i>Đã xóa</button>
     <button onclick="go('t-cms')" id="btn-t-cms" class="tab-btn px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-book"></i>Hướng dẫn</button>
     <button onclick="go('t-dev')" id="btn-t-dev" class="tab-btn col-span-4 md:col-span-1 px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-laptop"></i>Thiết bị</button>
@@ -87,8 +93,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
       <h3 class="font-extrabold text-indigo-800 text-[11px] md:text-sm lg:text-base mb-3 flex items-center"><i class="fas fa-clipboard-check mr-2 text-indigo-600"></i>📌 QUY TRÌNH VẬN HÀNH CHUẨN</h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3">
         <div class="bg-white p-2.5 rounded-xl border shadow-sm"><p class="text-[10px] md:text-xs lg:text-sm text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">1</span>TẠO LINK MỚI</p><p class="text-[9px] md:text-[11px] lg:text-xs text-slate-500 font-medium">Tạo Link Ẩn <i class="fas fa-arrow-right mx-1 text-slate-400"></i> <span class="bg-blue-600 text-white px-1.5 rounded">Đồng bộ GH</span>.</p></div>
-        <div class="bg-white p-2.5 rounded-xl border shadow-sm"><p class="text-[10px] md:text-xs lg:text-sm text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">2</span>KHÓA / MỞ KHÓA</p><p class="text-[9px] md:text-[11px] lg:text-xs text-slate-500 font-medium">Đổi trạng thái <i class="fas fa-arrow-right mx-1 text-slate-400"></i> <span class="bg-emerald-600 text-white px-1.5 rounded">Rebuild MAP</span>.</p></div>
-        <div class="bg-white p-2.5 rounded-xl border shadow-sm"><p class="text-[10px] md:text-xs lg:text-sm text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">3</span>SỬA / XÓA LINK</p><p class="text-[9px] md:text-[11px] lg:text-xs text-slate-500 font-medium">Sửa/Xóa <i class="fas fa-arrow-right mx-1 text-slate-400"></i> <span class="bg-emerald-600 text-white px-1.5 rounded">Rebuild MAP</span> <i class="fas fa-arrow-right mx-1 text-slate-400"></i> <span class="bg-blue-600 text-white px-1.5 rounded">Đồng bộ GH</span>.</p></div>
+        <div class="bg-white p-2.5 rounded-xl border shadow-sm"><p class="text-[10px] md:text-xs lg:text-sm text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">2</span>KHÓA / MỞ KHÓA</p><p class="text-[9px] md:text-[11px] lg:text-xs text-slate-500 font-medium">Hệ thống <span class="text-red-500 font-bold">Ngắt mạng Khách tức thì</span>.</p></div>
+        <div class="bg-white p-2.5 rounded-xl border shadow-sm"><p class="text-[10px] md:text-xs lg:text-sm text-slate-600 font-bold mb-1"><span class="text-indigo-500 mr-1">3</span>SỬA / XÓA LINK</p><p class="text-[9px] md:text-[11px] lg:text-xs text-slate-500 font-medium">Lưu thay đổi <i class="fas fa-arrow-right mx-1 text-slate-400"></i> <span class="bg-blue-600 text-white px-1.5 rounded">Đồng bộ GH</span>.</p></div>
       </div>
     </div>
     
@@ -98,8 +104,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
         <p class="text-[11px] md:text-xs lg:text-sm text-slate-500 mt-1 truncate">Đuôi tự động gán <code class="bg-slate-100 px-1 rounded text-pink-600 font-bold">#VPNTrinhHg</code></p>
       </div>
       <div class="grid grid-cols-2 sm:flex gap-2 w-full lg:w-auto">
-        <button id="btnRunGC" onclick="runGC()" class="bg-white text-red-600 hover:bg-red-50 font-bold px-3 py-2 rounded-xl text-xs lg:text-sm transition shadow-sm border border-slate-200"><i class="fas fa-broom mr-1"></i>Dọn KV</button>
-        <button onclick="rebuildAllMAP()" id="btnRebuildAll" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold px-3 py-2 rounded-xl text-xs lg:text-sm transition shadow-sm border border-emerald-100"><i class="fas fa-rotate mr-1"></i>Rebuild MAP</button>
+        <button id="btnRunGC" onclick="runGC()" class="bg-white text-red-600 hover:bg-red-50 font-bold px-3 py-2 rounded-xl text-xs lg:text-sm transition shadow-sm border border-slate-200"><i class="fas fa-broom mr-1"></i>Dọn KV Rác</button>
+        <button onclick="rebuildAllMAP()" id="btnRebuildAll" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold px-3 py-2 rounded-xl text-xs lg:text-sm transition shadow-sm border border-emerald-100"><i class="fas fa-rotate mr-1"></i>Cập nhật Router</button>
         <button onclick="triggerGitHub()" id="btnTriggerGH" class="col-span-2 sm:col-span-1 bg-blue-600 text-white hover:bg-blue-700 font-bold px-3 py-2 rounded-xl text-xs lg:text-sm transition shadow-md"><i class="fab fa-github mr-1"></i>Đồng bộ GITHUB</button>
       </div>
     </div>
@@ -115,6 +121,85 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
     
     <div id="linksTree" class="space-y-3 w-full min-w-0"></div>
+  </div>
+
+  <div id="t-promo" class="hidden w-full min-w-0">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Email Marketing (Promo)</h2>
+      <div class="bg-slate-200 p-1 rounded-xl flex gap-1">
+        <button onclick="switchPromoTab('edit')" id="p-tab-edit" class="bg-white text-indigo-600 shadow-sm font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition">Soạn Mail</button>
+        <button onclick="switchPromoTab('saved')" id="p-tab-saved" class="text-slate-500 hover:text-slate-700 font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition">Mẫu Đã Lưu</button>
+      </div>
+    </div>
+
+    <div id="promo-view-edit" class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div class="flex flex-col gap-4">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 w-full">
+          <div class="flex justify-between items-center mb-2 border-b pb-2">
+            <label class="font-bold text-xs lg:text-sm text-slate-700">Chọn Khách Hàng</label>
+            <div class="flex gap-2">
+              <button onclick="tickPromo(true)" class="text-[10px] font-bold text-blue-600 hover:underline">Chọn Hết</button>
+              <button onclick="tickPromo(false)" class="text-[10px] font-bold text-slate-500 hover:underline">Bỏ Chọn</button>
+            </div>
+          </div>
+          <div id="promoTargetList" class="max-h-[150px] overflow-y-auto space-y-1 bg-slate-50 p-2 rounded-lg border border-slate-100 text-xs">
+            </div>
+          <p id="promoCountTxt" class="text-right text-[10px] text-indigo-600 font-bold mt-2">Đã chọn: 0 khách</p>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-200">
+            <input type="text" id="promoSubj" placeholder="Tiêu đề Email (Subject)..." class="w-full p-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 font-bold bg-slate-50 mb-3">
+            
+            <div class="flex items-center gap-3 mb-3">
+              <label class="text-xs font-bold text-slate-600 shrink-0">Màu Header:</label>
+              <div class="flex gap-2">
+                <input type="radio" name="promoColor" value="#16a34a" id="cGreen" class="color-radio" checked onchange="updatePromoPreview()">
+                <label for="cGreen" class="color-label bg-green-600" title="Xanh lá"></label>
+                
+                <input type="radio" name="promoColor" value="#db2777" id="cPink" class="color-radio" onchange="updatePromoPreview()">
+                <label for="cPink" class="color-label bg-pink-600" title="Hồng"></label>
+                
+                <input type="radio" name="promoColor" value="#0d9488" id="cTeal" class="color-radio" onchange="updatePromoPreview()">
+                <label for="cTeal" class="color-label bg-teal-600" title="Xanh Teal"></label>
+                
+                <input type="radio" name="promoColor" value="#ea580c" id="cOrange" class="color-radio" onchange="updatePromoPreview()">
+                <label for="cOrange" class="color-label bg-orange-600" title="Cam Cháy"></label>
+              </div>
+            </div>
+            
+            <input type="text" id="promoHead" placeholder="Chữ in to trên Header..." class="w-full p-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 font-bold bg-slate-50" onkeyup="updatePromoPreview()">
+          </div>
+
+          <div class="bg-slate-50 p-2 border-b border-slate-200 flex gap-1.5 flex-wrap items-center">
+            <button onclick="insPromo('[B]In đậm[/B]')" class="bg-white border shadow-sm px-2 py-1 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-100">In Đậm</button>
+            <button onclick="insPromo('[I]In nghiêng[/I]')" class="bg-white border shadow-sm px-2 py-1 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-100">Nghiêng</button>
+            <button onclick="insPromo('[COLOR=red]Chữ màu[/COLOR]')" class="bg-white border shadow-sm px-2 py-1 rounded text-[10px] font-bold text-red-600 hover:bg-red-50">Đổi Màu</button>
+            <button onclick="insPromo('{MaDon}')" class="bg-indigo-100 border border-indigo-200 shadow-sm px-2 py-1 rounded text-[10px] font-black text-indigo-700 hover:bg-indigo-200">Mã Đơn</button>
+            <button onclick="insPromo('{Email}')" class="bg-indigo-100 border border-indigo-200 shadow-sm px-2 py-1 rounded text-[10px] font-black text-indigo-700 hover:bg-indigo-200">Email Khách</button>
+            <button onclick="insPromo('[BTN] MUA NGAY | https://...')" class="bg-white border shadow-sm px-2 py-1 rounded text-[10px] font-bold text-blue-600 hover:bg-blue-50">Nút Bấm</button>
+            <button onclick="insPromo('[IMG] https://...')" class="bg-white border shadow-sm px-2 py-1 rounded text-[10px] font-bold text-pink-600 hover:bg-pink-50">Ảnh</button>
+          </div>
+          
+          <textarea id="promoRaw" oninput="updatePromoPreview()" rows="10" class="w-full p-3 focus:outline-none text-slate-800 font-mono text-[11px] leading-relaxed resize-y bg-white" placeholder="Nội dung thư..."></textarea>
+          
+          <div class="p-3 border-t border-slate-100 bg-slate-50 grid grid-cols-2 gap-2">
+            <button onclick="savePromoTemplate()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl shadow-md transition text-xs"><i class="fas fa-save mr-1"></i> LƯU MẪU NÀY</button>
+            <button id="btnSendPromo" onclick="sendPromoMail()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold py-2.5 rounded-xl shadow-md transition text-xs"><i class="fas fa-paper-plane mr-1"></i> BẮN MAIL TRỰC TIẾP</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky top-16 bg-slate-200 border-[8px] border-slate-800 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden w-full max-w-[400px] mx-auto z-10 h-[75vh]">
+        <div class="w-32 h-6 bg-slate-800 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl z-20"></div>
+        <div class="p-4 bg-white w-full h-full overflow-y-auto">
+            <div id="promoPreviewPane" class="w-full pb-10"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="promo-view-saved" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+       </div>
   </div>
  
   <div id="t-dead" class="hidden w-full min-w-0">
@@ -238,14 +323,15 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
 </div>
  
 <script>
-const TABS=["t-ord","t-data","t-lnk","t-acc","t-exp","t-dead","t-cms","t-dev"];
+// TABS UPDATE: Thêm t-promo
+const TABS=["t-ord","t-data","t-lnk","t-acc","t-exp","t-promo","t-dead","t-cms","t-dev"];
  
+// DÙNG CẤU TRÚC ĐỘNG LOCATION.ORIGIN - CHẠY TEST HAY PROD TỰ ĐỘNG KHỚP API
 const API = window.location.origin;
 const PD  = window.location.origin;
-const GH_REPO = window.location.hostname.includes("vpntrinhhg") ? "trinhhg/vpntrinhhg" : "trinhhg/vpntest";
+const GH_REPO = window.location.hostname.includes("vpntest") ? "trinhhg/vpntest" : "trinhhg/vpntrinhhg";
 const MAIL_API = "https://script.google.com/macros/s/AKfycbyQjEln9By0HuUPtboqJpb1INI6rRp52BxvHR8HaE5fs8qojfgau1R_27P4RyLLxXIp/exec";
  
-// BẢNG GIÁ ĐÃ CẬP NHẬT CHO MENU TẠO ĐƠN THỦ CÔNG
 const PKGS = [
   "Gói 1 tháng - 60.000đ / $2.5 / ¥15.5 (100GB)", "Gói 1 tháng - 70.000đ / $3 / ¥18 (500GB)", "Gói 1 tháng - 80.000đ / $3.5 / ¥20.5 (1000GB)", "Gói Cao Cấp - 200.000đ / $8 / ¥50 (3000GB)", "Gói 1 Năm - 710.000đ / $27 / ¥177.5 (200GB/tháng)", "Không Giới Hạn - 200.000đ / $8 / ¥52 (200GB)", "Không Giới Hạn - 399.000đ / $16 / ¥102 (1000GB)", "Không Giới Hạn - 999.000đ / $40 / ¥256 (5000GB)",
 ];
@@ -317,7 +403,10 @@ function go(id){
  document.getElementById(id).classList.remove("hidden");
   const act = document.getElementById("btn-"+id); 
   if(act){ act.classList.remove("bg-white","text-slate-600","shadow-sm"); act.classList.add("bg-indigo-600","text-white","shadow-md","active"); }
-  if(id==="t-exp") renderExp(); if(id==="t-dead") renderDead(); if(id==="t-data") renderDataRequests();
+  if(id==="t-exp") renderExp(); 
+  if(id==="t-dead") renderDead(); 
+  if(id==="t-data") renderDataRequests();
+  if(id==="t-promo") { renderPromoTargets(); renderPromoSaved(); }
 }
  
 async function fetchAll(msg=false){
@@ -326,7 +415,9 @@ async function fetchAll(msg=false){
   if(!Array.isArray(ordersDb)) ordersDb=[]; if(!Array.isArray(dataRequestsDb)) dataRequestsDb=[]; if(!Array.isArray(linksDb)) linksDb=[]; if(!Array.isArray(deadLinksDb)) deadLinksDb=[]; if(!Array.isArray(devicesDb)) devicesDb=[]; if(!Array.isArray(accountsDb)) accountsDb=[];
   if(typeof cmsDb!=="object"||Array.isArray(cmsDb)) cmsDb={};
   
-  for(let k in cmsDb){ cmsDb[k] = reverseShortcodes(cmsDb[k]); }
+  if(!cmsDb.promo_templates) cmsDb.promo_templates = []; // Đảm bảo mảng template promo tồn tại
+
+  for(let k in cmsDb){ if(k !== 'promo_templates') cmsDb[k] = reverseShortcodes(cmsDb[k]); }
  
   renderOrd(); renderDataRequests(); renderLinks(); renderDev(); renderAcc(); 
  document.getElementById("cmsRaw").value=cmsDb[curCms]||""; updatePreview();
@@ -674,18 +765,18 @@ async function saveLnkEdit(){
   const id=document.getElementById("mLId").value, l=linksDb.find(x=>x.id===id); if(!l) return;
   const newOrig=document.getElementById("mLOrig").value.trim(); if(!newOrig) return toast("Link gốc rỗng!","err");
  l.email=document.getElementById("mLEmail").value.trim(); l.expDate=document.getElementById("mLExp").value.trim(); l.linkIndex=document.getElementById("mLIdx").value.trim(); l.orig=newOrig; delete l.machine; delete l.status; 
-  renderLinks(); cm("mLnk"); toast("Đang lưu chỉnh sửa..."); await apP("/api/links",linksDb); toast("Đã cập nhật! Bắt buộc Rebuild MAP và Đồng bộ GitHub.");
+  renderLinks(); cm("mLnk"); toast("Đang lưu chỉnh sửa..."); await apP("/api/links",linksDb); toast("Đã cập nhật! Bắt buộc Đồng bộ GitHub.");
 }
  
 async function toggleLock(tok,isLocked){
   if(!tok) return; let changed = false; linksDb.forEach(l => { if(getT(l.masked) === tok) { l.isLocked = !isLocked; changed = true; } });
   if(changed) { toast("Đang lưu trạng thái Khóa..."); await apP("/api/links", linksDb); }
-  renderLinks(); toast(isLocked?"Đã mở khóa!":"Đã khóa! Bấm REBUILD MAP!");
+  renderLinks(); toast(isLocked?"Đã mở khóa!":"Đã khóa khách hàng (Real-time)!");
 }
  
 async function delLink(id){
   const l=linksDb.find(x=>x.id===id); if(l){ deadLinksDb.unshift({...l,deadDate:new Date().toISOString()}); await apP("/api/deadlinks",deadLinksDb); }
-  linksDb=linksDb.filter(x=>x.id!==id); renderLinks(); toast("Đang ngắt kết nối..."); await apP("/api/links",linksDb); toast("Đã xóa link! Bấm Rebuild MAP và Đồng bộ GitHub.");
+  linksDb=linksDb.filter(x=>x.id!==id); renderLinks(); toast("Đang ngắt kết nối..."); await apP("/api/links",linksDb); toast("Đã xóa link và Ngắt mạng (Real-time)! Nhớ Đồng bộ GitHub.");
 }
  
 async function triggerGitHub() {
@@ -703,27 +794,25 @@ async function runGC(){
   try {
     const r = await fetch(API+"/api/gc", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ validTokens: Array.from(validTokens) }) });
     if (r.ok) { const res = await r.json(); deadLinksDb = []; await apP("/api/deadlinks", deadLinksDb); renderDead(); await rebuildAllMAP(); toast(`Dọn rác thành công! Đã xóa ${res.deleted} key rác.`); } else toast("Lỗi GC: HTTP " + r.status, "err");
-  } catch(e) { toast("Lỗi mạng khi dọn rác: " + e.message, "err"); } finally { if (btn) { btn.innerHTML = `<i class="fas fa-broom mr-1"></i>Dọn KV`; btn.disabled = false; } }
+  } catch(e) { toast("Lỗi mạng khi dọn rác: " + e.message, "err"); } finally { if (btn) { btn.innerHTML = `<i class="fas fa-broom mr-1"></i>Dọn KV Rác`; btn.disabled = false; } }
 }
  
 async function rebuildAllMAP(){
-  const btn=document.getElementById("btnRebuildAll"); if(btn) { btn.innerHTML=`<i class="fas fa-spinner fa-spin mr-1"></i>Rebuild...`; btn.disabled=true; }
-  toast("Đang Rebuild toàn bộ hệ thống MAP...");
+  const btn=document.getElementById("btnRebuildAll"); if(btn) { btn.innerHTML=`<i class="fas fa-spinner fa-spin mr-1"></i>Cập nhật...`; btn.disabled=true; }
+  toast("Đang Cập nhật toàn bộ Router...");
   try{
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
     if(r.ok) {
-      const lockedToks = new Set(); linksDb.forEach(l => { if(l.isLocked) lockedToks.add(getT(l.masked)); });
-      for(const tok of lockedToks) { if(tok) await fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:tok,action:"lock"})}).catch(()=>{}); }
-      toast("Đã khôi phục Khóa & Rebuild xong!");
+      toast("Đã Cập nhật Router thành công!");
     } else toast("Lỗi HTTP "+r.status,"err");
-  }catch(e){toast("Lỗi mạng: "+e.message,"err");} finally{ if(btn) { btn.innerHTML=`<i class="fas fa-rotate mr-1"></i>Rebuild MAP`; btn.disabled=false; } }
+  }catch(e){toast("Lỗi mạng: "+e.message,"err");} finally{ if(btn) { btn.innerHTML=`<i class="fas fa-rotate mr-1"></i>Cập nhật Router`; btn.disabled=false; } }
 }
  
 async function rebuildOneMAP(id){
-  const l=linksDb.find(x=>x.id===id); if(!l) return; toast("Đang rebuild 1 link này...");
+  const l=linksDb.find(x=>x.id===id); if(!l) return; toast("Đang cập nhật 1 link này...");
   try{
     const r=await fetch(API+"/api/links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(linksDb)});
-    if(r.ok) { if(l.isLocked) await fetch(API+"/api/lock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:getT(l.masked),action:"lock"})}).catch(()=>{}); toast("Xong!"); } else toast("Lỗi HTTP "+r.status,"err");
+    if(r.ok) { toast("Xong!"); } else toast("Lỗi HTTP "+r.status,"err");
   }catch(e){toast("Lỗi mạng: "+e.message,"err");}
 }
  
@@ -745,7 +834,7 @@ function renderDead(){
 }
 async function restoreLink(i){
   const l={...deadLinksDb[i]}; delete l.deadDate; linksDb.unshift(l); deadLinksDb.splice(i,1); renderDead(); renderLinks(); toast("Đang khôi phục...");
-  await apP("/api/links",linksDb); await apP("/api/deadlinks",deadLinksDb); toast("Đã khôi phục thành công! Nhớ Rebuild MAP.");
+  await apP("/api/links",linksDb); await apP("/api/deadlinks",deadLinksDb); toast("Đã khôi phục thành công! Nhớ Cập nhật Router.");
 }
 function clearDeadLinks(){ deadLinksDb=[]; renderDead(); toast("Đã xóa lịch sử!"); try{ fetch(API+"/api/deadlinks",{method:"DELETE"}); }catch{} }
  
@@ -796,7 +885,233 @@ async function saveCms(){
   cmsDb[curCms] = document.getElementById("cmsRaw").value;
   toast("Đang lưu CMS..."); await apP("/api/cms",cmsDb); toast("Đã lưu Hướng dẫn lên hệ thống!");
 }
- 
+
+// ════════════════════════════════════════════════════════════════
+// TÍNH NĂNG MỚI: EMAIL MARKETING (PROMO)
+// ════════════════════════════════════════════════════════════════
+
+function switchPromoTab(tab) {
+  if (tab === 'edit') {
+    document.getElementById('promo-view-edit').classList.remove('hidden');
+    document.getElementById('promo-view-saved').classList.add('hidden');
+    document.getElementById('p-tab-edit').className = "bg-white text-indigo-600 shadow-sm font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition";
+    document.getElementById('p-tab-saved').className = "text-slate-500 hover:text-slate-700 font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition";
+  } else {
+    document.getElementById('promo-view-edit').classList.add('hidden');
+    document.getElementById('promo-view-saved').classList.remove('hidden');
+    document.getElementById('p-tab-saved').className = "bg-white text-indigo-600 shadow-sm font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition";
+    document.getElementById('p-tab-edit').className = "text-slate-500 hover:text-slate-700 font-bold px-4 py-1.5 rounded-lg text-xs md:text-sm transition";
+    renderPromoSaved();
+  }
+}
+
+function tickPromo(isAll) {
+  document.querySelectorAll('.promo-target-cb').forEach(cb => cb.checked = isAll);
+  updatePromoCount();
+}
+
+function updatePromoCount() {
+  const cnt = document.querySelectorAll('.promo-target-cb:checked').length;
+  document.getElementById('promoCountTxt').innerText = `Đã chọn: ${cnt} đơn hàng`;
+}
+
+function renderPromoTargets() {
+  const container = document.getElementById('promoTargetList');
+  if(!ordersDb.length) { container.innerHTML = `<p class="text-slate-400 p-2 text-center">Không có khách hàng nào.</p>`; return; }
+  
+  // Render danh sách Đơn Hàng (Không lọc, hiện tất cả để Admin tự tick)
+  container.innerHTML = ordersDb.map(o => `
+    <label class="flex items-center gap-2 p-1.5 hover:bg-indigo-50 rounded cursor-pointer transition">
+      <input type="checkbox" value="${o.id}" class="promo-target-cb w-3.5 h-3.5 accent-indigo-600" checked onchange="updatePromoCount()">
+      <div class="flex-1 truncate">
+        <span class="font-bold text-slate-800">${o.email || "Trống"}</span> 
+        <span class="text-[9px] text-slate-500 ml-1">(${o.id})</span>
+      </div>
+      <span class="text-[9px] font-bold ${o.status==='success'?'text-green-600':'text-red-500'}">${o.status==='success'?'Active':'Khác'}</span>
+    </label>
+  `).join("");
+  updatePromoCount();
+}
+
+function insPromo(t) { 
+  const ta = document.getElementById("promoRaw"), s = ta.selectionStart; 
+  ta.value = ta.value.slice(0,s) + t + ta.value.slice(ta.selectionEnd); 
+  ta.selectionStart = ta.selectionEnd = s + t.length; 
+  ta.focus(); 
+  updatePromoPreview(); 
+}
+
+function parsePromoHTML(text, maDon = "{MaDon}", email = "{Email}") {
+  if (!text) return "";
+  let pText = text.replace(/\[B\](.*?)\[\/B\]/g, "<b>$1</b>");
+  pText = pText.replace(/\[I\](.*?)\[\/I\]/g, "<i>$1</i>");
+  pText = pText.replace(/\[COLOR=(.*?)\](.*?)\[\/COLOR\]/g, "<span style='color:$1'>$2</span>");
+  pText = pText.replace(/\{MaDon\}/g, `<b style="color:#4f46e5;">${maDon}</b>`);
+  pText = pText.replace(/\{Email\}/g, `<b style="color:#0f172a;">${email}</b>`);
+  
+  const lines = pText.split("\n");
+  let html = "";
+  for(let line of lines) {
+    line = line.trim();
+    if(!line) continue;
+    if(line.startsWith("[BTN]")) {
+      const parts = line.substring(5).split("|"); const name = parts[0]?.trim()||"CLICK"; const link = parts[1]?.trim()||"#";
+      html += `<div style="text-align:center; margin:15px 0;"><a href="${link}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;padding:12px 25px;border-radius:8px;font-weight:900;text-decoration:none;font-size:14px;box-shadow:0 4px 10px rgba(37,99,235,0.3)">${name}</a></div>\n`;
+    }
+    else if(line.startsWith("[IMG]")) html += `<div style="text-align:center; margin:15px 0;"><img src="${line.substring(5).trim()}" style="max-width:100%;border-radius:8px;border:1px solid #e2e8f0;" /></div>\n`;
+    else html += `<p style="margin:0 0 10px 0;color:#334155;font-size:14px;line-height:1.6;">${line}</p>\n`;
+  }
+  return html;
+}
+
+function getPromoWrapper(colorHex, headerText, bodyHtml) {
+  return `<div style="font-family:sans-serif; width:100%; max-width:500px; margin:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; box-sizing:border-box;">
+      <div style="background:linear-gradient(135deg, ${colorHex}, ${colorHex}dd); padding:20px; text-align:center;">
+        <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase; letter-spacing:0.5px;">${headerText}</h2>
+      </div>
+      <div style="padding:20px; box-sizing:border-box;">
+        ${bodyHtml}
+        
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; margin-top:25px; text-align:center;">
+          <p style="margin:0 0 12px 0; color:#475569; font-size:13px; line-height:1.5;">Cần hỗ trợ? Đội ngũ của chúng tôi sẵn sàng 24/24</p>
+          <div style="display:block; width:100%; text-align:center;">
+            <a href="https://zalo.me/0917678211" style="display:inline-block; width:46%; background:#0068ff; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; box-sizing:border-box;">Chat Zalo</a>
+            <a href="https://www.facebook.com/trinh.hg.57" style="display:inline-block; width:46%; background:#0668E1; color:white; padding:10px 0; text-decoration:none; border-radius:8px; font-weight:bold; font-size:12px; margin-left:4%; box-sizing:border-box;">Messenger</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function updatePromoPreview() {
+  const headTxt = document.getElementById('promoHead').value || "TIÊU ĐỀ MAIL";
+  const rawBody = document.getElementById('promoRaw').value;
+  let colorHex = "#16a34a";
+  const cEl = document.querySelector('input[name="promoColor"]:checked');
+  if(cEl) colorHex = cEl.value;
+
+  const parsedBody = parsePromoHTML(rawBody);
+  document.getElementById("promoPreviewPane").innerHTML = getPromoWrapper(colorHex, headTxt, parsedBody);
+}
+
+async function savePromoTemplate() {
+  const subj = document.getElementById('promoSubj').value.trim();
+  const headTxt = document.getElementById('promoHead').value.trim();
+  const rawBody = document.getElementById('promoRaw').value.trim();
+  let colorHex = "#16a34a";
+  const cEl = document.querySelector('input[name="promoColor"]:checked');
+  if(cEl) colorHex = cEl.value;
+
+  if(!subj || !headTxt || !rawBody) return toast("Vui lòng điền đủ thông tin để lưu mẫu!", "err");
+
+  const tpl = { id: Date.now(), subj, headTxt, rawBody, colorHex, date: new Date().toLocaleString('vi-VN') };
+  cmsDb.promo_templates.unshift(tpl);
+  
+  toast("Đang lưu Template Promo...");
+  await apP("/api/cms", cmsDb);
+  toast("Đã lưu mẫu thành công!");
+}
+
+function renderPromoSaved() {
+  const container = document.getElementById('promo-view-saved');
+  const tpls = cmsDb.promo_templates || [];
+  if(tpls.length === 0) {
+    container.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200 font-bold">Chưa có mẫu nào được lưu</div>`;
+    return;
+  }
+
+  container.innerHTML = tpls.map((t, i) => `
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full" style="background:${t.colorHex}"></div>
+          <h3 class="font-bold text-sm text-slate-800 truncate" title="${t.subj}">${t.subj}</h3>
+        </div>
+        <p class="text-[10px] text-slate-400 mb-2">Header: ${t.headTxt}</p>
+        <p class="text-xs text-slate-500 line-clamp-3 bg-slate-50 p-2 rounded border border-slate-100 font-mono leading-relaxed">${t.rawBody}</p>
+      </div>
+      <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+        <button onclick="loadPromoTemplate(${i})" class="flex-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white font-bold py-1.5 rounded-lg text-xs transition shadow-sm"><i class="fas fa-edit mr-1"></i> Dùng Mẫu Này</button>
+        <button onclick="delPromoTemplate(${i})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function loadPromoTemplate(idx) {
+  const t = cmsDb.promo_templates[idx];
+  if(!t) return;
+  document.getElementById('promoSubj').value = t.subj;
+  document.getElementById('promoHead').value = t.headTxt;
+  document.getElementById('promoRaw').value = t.rawBody;
+  
+  document.querySelectorAll('input[name="promoColor"]').forEach(r => {
+    if(r.value === t.colorHex) r.checked = true;
+  });
+
+  switchPromoTab('edit');
+  updatePromoPreview();
+  toast("Đã tải mẫu ra khung soạn thảo!");
+}
+
+async function delPromoTemplate(idx) {
+  cmsDb.promo_templates.splice(idx, 1);
+  renderPromoSaved();
+  toast("Đang xóa mẫu...");
+  await apP("/api/cms", cmsDb);
+  toast("Đã xóa mẫu!");
+}
+
+async function sendPromoMail() {
+  const checkedBoxes = document.querySelectorAll('.promo-target-cb:checked');
+  if (checkedBoxes.length === 0) return toast("Bạn chưa chọn khách hàng nào để gửi!", "err");
+  
+  const subj = document.getElementById('promoSubj').value.trim();
+  const headTxt = document.getElementById('promoHead').value.trim();
+  const rawBody = document.getElementById('promoRaw').value.trim();
+  let colorHex = "#16a34a";
+  const cEl = document.querySelector('input[name="promoColor"]:checked');
+  if(cEl) colorHex = cEl.value;
+  
+  if (!subj || !headTxt || !rawBody) return toast("Vui lòng điền đủ Tiêu đề, Header và Nội dung thư!", "err");
+
+  if (!confirm(`Xác nhận gửi chiến dịch Promo tới ${checkedBoxes.length} khách hàng?`)) return;
+
+  const btn = document.getElementById('btnSendPromo');
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> ĐANG BẮN MAIL...`;
+  btn.disabled = true;
+
+  let successCount = 0;
+  
+  // Bắn mail cá nhân hóa từng đơn
+  for (let cb of checkedBoxes) {
+    const oId = cb.value;
+    const order = ordersDb.find(o => o.id === oId);
+    if (!order || !order.email) continue;
+
+    let parsedBody = parsePromoHTML(rawBody, order.id, order.email);
+    let html = getPromoWrapper(colorHex, headTxt, parsedBody);
+
+    try {
+      await fetch(MAIL_API, {
+        method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: order.email, subject: subj, html: html })
+      });
+      successCount++;
+      // Sleep nhỏ xíu để tránh spam script Google
+      await new Promise(r => setTimeout(r, 300));
+    } catch (e) { console.error("Lỗi gửi email Promo:", e); }
+  }
+
+  toast(`Hoàn tất! Đã gửi thành công ${successCount}/${checkedBoxes.length} email.`, "success");
+  btn.innerHTML = `<i class="fas fa-paper-plane mr-1"></i> BẮN MAIL TRỰC TIẾP`;
+  btn.disabled = false;
+}
+
+// ════════════════════════════════════════════════════════════════
+// END PROMO
+// ════════════════════════════════════════════════════════════════
+
 function renderDev(){
   const tb=document.getElementById("devBody");
   if(!devicesDb.length){tb.innerHTML=`<div class="p-6 text-center text-slate-400 bg-white rounded-xl border shadow-sm font-bold lg:text-base">Trống</div>`;return;}
