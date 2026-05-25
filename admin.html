@@ -922,7 +922,7 @@ function parsePromoHTML(text, maDon="{MaDon}", email="{Email}"){
   let pText=text;
   pText=pText.replace(/\[B\](.*?)\[\/B\]/gs,"<b>$1</b>");
   pText=pText.replace(/\[I\](.*?)\[\/I\]/gs,"<i>$1</i>");
-  pText=pText.replace(/\[COLOR=(.*?)\](.*?)\[\/COLOR\]/gs,"<span style='color:$1'>$2</span>");
+  pText=pText.replace(/\[COLOR=(.*?)\]([\s\S]*?)\[\/COLOR\]/g,"<span style='color:$1'>$2</span>");
   pText=pText.replace(/\{MaDon\}/g,`<b style="color:#4f46e5;">${maDon}</b>`);
   pText=pText.replace(/\{Email\}/g,`<b style="color:#0f172a;">${email}</b>`);
   const lines=pText.split("\n"); let html="";
