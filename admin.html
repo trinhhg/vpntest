@@ -4,11 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VPN Trinh Hg — Admin</title>
-<script>
-// Inline Tailwind config trước
-window.tailwind = window.tailwind || {};
-</script>
-<script src="https://cdn.tailwindcss.com?v=3.4.1"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
@@ -139,6 +135,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <button onclick="go('t-dev')"   id="btn-t-dev"   class="tab-btn col-span-4 md:col-span-1 px-1 py-1 md:px-4 md:py-1.5 rounded-xl font-bold text-[10px] sm:text-xs md:text-sm bg-white text-slate-600 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-center gap-1"><i class="fas fa-laptop"></i>Thiết bị</button>
   </div>
 
+  <!-- ══ ĐƠN HÀNG ══ -->
   <div id="t-ord" class="w-full min-w-0">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Quản lý Đơn hàng</h2>
@@ -147,6 +144,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <div id="ordBody" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ DUNG LƯỢNG ══ -->
   <div id="t-data" class="hidden w-full min-w-0">
     <div class="flex flex-row items-center justify-between mb-4 gap-3">
       <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Yêu cầu check dung lượng</h2>
@@ -155,12 +153,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <div id="dataReqBody" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ HẾT HẠN ══ -->
   <div id="t-exp" class="hidden w-full min-w-0">
     <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800 mb-2">Đơn hàng sắp hết hạn</h2>
     <p class="text-[11px] md:text-xs lg:text-sm text-slate-500 mb-4">Sắp xếp ưu tiên gần hết hạn nhất (Đỏ = ≤ 3 ngày).</p>
     <div id="expBody" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ LINK SUB ══ -->
   <div id="t-lnk" class="hidden space-y-4 w-full min-w-0">
     <div class="bg-indigo-50 border border-indigo-100 p-3 md:p-4 rounded-2xl w-full">
       <h3 class="font-extrabold text-indigo-800 text-[11px] md:text-sm lg:text-base mb-3 flex items-center"><i class="fas fa-clipboard-check mr-2 text-indigo-600"></i>📌 QUY TRÌNH VẬN HÀNH CHUẨN</h3>
@@ -193,23 +193,29 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <div id="linksTree" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ EMAIL PROMO ══ -->
   <div id="t-promo" class="hidden w-full min-w-0">
+    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
       <div>
         <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Email Marketing</h2>
         <p class="text-xs text-slate-400 mt-0.5">Soạn và gửi chiến dịch Promo cá nhân hóa tới từng khách</p>
       </div>
+      <!-- Sub-tabs -->
       <div class="bg-slate-100 p-1 rounded-xl flex gap-1 self-start sm:self-auto">
         <div class="promo-sub-tab active" id="ptab-edit" onclick="switchPromoTab('edit')"><i class="fas fa-pen-nib mr-1.5"></i>Soạn Mail</div>
         <div class="promo-sub-tab" id="ptab-saved" onclick="switchPromoTab('saved')"><i class="fas fa-folder-open mr-1.5"></i>Mẫu Đã Lưu</div>
       </div>
     </div>
 
+    <!-- VIEW: SOẠN MAIL -->
     <div id="promo-view-edit">
       <div class="grid grid-cols-1 xl:grid-cols-5 gap-4 items-start">
 
+        <!-- CỘT TRÁI: Controls -->
         <div class="xl:col-span-3 flex flex-col gap-4">
 
+          <!-- PANEL 1: Chọn khách -->
           <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
             <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50">
               <div class="flex items-center gap-2">
@@ -225,43 +231,54 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
             <div id="promoTargetList" class="max-h-44 overflow-y-auto p-2 space-y-0.5"></div>
           </div>
 
+          <!-- PANEL 2: Soạn nội dung -->
           <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
+            <!-- Subject + màu header -->
             <div class="px-4 pt-4 pb-3 border-b border-slate-100 space-y-3">
               <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1.5">Tiêu đề Email (Subject)</label>
                 <input type="text" id="promoSubj" placeholder="Ví dụ: 🔥 Flash Sale 50% - Chỉ hôm nay!" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-indigo-400 bg-slate-50 transition">
               </div>
 
+              <!-- Màu header -->
               <div class="flex items-center gap-4">
                 <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wide shrink-0">Màu Header:</label>
                 <div class="flex items-center gap-2 flex-wrap">
+                  <!-- Xanh lá - Khuyến mãi/Quà tặng -->
                   <input type="radio" name="promoColor" value="#16a34a" id="cGreen" class="color-swatch" checked onchange="updatePromoPreview()">
                   <label for="cGreen" class="bg-green-600" title="Xanh Lá — Khuyến mãi, quà tặng"></label>
 
+                  <!-- Hồng - Sale lớn -->
                   <input type="radio" name="promoColor" value="#db2777" id="cPink" class="color-swatch" onchange="updatePromoPreview()">
                   <label for="cPink" class="bg-pink-600" title="Hồng — Sale lớn, sự kiện đặc biệt"></label>
 
+                  <!-- Teal - Ra mắt gói mới -->
                   <input type="radio" name="promoColor" value="#0d9488" id="cTeal" class="color-swatch" onchange="updatePromoPreview()">
                   <label for="cTeal" class="bg-teal-600" title="Teal — Ra mắt gói mới"></label>
 
+                  <!-- Cam cháy - Flash sale -->
                   <input type="radio" name="promoColor" value="#ea580c" id="cOrange" class="color-swatch" onchange="updatePromoPreview()">
                   <label for="cOrange" class="bg-orange-600" title="Cam Cháy — Flash sale, giới hạn"></label>
 
+                  <!-- Tím đậm - VIP/Premium -->
                   <input type="radio" name="promoColor" value="#7c3aed" id="cViolet" class="color-swatch" onchange="updatePromoPreview()">
                   <label for="cViolet" class="bg-violet-600" title="Tím Đậm — Gói VIP/Premium"></label>
 
+                  <!-- Đen - Sang trọng -->
                   <input type="radio" name="promoColor" value="#1e293b" id="cDark" class="color-swatch" onchange="updatePromoPreview()">
                   <label for="cDark" class="bg-slate-800" title="Đen — Sang trọng, cao cấp"></label>
                 </div>
               </div>
 
+              <!-- Chữ header -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1.5">Chữ Header lớn</label>
                 <input type="text" id="promoHead" placeholder="Ví dụ: 🎉 THÁNG 6 KHUYẾN MÃI LỚN" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-indigo-400 bg-slate-50 transition" onkeyup="updatePromoPreview()">
               </div>
             </div>
 
+            <!-- Toolbar -->
             <div class="editor-toolbar">
               <span class="text-[9px] font-black text-slate-300 uppercase mr-1">Định dạng:</span>
               <button class="toolbar-btn" onclick="insPromo('[B]In đậm[/B]')"><b>B</b></button>
@@ -278,10 +295,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
               <button class="toolbar-btn" onclick="insPromo('[LINE]')" style="color:#94a3b8">— Kẻ ngang</button>
             </div>
 
+            <!-- Textarea -->
             <textarea id="promoRaw" oninput="updatePromoPreview()" rows="12"
               class="w-full px-4 py-3 focus:outline-none text-slate-800 font-mono text-[12px] leading-relaxed resize-y bg-white border-0"
               placeholder="Nội dung thư...&#10;&#10;Ví dụ:&#10;Chào bạn [B]{Email}[/B],&#10;&#10;Tháng 6 này, VPN Trinh Hg có chương trình ưu đãi cực khủng!&#10;[COLOR=red]Giảm 30%[/COLOR] cho tất cả các gói.&#10;&#10;[BTN] ĐĂNG KÝ NGAY | https://vpntrinhhg.pages.dev"></textarea>
 
+            <!-- Footer actions -->
             <div class="p-3 border-t border-slate-100 bg-slate-50 flex gap-2">
               <button onclick="savePromoTemplate()" class="flex-1 bg-slate-700 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
                 <i class="fas fa-bookmark"></i>Lưu Mẫu
@@ -293,6 +312,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
           </div>
         </div>
 
+        <!-- CỘT PHẢI: Phone Preview -->
         <div class="xl:col-span-2 sticky top-16">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center mb-3"><i class="fas fa-mobile-alt mr-1"></i>Preview trên điện thoại</p>
           <div class="phone-shell mx-auto" style="width:280px; height:560px;">
@@ -300,13 +320,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
               <div class="phone-statusbar">
                 <div class="phone-notch"></div>
               </div>
+              <!-- Fake email client header -->
               <div class="bg-white px-3 py-2 border-b border-slate-100 flex items-center gap-2">
                 <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                   <i class="fas fa-envelope text-indigo-500" style="font-size:10px"></i>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-[9px] font-black text-slate-700 truncate" id="previewSubjLine">Tiêu đề email...</div>
-                  <div class="text-[8px] text-slate-400">VPN Trinh Hg <admin@vpntrinhhg.com></div>
+                  <div class="text-[8px] text-slate-400">VPN Trinh Hg &lt;admin@vpntrinhhg.com&gt;</div>
                 </div>
               </div>
               <div class="phone-content">
@@ -317,11 +338,17 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
         </div>
 
       </div>
-    </div><div id="promo-view-saved" class="hidden">
+    </div><!-- /promo-view-edit -->
+
+    <!-- VIEW: MẪU ĐÃ LƯU -->
+    <div id="promo-view-saved" class="hidden">
       <div id="promoSavedGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
-  </div><div id="t-dead" class="hidden w-full min-w-0">
+  </div><!-- /t-promo -->
+
+  <!-- ══ ĐÃ XÓA ══ -->
+  <div id="t-dead" class="hidden w-full min-w-0">
     <div class="flex flex-row items-center justify-between mb-4 gap-3">
       <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Lịch sử Đã Xóa</h2>
       <button onclick="clearDeadLinks()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl text-xs lg:text-sm transition shadow-sm"><i class="fas fa-eraser mr-1"></i>Xóa UI</button>
@@ -329,6 +356,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <div id="deadBody" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ HƯỚNG DẪN CMS ══ -->
   <div id="t-cms" class="hidden w-full min-w-0">
     <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-4 text-slate-800">Soạn Hướng Dẫn (CMS)</h2>
     <div class="flex flex-wrap gap-2 mb-4">
@@ -364,6 +392,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     </div>
   </div>
 
+  <!-- ══ TÀI KHOẢN ══ -->
   <div id="t-acc" class="hidden w-full min-w-0">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg md:text-xl lg:text-2xl font-bold text-slate-800">Tài khoản VPN gốc</h2>
@@ -372,12 +401,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; 
     <div id="accTree" class="space-y-3 w-full min-w-0"></div>
   </div>
 
+  <!-- ══ THIẾT BỊ ══ -->
   <div id="t-dev" class="hidden w-full min-w-0">
     <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-4 text-slate-800">Thiết bị quản trị</h2>
     <div id="devBody" class="space-y-3 w-full min-w-0"></div>
   </div>
 </main>
 
+<!-- ══ MODALS ══ -->
 <div id="mOrd" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4">
   <div class="glass-card p-4 md:p-6 lg:p-8 w-full max-w-lg max-h-[98vh] overflow-y-auto min-w-0">
     <h3 id="mOrdTtl" class="text-base md:text-xl lg:text-2xl font-bold mb-3 text-slate-800">Đơn hàng</h3>
@@ -462,9 +493,9 @@ let ordersDb=[], dataRequestsDb=[], linksDb=[], deadLinksDb=[], cmsDb={}, device
 let myDev="", curCms="android";
 
 // ── localStorage helpers với SITE_KEY prefix ──
-const lsGet = (k)    => { try{ return JSON.parse(localStorage.getItem(SITE_KEY+"_"+k)); }catch(e){ return null; } };
-const lsSet = (k, v) => { try{ localStorage.setItem(SITE_KEY+"_"+k, JSON.stringify(v)); }catch(e){} };
-const lsDel = (k)    => { try{ localStorage.removeItem(SITE_KEY+"_"+k); }catch(e){} };
+const lsGet = (k)    => { try{ return JSON.parse(localStorage.getItem(SITE_KEY+"_"+k)); }catch{ return null; } };
+const lsSet = (k, v) => { try{ localStorage.setItem(SITE_KEY+"_"+k, JSON.stringify(v)); }catch{} };
+const lsDel = (k)    => { try{ localStorage.removeItem(SITE_KEY+"_"+k); }catch{} };
 const lsTime= (k)    => { return parseInt(localStorage.getItem(SITE_KEY+"_t_"+k)||"0"); };
 const lsSetTime=(k)  => { localStorage.setItem(SITE_KEY+"_t_"+k, Date.now()); };
 
@@ -488,7 +519,7 @@ async function apG(p, def){
     if(Date.now() - lastPush < 15000) return lsGet("a"+p) || def;
     const r=await fetch(API+p+"?_t="+Date.now()); if(!r.ok) throw new Error(r.status);
     const d=await r.json(); lsSet("a"+p, d); return d;
-  }catch(e1){ try{ return lsGet("a"+p)||def; }catch(e2){ return def; } }
+  }catch{ try{ return lsGet("a"+p)||def; }catch{ return def; } }
 }
 async function apP(p, data){
   lsSet("a"+p, data); lsSetTime(p);
@@ -561,7 +592,7 @@ async function fetchAll(msg=false){
   if(msg) toast("Đã làm mới dữ liệu!");
 }
 
-const pd=(s)=>{ const p=s?s.split("/"):null; return (p&&p.length===3)?new Date(`${p[2]}-${p[1]}-${p[0]}T23:59:59`):null; };
+const pd=(s)=>{ const p=s?.split("/"); return p?.length===3?new Date(`${p[2]}-${p[1]}-${p[0]}T23:59:59`):null; };
 
 // ── RENDER ORDERS ──
 function renderOrd(){
@@ -673,12 +704,12 @@ function renderExp(){
   }).join("");
 }
 function sendExpMail(id){
-  const o=ordersDb.find(x=>x.id===id); if(!o||!o.email) return;
+  const o=ordersDb.find(x=>x.id===id); if(!o?.email) return;
   const html=`<div style="font-family:sans-serif;width:100%;max-width:450px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-sizing:border-box;"><div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:20px;text-align:center;"><h2 style="color:white;margin:0;font-size:18px;text-transform:uppercase;">GÓI VPN SẮP HẾT HẠN</h2></div><div style="padding:25px 20px;box-sizing:border-box;text-align:center;"><p style="font-size:15px;line-height:1.6;margin:0 0 15px 0;">Gói VPN <b>${o.pkgName}</b> của bạn sắp hết hạn.</p><div style="background:#f1f5f9;border-left:4px solid #f59e0b;padding:15px;border-radius:8px;margin:20px 0;text-align:center;"><p style="margin:0;font-size:11px;color:#64748b;font-weight:bold;">MÃ ĐƠN HÀNG</p><p style="margin:8px 0 0 0;font-size:22px;font-weight:900;color:#d97706;word-break:break-word;">${o.id}</p></div><a href="${PD}" style="background:#1e293b;color:white;padding:12px 15px;border-radius:10px;text-decoration:none;font-weight:900;display:inline-block;font-size:13px;width:100%;box-sizing:border-box;">GIA HẠN NGAY</a></div></div>`;
   fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:"VPN Trinh Hg - Gói VPN sắp hết hạn",html})}); toast("Đã gửi email nhắc!");
 }
 function sendZaloMail(id){
-  const o=ordersDb.find(x=>x.id===id); if(!o||!o.email) return toast("Đơn này chưa có email!","err");
+  const o=ordersDb.find(x=>x.id===id); if(!o?.email) return toast("Đơn này chưa có email!","err");
   const html=`<div style="font-family:sans-serif;width:100%;max-width:450px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-sizing:border-box;"><div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:20px;text-align:center;"><h2 style="color:white;margin:0;font-size:18px;text-transform:uppercase;">HỖ TRỢ CÀI ĐẶT</h2></div><div style="padding:25px 20px;box-sizing:border-box;text-align:center;"><p style="font-size:15px;line-height:1.6;margin:0 0 15px 0;">Vui lòng liên hệ Admin qua Zalo để được hỗ trợ về mã đơn <b style="color:#2563eb;word-break:break-word;">${o.id}</b>.</p><div style="background:#fefce8;border:2px dashed #facc15;padding:20px;border-radius:12px;margin:20px 0;"><p style="margin:0;font-size:13px;color:#a16207;font-weight:bold;">ZALO ADMIN</p><p style="margin:10px 0 0 0;font-size:28px;font-weight:900;color:#ca8a04;">0917678211</p></div><a href="${PD}" style="background:#1e293b;color:white;padding:12px 15px;border-radius:10px;text-decoration:none;font-weight:900;display:inline-block;font-size:14px;width:100%;box-sizing:border-box;">TRUY CẬP CỔNG KHÁCH HÀNG</a></div></div>`;
   fetch(MAIL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:o.email,subject:"VPN Trinh Hg - Hỗ trợ cài đặt",html})}); toast("Đã gửi mail Nhắc Zalo!");
 }
@@ -728,7 +759,7 @@ async function createLink(){
     if(orig.includes("liangxin")) masked=PD+"/v1/VPNTrinhHg"+queryStr+"#VPNTrinhHg";
     else if(orig.includes("djjc.cfd")) masked=PD+"/v2/VPNTrinhHg"+queryStr+"#VPNTrinhHg";
     else return toast("Domain không hỗ trợ!","err");
-  }catch(e){return toast("Link không hợp lệ!","err");}
+  }catch{return toast("Link không hợp lệ!","err");}
   linksDb.unshift({id:"LNK-"+Date.now(),orig,masked,email,expDate,linkIndex:idx,isLocked:false,date:new Date().toLocaleString("vi")});
   renderLinks(); toast("Đang lưu link..."); await apP("/api/links",linksDb); toast("Đã tạo link ẩn! Nhớ Đồng bộ GitHub.");
   document.getElementById("lkOrig").value=""; document.getElementById("lkEmail").value=""; document.getElementById("lkExp").value=""; document.getElementById("lkIdx").value="";
@@ -799,7 +830,7 @@ async function restoreLink(i){
   const l={...deadLinksDb[i]};delete l.deadDate;linksDb.unshift(l);deadLinksDb.splice(i,1);renderDead();renderLinks();toast("Đang khôi phục...");
   await apP("/api/links",linksDb);await apP("/api/deadlinks",deadLinksDb);toast("Khôi phục xong! Nhớ Cập nhật Router.");
 }
-function clearDeadLinks(){deadLinksDb=[];renderDead();toast("Đã xóa lịch sử!");try{fetch(API+"/api/deadlinks",{method:"DELETE"});}catch(e){}}
+function clearDeadLinks(){deadLinksDb=[];renderDead();toast("Đã xóa lịch sử!");try{fetch(API+"/api/deadlinks",{method:"DELETE"});}catch{}}
 
 // ── CMS ──
 function setCms(dev){
@@ -817,7 +848,7 @@ function parseShortcodes(text){
     else if(line.startsWith("[SUB]"))  html+=`<div style="display:inline-block;background:#e0e7ff;border-left:4px solid #4f46e5;padding:6px 12px;border-radius:4px;margin-top:15px;margin-bottom:10px"><h3 style="font-size:14px;font-weight:800;color:#3730a3;margin:0">${line.substring(5).trim()}</h3></div>\n`;
     else if(line.startsWith("[STEP]")) html+=`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start"><span style="background:#4f46e5;color:white;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:11px;font-weight:bold;flex-shrink:0">${stepCount++}</span><p style="margin:0;color:#334155;line-height:20px">${line.substring(6).trim()}</p></div>\n`;
     else if(line.startsWith("[NOTE]")) html+=`<div style="display:inline-block;max-width:100%;background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;padding:8px 12px;border-radius:6px;margin:10px 0"><p style="margin:0;color:#92400e;line-height:1.5"><b>⚠️ LƯU Ý:</b> ${line.substring(6).trim()}</p></div>\n`;
-    else if(line.startsWith("[BTN]")){const parts=line.substring(5).split("|");const name=(parts[0]?parts[0].trim():null)||"TẢI VỀ";const link=(parts[1]?parts[1].trim():null)||"#";html+=`<div style="display:inline-block;margin:10px 0"><a href="${link}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;padding:10px 20px;border-radius:10px;font-weight:bold;text-decoration:none;box-shadow:0 4px 15px rgba(109,40,217,0.4)"><i class="fas fa-download" style="margin-right:8px"></i>${name}</a></div>\n`;}
+    else if(line.startsWith("[BTN]")){const parts=line.substring(5).split("|");const name=parts[0]?.trim()||"TẢI VỀ";const link=parts[1]?.trim()||"#";html+=`<div style="display:inline-block;margin:10px 0"><a href="${link}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;padding:10px 20px;border-radius:10px;font-weight:bold;text-decoration:none;box-shadow:0 4px 15px rgba(109,40,217,0.4)"><i class="fas fa-download" style="margin-right:8px"></i>${name}</a></div>\n`;}
     else if(line.startsWith("[IMG]")) html+=`<img src="${line.substring(5).trim()}" style="max-width:100%;border-radius:6px;border:1px solid #e2e8f0;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);margin:10px 0" />\n`;
     else html+=`<p style="margin:0 0 10px 0;color:#334155;">${line}</p>\n`;
   }
@@ -889,9 +920,9 @@ function insPromo(t){
 function parsePromoHTML(text, maDon="{MaDon}", email="{Email}"){
   if(!text) return "";
   let pText=text;
-  pText=pText.replace(/\[B\]([\s\S]*?)\[\/B\]/g,"<b>$1</b>");
-  pText=pText.replace(/\[I\]([\s\S]*?)\[\/I\]/g,"<i>$1</i>");
-  pText=pText.replace(/\[COLOR=(.*?)\]([\s\S]*?)\[\/COLOR\]/g,"<span style='color:$1'>$2</span>");
+  pText=pText.replace(/\[B\](.*?)\[\/B\]/gs,"<b>$1</b>");
+  pText=pText.replace(/\[I\](.*?)\[\/I\]/gs,"<i>$1</i>");
+  pText=pText.replace(/\[COLOR=(.*?)\](.*?)\[\/COLOR\]/gs,"<span style='color:$1'>$2</span>");
   pText=pText.replace(/\{MaDon\}/g,`<b style="color:#4f46e5;">${maDon}</b>`);
   pText=pText.replace(/\{Email\}/g,`<b style="color:#0f172a;">${email}</b>`);
   const lines=pText.split("\n"); let html="";
@@ -900,7 +931,7 @@ function parsePromoHTML(text, maDon="{MaDon}", email="{Email}"){
     if(line==="[LINE]"){
       html+=`<hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;" />\n`;
     } else if(line.startsWith("[BTN]")){
-      const parts=line.substring(5).split("|");const name=(parts[0]?parts[0].trim():null)||"CLICK";const link=(parts[1]?parts[1].trim():null)||"#";
+      const parts=line.substring(5).split("|");const name=parts[0]?.trim()||"CLICK";const link=parts[1]?.trim()||"#";
       html+=`<div style="text-align:center;margin:16px 0;"><a href="${link}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;padding:12px 28px;border-radius:10px;font-weight:900;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(37,99,235,0.35)">${name}</a></div>\n`;
     } else if(line.startsWith("[IMG]")){
       html+=`<div style="text-align:center;margin:16px 0;"><img src="${line.substring(5).trim()}" style="max-width:100%;border-radius:10px;border:1px solid #e2e8f0;" /></div>\n`;
@@ -1061,22 +1092,22 @@ function openAccModal(idx){
 }
 async function saveAcc(){
   const idx=document.getElementById("mAccIdx").value, acc={email:document.getElementById("mAEmail").value.trim(),note:document.getElementById("mANote").value.trim()};
-  if(idx===""){ acc.customers=[]; accountsDb.unshift(acc); } else { const old=accountsDb[parseInt(idx)]; acc.customers=(old&&old.customers)?old.customers:[]; accountsDb[parseInt(idx)]=acc; }
-  renderAcc(); cm("mAcc"); toast("Đang lưu Tài khoản..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
+  if(idx===""){ acc.customers=[]; accountsDb.unshift(acc); } else { const old=accountsDb[parseInt(idx)]; acc.customers=old?.customers||[]; accountsDb[parseInt(idx)]=acc; }
+  renderAcc(); cm("mAcc"); toast("Đang lưu..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
 }
 async function delAcc(i){ accountsDb.splice(i,1); renderAcc(); toast("Đang xóa..."); await apP("/api/accounts",accountsDb); toast("Đã xóa!"); }
 function openCustModal(ai,ci){
   const isNew=ci===null; document.getElementById("mCustAccIdx").value=ai; document.getElementById("mCustEmailIdx").value=isNew?"":ci;
-  const a=accountsDb[ai]; document.getElementById("mCustAccName").textContent="Mẹ: "+((a&&a.email)?a.email:"");
-  const cu=isNew?{}:((a&&a.customers)?a.customers:[])[ci]||{}; document.getElementById("mCustEmail").value=cu.email||""; document.getElementById("mCustNote").value=cu.note||""; document.getElementById("mCust").classList.remove("hidden");
+  const a=accountsDb[ai]; document.getElementById("mCustAccName").textContent="Mẹ: "+(a?.email||"");
+  const cu=isNew?{}:(a?.customers||[])[ci]||{}; document.getElementById("mCustEmail").value=cu.email||""; document.getElementById("mCustNote").value=cu.note||""; document.getElementById("mCust").classList.remove("hidden");
 }
 async function saveCust(){
   const ai=parseInt(document.getElementById("mCustAccIdx").value), ci=document.getElementById("mCustEmailIdx").value, isNew=ci==="", cu={email:document.getElementById("mCustEmail").value.trim(),note:document.getElementById("mCustNote").value.trim()};
   if(!cu.email) return toast("Email rỗng!","err"); if(!accountsDb[ai].customers) accountsDb[ai].customers=[];
   if(isNew) accountsDb[ai].customers.unshift(cu); else accountsDb[ai].customers[parseInt(ci)]=cu;
-  renderAcc(); cm("mCust"); toast("Đang lưu khách..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
+  renderAcc(); cm("mCust"); toast("Đang lưu..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
 }
-async function delCust(ai,ci){ accountsDb[ai].customers.splice(ci,1); renderAcc(); toast("Đang xóa khách..."); await apP("/api/accounts",accountsDb); toast("Đã xóa!"); }
+async function delCust(ai,ci){ accountsDb[ai].customers.splice(ci,1); renderAcc(); toast("Đang xóa..."); await apP("/api/accounts",accountsDb); toast("Đã xóa!"); }
 
 // ── DEVICES ──
 function renderDev(){
