@@ -1159,4 +1159,63 @@ function renderAcc(){
   if(!accountsDb.length){c.innerHTML=`<div class="border border-dashed border-slate-300 p-8 rounded-2xl text-center text-slate-400 font-bold">Chưa có tài khoản nào</div>`;return;}
   c.innerHTML=accountsDb.map((a,ai)=>{
     const custs=a.customers||[];
-    const custRows=custs.map((cu,ci)=>`<div class="
+    const custRows=custs.map((cu,ci)=>`<div class="flex items-center gap-2 py-2 border-b border-slate-100 last:border-0 min-w-0">
+      <span class="text-slate-400 font-mono text-[9px] font-bold cp shrink-0" onclick="cp('${ci+1}')">#${ci+1}</span>
+      <div class="flex-1 min-w-0"><span class="font-bold text-[11px] text-slate-800 cp truncate block" onclick="cp('${cu.email||''}')">${cu.email||"—"}</span>${cu.note?`<span class="text-[9px] font-medium text-slate-500 cp truncate block" onclick="cp('${cu.note}')">${cu.note}</span>`:""}</div>
+      <div class="flex gap-1 shrink-0">
+        <button onclick="openCustModal(${ai},${ci})" class="text-indigo-600 hover:text-white text-[10px] w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded hover:bg-indigo-500 transition shadow-sm"><i class="fas fa-pen"></i></button>
+        <button onclick="delCust(${ai},${ci})" class="text-red-500 hover:text-white text-[10px] w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded hover:bg-red-500 transition shadow-sm"><i class="fas fa-times"></i></button>
+      </div>
+    </div>`).join("");
+    return `<div class="bg-white border border-slate-200 rounded-2xl mb-4 shadow-sm p-4 min-w-0">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex-1 min-w-0"><div class="font-extrabold text-sm text-slate-800 cp truncate mb-1" onclick="cp('${a.email||''}')">${a.email||"—"}</div>${a.note?`<div class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded shadow-sm w-fit cp" onclick="cp('${a.note}')">${a.note}</div>`:""}</div>
+        <div class="flex gap-1.5 shrink-0">
+          <button onclick="openCustModal(${ai},null)" class="text-emerald-600 font-bold px-2 py-1.5 bg-emerald-50 rounded text-[10px] hover:bg-emerald-500 hover:text-white transition border border-emerald-100 shadow-sm"><i class="fas fa-user-plus"></i></button>
+          <button onclick="openAccModal(${ai})" class="text-indigo-600 font-bold px-2 py-1.5 bg-indigo-50 border border-indigo-100 rounded text-[10px] hover:bg-indigo-500 hover:text-white transition shadow-sm"><i class="fas fa-pen"></i></button>
+          <button onclick="delAcc(${ai})" class="text-red-500 font-bold px-2 py-1.5 bg-red-50 border border-red-100 rounded text-[10px] hover:bg-red-500 hover:text-white transition shadow-sm"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="mt-3 border-l-2 border-indigo-200 ml-1.5 pl-3 bg-slate-50/50 rounded-r-lg">${custs.length?custRows:`<div class="py-3 text-[10px] font-bold text-slate-400 italic">Tài khoản trống</div>`}</div>
+    </div>`;
+  }).join("");
+}
+function openAccModal(idx){
+  const isNew=idx===null; document.getElementById("mAccTtl").textContent=isNew?"Thêm Mẹ":"Sửa Mẹ"; document.getElementById("mAccIdx").value=isNew?"":idx;
+  const a=isNew?{}:accountsDb[idx]; document.getElementById("mAEmail").value=a.email||""; document.getElementById("mANote").value=a.note||""; document.getElementById("mAcc").classList.remove("hidden");
+}
+async function saveAcc(){
+  const idx=document.getElementById("mAccIdx").value, acc={email:document.getElementById("mAEmail").value.trim(),note:document.getElementById("mANote").value.trim()};
+  if(idx===""){ acc.customers=[]; accountsDb.unshift(acc); } else { const old=accountsDb[parseInt(idx)]; acc.customers=old?.customers||[]; accountsDb[parseInt(idx)]=acc; }
+  renderAcc(); cm("mAcc"); toast("Đang lưu..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
+}
+async function delAcc(i){ accountsDb.splice(i,1); renderAcc(); await apP("/api/accounts",accountsDb); toast("Đã xóa!"); }
+function openCustModal(ai,ci){
+  const isNew=ci===null; document.getElementById("mCustAccIdx").value=ai; document.getElementById("mCustEmailIdx").value=isNew?"":ci;
+  const a=accountsDb[ai]; document.getElementById("mCustAccName").textContent="Mẹ: "+(a?.email||"");
+  const cu=isNew?{}:(a?.customers||[])[ci]||{}; document.getElementById("mCustEmail").value=cu.email||""; document.getElementById("mCustNote").value=cu.note||""; document.getElementById("mCust").classList.remove("hidden");
+}
+async function saveCust(){
+  const ai=parseInt(document.getElementById("mCustAccIdx").value), ci=document.getElementById("mCustEmailIdx").value, isNew=ci==="";
+  const cu={email:document.getElementById("mCustEmail").value.trim(),note:document.getElementById("mCustNote").value.trim()};
+  if(!cu.email) return toast("Email rỗng!","err"); if(!accountsDb[ai].customers) accountsDb[ai].customers=[];
+  if(isNew) accountsDb[ai].customers.unshift(cu); else accountsDb[ai].customers[parseInt(ci)]=cu;
+  renderAcc(); cm("mCust"); toast("Đang lưu..."); await apP("/api/accounts",accountsDb); toast("Đã lưu!");
+}
+async function delCust(ai,ci){ accountsDb[ai].customers.splice(ci,1); renderAcc(); await apP("/api/accounts",accountsDb); toast("Đã xóa!"); }
+function renderDev(){
+  const tb=document.getElementById("devBody");
+  if(!devicesDb.length){tb.innerHTML=`<div class="p-6 text-center text-slate-400 bg-white rounded-xl border shadow-sm font-bold">Trống</div>`;return;}
+  tb.innerHTML=devicesDb.map(d=>`<div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between gap-3 min-w-0">
+    <div class="min-w-0">
+      <div class="font-mono font-bold text-xs text-indigo-600 cp truncate" onclick="cp('${d.id}')">${d.id}${d.id===myDev?` <span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[9px] font-bold ml-1">Bạn</span>`:""}</div>
+      <div class="text-[10px] text-slate-500 cp truncate my-1" onclick="cp('${d.ua||""}')">${d.ua||""}</div>
+      <div class="text-[9px] font-bold text-slate-400">${d.date||""}</div>
+    </div>
+    <button onclick="delDev('${d.id}')" class="text-red-500 font-bold px-3 py-2 bg-red-50 rounded-lg text-xs hover:bg-red-500 hover:text-white transition shrink-0"><i class="fas fa-trash"></i></button>
+  </div>`).join("");
+}
+async function delDev(id){ devicesDb=devicesDb.filter(x=>x.id!==id); renderDev(); await apP("/api/devices",devicesDb); if(id===myDev) doLogout(); else toast("Đã xóa!"); }
+</script>
+</body>
+</html>
